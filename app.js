@@ -3,8 +3,8 @@
    ============================================================ */
 
 /* ── CONFIG ─────────────────────────────────────────────────── */
-const SUPABASE_URL  = 'https://stczzndroorzorquszxn.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_7_58bmgqais4Y_EJtlO2Nw_bLgs2uUq';
+const SUPABASE_URL  = 'https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON = 'YOUR_ANON_KEY_HERE';
 const ADMIN_EMAIL   = 'text.me.md.alamin@gmail.com';
 
 const { createClient } = supabase;
@@ -22,16 +22,31 @@ let reactedMap     = JSON.parse(localStorage.getItem('reacted') || '{}');
 let configuredEmojis = JSON.parse(localStorage.getItem('emojis') || '["❤️","🔥","👏","😮"]');
 let editingNoticeId  = null;
 let searchActive     = false;
+let authInitialized  = false;
 
-/* ── INIT ────────────────────────────────────────────────────── */
-sb.auth.onAuthStateChange(async (_e, session) => {
-  if (session?.user) {
+/* ── INIT: CHECK EXISTING SESSION (PERSIST LOGIN) ───────────── */
+(async function checkExistingSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
     currentUser = session.user;
-    isAdmin     = currentUser.email === ADMIN_EMAIL;
+    isAdmin = currentUser.email === ADMIN_EMAIL;
     await loadProfile();
     showApp();
   } else {
-    currentUser = null; isAdmin = false;
+    showScreen('auth-screen');
+  }
+})();
+
+/* ── AUTH STATE LISTENER ─────────────────────────────────────── */
+sb.auth.onAuthStateChange(async (_e, session) => {
+  if (authInitialized) return;
+  if (session?.user) {
+    authInitialized = true;
+    currentUser = session.user;
+    isAdmin = currentUser.email === ADMIN_EMAIL;
+    await loadProfile();
+    showApp();
+  } else if (!authInitialized) {
     showScreen('auth-screen');
   }
 });
@@ -101,6 +116,10 @@ async function handleSignup() {
 
 async function handleLogout() {
   await sb.auth.signOut();
+  authInitialized = false;
+  currentUser = null;
+  isAdmin = false;
+  showScreen('auth-screen');
 }
 
 /* ── FEED ────────────────────────────────────────────────────── */
@@ -660,7 +679,7 @@ async function openDashboard() {
       <td>${esc(n.content.substring(0, 60))}${n.content.length > 60 ? '…' : ''}</td>
       <td>${formatTime(n.created_at)}</td>
       <td class="views-cell">${viewMap[n.id] || 0}</td>
-    </tr>`).join('');
+     </tr>`).join('');
 
   document.getElementById('dash-content').innerHTML = `
     <div class="dash-grid">
