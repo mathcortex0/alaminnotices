@@ -3,8 +3,8 @@
    ============================================================ */
 
 /* ── CONFIG ─────────────────────────────────────────────────── */
-const SUPABASE_URL  = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON = 'YOUR_ANON_KEY_HERE';
+const SUPABASE_URL  = 'https://stczzndroorzorquszxn.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_7_58bmgqais4Y_EJtlO2Nw_bLgs2uUq';
 const ADMIN_EMAIL   = 'text.me.md.alamin@gmail.com';
 
 const { createClient } = supabase;
