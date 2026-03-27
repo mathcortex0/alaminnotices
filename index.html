@@ -43,7 +43,7 @@
                 </div>
         </main>
 
-        <button id="admin-fab" class="fab hidden" onclick="toggleModal()">+</button>
+        <button id="admin-fab" class="fab hidden">+</button>
     </div>
 
     <div id="admin-modal" class="modal hidden">
@@ -52,11 +52,11 @@
             <input type="text" id="post-title" placeholder="Title">
             <textarea id="post-content" rows="5" placeholder="What's the update?"></textarea>
             <div class="file-area">
-                <label for="post-image" class="file-label">Add Image (Optional)</label>
+                <label>Add Image (Optional)</label>
                 <input type="file" id="post-image" accept="image/*">
             </div>
             <div class="modal-actions">
-                <button onclick="toggleModal()" class="btn-outline">Cancel</button>
+                <button id="close-modal" class="btn-outline">Cancel</button>
                 <button id="submit-post" class="btn-primary">Post Notice</button>
             </div>
         </div>
