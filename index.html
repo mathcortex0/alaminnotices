@@ -3,65 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alamin Notices | Premium Portal</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Alamin Notices | Official</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --charcoal: #121212; --navy: #1A2238; --gold: #FFD700; --text: #F5F5F5; }
+        * { box-sizing: border-box; transition: 0.3s; }
+        body { background: var(--charcoal); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; }
+        .hidden { display: none !important; }
+
+        /* Auth Screen */
+        .overlay { position: fixed; inset: 0; background: var(--charcoal); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .auth-card { background: var(--navy); padding: 2rem; border-radius: 16px; border: 1px solid rgba(255,215,0,0.2); text-align: center; width: 90%; max-width: 380px; }
+        .auth-tabs { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+        .auth-tabs button { background: none; border: none; color: #888; cursor: pointer; font-weight: 600; padding-bottom: 5px; }
+        .auth-tabs button.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        input, textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #333; background: #000; color: white; }
+        
+        /* Feed */
+        .navbar { background: var(--navy); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,215,0,0.1); }
+        .feed-container { max-width: 600px; margin: 2rem auto; padding: 0 15px; }
+        .notice-card { background: var(--navy); border-radius: 12px; padding: 20px; margin-bottom: 1.5rem; border-left: 4px solid var(--gold); }
+        .notice-card img { width: 100%; border-radius: 8px; margin-top: 15px; }
+
+        /* Buttons */
+        .btn-p { background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 24px; cursor: pointer; }
+        
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .m-content { background: var(--navy); padding: 2rem; border-radius: 15px; width: 90%; max-width: 500px; }
+    </style>
 </head>
 <body>
 
     <div id="auth-overlay" class="overlay">
         <div class="auth-card">
-            <img src="1774627514585.png" alt="Logo" class="logo-large">
-            <h1>Alamin Notices</h1>
-            
+            <h2 style="color:var(--gold)">Alamin Notices</h2>
             <div class="auth-tabs">
-                <button id="tab-login" class="active">Login</button>
-                <button id="tab-signup">Sign Up</button>
+                <button id="t-login" class="active">Login</button>
+                <button id="t-signup">Sign Up</button>
             </div>
-
-            <div class="auth-form">
-                <input type="email" id="auth-email" placeholder="Email Address">
-                <input type="password" id="auth-password" placeholder="Password">
-                <button id="auth-action-btn" class="btn-primary">Login</button>
-                <p id="auth-msg"></p>
-            </div>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="pass" placeholder="Password">
+            <button id="auth-btn" class="btn-p">Login</button>
+            <p id="msg" style="color:red; font-size: 12px; margin-top:10px"></p>
         </div>
     </div>
 
-    <div id="main-app" class="hidden">
+    <div id="app" class="hidden">
         <nav class="navbar">
-            <div class="nav-content">
-                <img src="1774627514585.png" alt="Logo" class="logo-small">
-                <span class="brand-name">ALAMIN NOTICES</span>
-            </div>
-            <button id="logout-btn" class="btn-outline">Logout</button>
+            <span style="color:var(--gold); font-weight:600">ALAMIN NOTICES</span>
+            <button onclick="logout()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px; cursor:pointer">Logout</button>
         </nav>
-
-        <main class="feed-container">
-            <div id="notices-list">
-                </div>
-        </main>
-
+        <div class="feed-container" id="list">Loading...</div>
         <button id="admin-fab" class="fab hidden">+</button>
     </div>
 
-    <div id="admin-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2>New Announcement</h2>
-            <input type="text" id="post-title" placeholder="Title">
-            <textarea id="post-content" rows="5" placeholder="What's the update?"></textarea>
-            <div class="file-area">
-                <label>Add Image (Optional)</label>
-                <input type="file" id="post-image" accept="image/*">
-            </div>
-            <div class="modal-actions">
-                <button id="close-modal" class="btn-outline">Cancel</button>
-                <button id="submit-post" class="btn-primary">Post Notice</button>
-            </div>
+    <div id="post-modal" class="modal hidden">
+        <div class="m-content">
+            <h3>New Notice</h3>
+            <input type="text" id="p-title" placeholder="Title">
+            <textarea id="p-content" rows="4" placeholder="Content"></textarea>
+            <input type="file" id="p-img" accept="image/*">
+            <button id="p-submit" class="btn-p">Post</button>
+            <button onclick="closeM()" style="background:none; border:none; color:#888; margin-top:10px; cursor:pointer; width:100%">Cancel</button>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // REPLACE THESE WITH YOUR KEYS
+        const URL = 'https://stczzndroorzorquszxn.supabase.co';
+        const KEY = 'sb_publishable_7_58bmgqais4Y_EJtlO2Nw_bLgs2uUq';
+        const sb = supabase.createClient(URL, KEY);
+        const ADMIN = 'text.me.md.alamin@gmail.com';
+
+        let isSignUp = false;
+
+        // Auth Listener
+        sb.auth.onAuthStateChange((evt, session) => {
+            if (session) {
+                document.getElementById('auth-overlay').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                if(session.user.email === ADMIN) document.getElementById('admin-fab').classList.remove('hidden');
+                load();
+            } else {
+                document.getElementById('auth-overlay').classList.remove('hidden');
+                document.getElementById('app').classList.add('hidden');
+            }
+        });
+
+        // Tabs
+        document.getElementById('t-login').onclick = () => { isSignUp = false; updateTabs(); };
+        document.getElementById('t-signup').onclick = () => { isSignUp = true; updateTabs(); };
+
+        function updateTabs() {
+            document.getElementById('t-login').classList.toggle('active', !isSignUp);
+            document.getElementById('t-signup').classList.toggle('active', isSignUp);
+            document.getElementById('auth-btn').innerText = isSignUp ? "Create Account" : "Login";
+        }
+
+        // Login Logic
+        document.getElementById('auth-btn').onclick = async () => {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            document.getElementById('msg').innerText = "Processing...";
+
+            if(isSignUp) {
+                const { error } = await sb.auth.signUp({ email, password: pass });
+                if(error) document.getElementById('msg').innerText = error.message;
+                else alert("Account created! You can now login.");
+            } else {
+                const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+                if(error) document.getElementById('msg').innerText = error.message;
+            }
+        };
+
+        async function logout() { await sb.auth.signOut(); location.reload(); }
+
+        // Load Notices
+        async function load() {
+            const { data } = await sb.from('notices').select('*').order('created_at', { ascending: false });
+            const list = document.getElementById('list');
+            list.innerHTML = data && data.length ? data.map(n => `
+                <div class="notice-card">
+                    <h3>${n.title || 'Notice'}</h3>
+                    <p>${n.content}</p>
+                    ${n.image_url ? `<img src="${n.image_url}">` : ''}
+                    <small>${new Date(n.created_at).toLocaleDateString()}</small>
+                </div>
+            `).join('') : "No notices yet.";
+        }
+
+        // Admin Posting
+        document.getElementById('admin-fab').onclick = () => document.getElementById('post-modal').classList.remove('hidden');
+        function closeM() { document.getElementById('post-modal').classList.add('hidden'); }
+
+        document.getElementById('p-submit').onclick = async () => {
+            const title = document.getElementById('p-title').value;
+            const content = document.getElementById('p-content').value;
+            const file = document.getElementById('p-img').files[0];
+            let imgUrl = null;
+
+            if(!content) return alert("Content required");
+            document.getElementById('p-submit').innerText = "Posting...";
+
+            if (file) {
+                const path = `notices/${Date.now()}_${file.name}`;
+                const { data } = await sb.storage.from('notice-images').upload(path, file);
+                if (data) imgUrl = sb.storage.from('notice-images').getPublicUrl(path).data.publicUrl;
+            }
+
+            const { error } = await sb.from('notices').insert([{ title, content, image_url: imgUrl }]);
+            if(!error) { closeM(); load(); }
+            else alert(error.message);
+            document.getElementById('p-submit').innerText = "Post";
+        };
+    </script>
 </body>
 </html>
