@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alamin Notices | Official Feed</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div id="auth-overlay" class="overlay">
+        <div class="auth-card">
+            <img src="1774627514585.png" alt="Logo" class="logo-large">
+            <h1>Alamin Notices</h1>
+            <p>Access the premium announcement portal.</p>
+            <button id="login-btn" class="btn-primary">Sign in with Google</button>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <nav class="navbar">
+            <div class="nav-content">
+                <img src="1774627514585.png" alt="Logo" class="logo-small">
+                <span class="brand-name">Alamin Notices</span>
+            </div>
+            <button id="logout-btn" class="btn-outline">Logout</button>
+        </nav>
+
+        <main class="feed-container">
+            <div id="notices-list"></div>
+        </main>
+
+        <button id="admin-fab" class="fab hidden" onclick="toggleModal()">+</button>
+    </div>
+
+    <div id="admin-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Create New Notice</h2>
+            <input type="text" id="post-title" placeholder="Notice Title...">
+            <textarea id="post-content" placeholder="Write your announcement here..."></textarea>
+            <div class="file-input-wrapper">
+                <button class="btn-secondary">Choose Image (Optional)</button>
+                <input type="file" id="post-image" accept="image/*">
+            </div>
+            <div class="modal-actions">
+                <button onclick="toggleModal()" class="btn-outline">Cancel</button>
+                <button id="submit-post" class="btn-primary">Post Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
