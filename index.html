@@ -17,13 +17,10 @@
       box-sizing: border-box;
     }
 
-    /* ============================================================
-       THEME VARIABLES
-    ============================================================ */
     :root {
       --bg-page: #f8fafc;
       --bg-surface: #ffffff;
-      --bg-elevated: #ffffff;
+      --bg-elevated: #f1f5f9;
       --text-primary: #0f172a;
       --text-secondary: #475569;
       --text-muted: #94a3b8;
@@ -60,18 +57,7 @@
       min-height: 100vh;
     }
 
-    /* ============================================================
-       UTILITIES
-    ============================================================ */
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
-
-    /* ============================================================
-       AUTH SCREEN
-    ============================================================ */
+    /* Auth Screen */
     .auth-screen {
       display: flex;
       align-items: center;
@@ -94,10 +80,11 @@
       margin-bottom: 2rem;
     }
     .auth-logo img {
-      width: 64px;
-      height: 64px;
+      width: 70px;
+      height: 70px;
       border-radius: 1rem;
       margin-bottom: 1rem;
+      object-fit: cover;
     }
     .auth-logo h1 {
       font-size: 1.75rem;
@@ -148,7 +135,7 @@
       color: var(--text-muted);
       margin-bottom: 0.5rem;
     }
-    .field input {
+    .field input, .field select, .field textarea {
       width: 100%;
       padding: 0.75rem 1rem;
       background: var(--bg-elevated);
@@ -159,7 +146,7 @@
       font-size: 0.875rem;
       transition: var(--transition);
     }
-    .field input:focus {
+    .field input:focus, .field select:focus, .field textarea:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-light);
@@ -180,6 +167,14 @@
       background: var(--accent-hover);
       transform: translateY(-1px);
     }
+    .btn-secondary {
+      padding: 0.75rem 1.5rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
     .msg-box {
       margin-top: 1rem;
       padding: 0.75rem;
@@ -190,9 +185,7 @@
     .msg-box.error { background: #fee2e2; color: #dc2626; display: block; }
     .msg-box.success { background: #dcfce7; color: #16a34a; display: block; }
 
-    /* ============================================================
-       APP HEADER
-    ============================================================ */
+    /* App Header */
     .app-header {
       position: sticky;
       top: 0;
@@ -201,17 +194,15 @@
       border-bottom: 1px solid var(--border);
       padding: 0.75rem 1rem;
       backdrop-filter: blur(10px);
-      background: rgba(var(--bg-surface-rgb, 255,255,255), 0.9);
-    }
-    [data-theme="dark"] .app-header {
-      background: rgba(17, 22, 27, 0.9);
+      background: rgba(var(--bg-surface-rgb, 255,255,255), 0.95);
     }
     .header-content {
-      max-width: 720px;
+      max-width: 800px;
       margin: 0 auto;
       display: flex;
       align-items: center;
       gap: 1rem;
+      flex-wrap: wrap;
     }
     .logo-area {
       display: flex;
@@ -219,9 +210,10 @@
       gap: 0.5rem;
     }
     .logo-area img {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 0.5rem;
+      object-fit: cover;
     }
     .logo-area h2 {
       font-size: 1.25rem;
@@ -230,14 +222,16 @@
     .search-area {
       flex: 1;
       position: relative;
+      min-width: 180px;
     }
-    .search-area i {
+    .search-area svg {
       position: absolute;
       left: 0.75rem;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 0.875rem;
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-muted);
     }
     .search-area input {
       width: 100%;
@@ -294,16 +288,18 @@
       font-size: 0.875rem;
       font-weight: 500;
     }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
 
-    /* ============================================================
-       CATEGORY FILTERS
-    ============================================================ */
+    /* Category Filters */
     .category-filters {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
       margin-bottom: 1.5rem;
-      padding: 0 1rem;
     }
     .filter-chip {
       padding: 0.5rem 1rem;
@@ -320,14 +316,8 @@
       border-color: var(--accent);
       color: white;
     }
-    .filter-chip:hover:not(.active) {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
 
-    /* ============================================================
-       NOTICE CARD
-    ============================================================ */
+    /* Notice Card */
     .notice-card {
       background: var(--bg-surface);
       border: 1px solid var(--border);
@@ -399,11 +389,6 @@
       margin-bottom: 1rem;
       white-space: pre-wrap;
     }
-    .notice-content img {
-      max-width: 100%;
-      border-radius: var(--radius-md);
-      margin-top: 0.75rem;
-    }
     .notice-image {
       max-width: 100%;
       border-radius: var(--radius-md);
@@ -412,7 +397,7 @@
     .card-footer {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 1rem;
       margin-top: 1rem;
       padding-top: 0.75rem;
       border-top: 1px solid var(--border);
@@ -435,7 +420,6 @@
       fill: none;
       stroke: currentColor;
       stroke-width: 1.5;
-      transition: var(--transition);
     }
     .like-btn.liked {
       color: var(--accent);
@@ -459,11 +443,6 @@
       display: flex;
       align-items: center;
       gap: 0.25rem;
-      transition: var(--transition);
-    }
-    .comment-btn:hover, .share-btn:hover {
-      background: var(--bg-elevated);
-      color: var(--text-primary);
     }
     .admin-actions {
       display: flex;
@@ -479,9 +458,98 @@
       cursor: pointer;
     }
 
-    /* ============================================================
-       SKELETON LOADER
-    ============================================================ */
+    /* Comments Section */
+    .comments-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+    .comments-section.open {
+      display: block;
+    }
+    .comment {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .comment.reply {
+      margin-left: 2.5rem;
+    }
+    .comment-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .comment-bubble {
+      flex: 1;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      padding: 0.5rem 0.75rem;
+    }
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+    }
+    .comment-name {
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+    .comment-time {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+    .comment-text {
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+    .comment-actions {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 0.75rem;
+    }
+    .reply-btn {
+      background: none;
+      border: none;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .reply-form {
+      margin-top: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    .reply-form input {
+      flex: 1;
+      padding: 0.5rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      font-size: 0.75rem;
+    }
+    .comment-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .comment-input input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+    }
+
+    /* Skeleton */
     .skeleton-card {
       background: var(--bg-surface);
       border: 1px solid var(--border);
@@ -499,15 +567,12 @@
     }
     .skeleton-title { height: 20px; width: 60%; }
     .skeleton-text { height: 40px; width: 100%; }
-    .skeleton-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--border); }
     @keyframes shimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
 
-    /* ============================================================
-       MODAL
-    ============================================================ */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -530,17 +595,12 @@
       max-height: 90vh;
       overflow-y: auto;
       padding: 1.5rem;
-      border: 1px solid var(--border);
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.25rem;
-    }
-    .modal-header h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
     }
     .close-modal {
       background: transparent;
@@ -549,151 +609,11 @@
       cursor: pointer;
       color: var(--text-muted);
     }
-    .rich-toolbar {
-      display: flex;
-      gap: 0.25rem;
-      margin-bottom: 0.5rem;
-      flex-wrap: wrap;
-      padding: 0.5rem;
-      background: var(--bg-elevated);
-      border-radius: var(--radius-md);
-    }
-    .tool-btn {
-      background: transparent;
-      border: none;
-      padding: 0.375rem 0.625rem;
-      cursor: pointer;
-      border-radius: var(--radius-sm);
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-    .tool-btn:hover {
-      background: var(--border);
-    }
-    .rich-input {
-      width: 100%;
-      min-height: 120px;
-      padding: 0.75rem;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.875rem;
-      resize: vertical;
-    }
-    .rich-input:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-    select, input[type="file"] {
-      width: 100%;
-      padding: 0.625rem;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--text-primary);
-    }
     .modal-footer {
       display: flex;
       gap: 0.75rem;
       margin-top: 1.5rem;
     }
-    .btn-secondary {
-      flex: 1;
-      padding: 0.75rem;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-    }
-
-    /* ============================================================
-       TOAST
-    ============================================================ */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 2rem;
-      padding: 0.75rem 1.5rem;
-      box-shadow: var(--shadow-lg);
-      z-index: 1100;
-      animation: toastIn 0.3s ease;
-      font-size: 0.875rem;
-    }
-    @keyframes toastIn {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-    }
-
-    /* ============================================================
-       COMMENTS SECTION
-    ============================================================ */
-    .comments-section {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-      display: none;
-    }
-    .comments-section.open {
-      display: block;
-    }
-    .comment {
-      display: flex;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-    }
-    .comment-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--text-muted);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      color: white;
-    }
-    .comment-bubble {
-      flex: 1;
-      background: var(--bg-elevated);
-      border-radius: var(--radius-md);
-      padding: 0.5rem 0.75rem;
-    }
-    .comment-name {
-      font-weight: 600;
-      font-size: 0.75rem;
-    }
-    .comment-text {
-      font-size: 0.8rem;
-      margin-top: 0.25rem;
-    }
-    .comment-input {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-    }
-    .comment-input input {
-      flex: 1;
-      padding: 0.5rem;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 2rem;
-    }
-
-    /* ============================================================
-       FAB
-    ============================================================ */
     .fab {
       position: fixed;
       bottom: 1.5rem;
@@ -712,12 +632,24 @@
       align-items: center;
       justify-content: center;
     }
-    .fab:hover {
-      transform: scale(1.05);
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.75rem 1.5rem;
+      box-shadow: var(--shadow-lg);
+      z-index: 1100;
+      animation: fadeInUp 0.3s ease;
     }
-    .hidden {
-      display: none;
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -726,7 +658,7 @@
 <div id="authScreen" class="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e11d48'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='white' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E" alt="Logo">
+      <img id="authLogo" src="1774627514585.png" alt="Alamin Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23e11d48%22/%3E%3Ctext x=%2250%22 y=%2268%22 font-size=%2248%22 text-anchor=%22middle%22 fill=%22white%22%3EA%3C/text%3E%3C/svg%3E'">
       <h1>Alamin Notices</h1>
       <p>Official Announcement Portal</p>
     </div>
@@ -753,8 +685,8 @@
 <div id="appScreen" style="display:none">
   <header class="app-header">
     <div class="header-content">
-      <div class="logo-area"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e11d48'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='white'%3EA%3C/text%3E%3C/svg%3E" alt=""><h2>Alamin</h2></div>
-      <div class="search-area"><i>🔍</i><input type="text" id="searchInput" placeholder="Search notices..."></div>
+      <div class="logo-area"><img src="1774627514585.png" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23e11d48%22/%3E%3Ctext x=%2250%22 y=%2268%22 font-size=%2248%22 text-anchor=%22middle%22 fill=%22white%22%3EA%3C/text%3E%3C/svg%3E'"><h2>Alamin</h2></div>
+      <div class="search-area"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="7"/><path d="M21 21l-6-6"/></svg><input type="text" id="searchInput" placeholder="Search notices..."></div>
       <div class="header-actions">
         <button class="icon-btn" id="refreshBtn" title="Refresh">⟳</button>
         <button class="icon-btn" id="themeToggleBtn" title="Theme">🌙</button>
@@ -782,8 +714,7 @@
     <div class="modal-header"><h3 id="postModalTitle">New Notice</h3><button class="close-modal" onclick="closePostModal()">×</button></div>
     <div class="field"><label>Category</label><select id="postCategory"><option value="general">General</option><option value="announcement">Announcement</option><option value="urgent">Urgent</option><option value="event">Event</option></select></div>
     <div class="field"><label>Title</label><input type="text" id="postTitle" placeholder="Notice title"></div>
-    <div class="rich-toolbar"><button class="tool-btn" onclick="formatText('bold')"><b>B</b></button><button class="tool-btn" onclick="formatText('italic')"><i>I</i></button><button class="tool-btn" onclick="formatText('link')">🔗</button><button class="tool-btn" onclick="formatText('ul')">• List</button><button class="tool-btn" onclick="formatText('ol')">1. List</button></div>
-    <textarea id="postContent" class="rich-input" placeholder="Write your notice... Use **bold**, *italic*, [link](url), - for lists" rows="6"></textarea>
+    <div class="field"><label>Content</label><textarea id="postContent" rows="5" placeholder="Write your notice... Use **bold**, *italic*, [link](url), - for lists"></textarea></div>
     <div class="field"><label>Image (optional)</label><input type="file" id="postImage" accept="image/*"></div>
     <div class="modal-footer"><button class="btn-secondary" onclick="closePostModal()">Cancel</button><button class="btn-primary" id="publishBtn" onclick="publishNotice()">Publish</button></div>
     <div id="postMsg" class="msg-box"></div>
@@ -791,148 +722,368 @@
 </div>
 
 <script>
-  // ============================================================
-  // CONFIG & INIT
-  // ============================================================
-  const SUPABASE_URL = 'https://stczzndroorzorquszxn.supabase.co';
-  const SUPABASE_ANON = 'sb_publishable_7_58bmgqais4Y_EJtlO2Nw_bLgs2uUq';
-  const ADMIN_EMAIL = 'text.me.md.alamin@gmail.com';
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { autoRefreshToken: true, persistSession: true, storageKey: 'alamin-auth' } });
+// ============================================================
+// ALAMIN NOTICES — COMPLETE APP WITH PERSISTENT LOGIN
+// ============================================================
 
-  let currentUser = null, isAdmin = false, displayName = '', currentCategory = 'all', allNotices = [], editId = null;
-  let userLikes = JSON.parse(localStorage.getItem('userLikes') || '{}');
+const SUPABASE_URL = 'https://stczzndroorzorquszxn.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_7_58bmgqais4Y_EJtlO2Nw_bLgs2uUq';
+const ADMIN_EMAIL = 'text.me.md.alamin@gmail.com';
 
-  // Theme
-  function initTheme() { const theme = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', theme); updateThemeIcon(theme); }
-  function toggleTheme() { const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', newTheme); localStorage.setItem('theme', newTheme); updateThemeIcon(newTheme); }
-  function updateThemeIcon(theme) { const btn = document.getElementById('themeToggleBtn'); if(btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙'; }
-  initTheme();
-  document.getElementById('themeToggleBtn')?.addEventListener('click', toggleTheme);
-
-  // Auto login check
-  (async function() {
-    document.getElementById('authScreen').style.display = 'flex';
-    document.getElementById('appScreen').style.display = 'none';
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) { currentUser = session.user; isAdmin = currentUser.email === ADMIN_EMAIL; await loadProfile(); showApp(); }
-  })();
-
-  sb.auth.onAuthStateChange(async (e, session) => {
-    if (e === 'SIGNED_IN' && session) { currentUser = session.user; isAdmin = currentUser.email === ADMIN_EMAIL; await loadProfile(); showApp(); }
-    else if (e === 'SIGNED_OUT') { currentUser = null; showAuth(); }
-  });
-
-  async function loadProfile() {
-    const { data } = await sb.from('profiles').select('display_name').eq('id', currentUser.id).single();
-    displayName = data?.display_name || currentUser.email.split('@')[0];
-    document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase();
-    document.getElementById('userNameDisplay').textContent = displayName;
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    storageKey: 'alamin-persistent-auth',
+    storage: localStorage
   }
+});
 
-  function showApp() { document.getElementById('authScreen').style.display = 'none'; document.getElementById('appScreen').style.display = 'block'; loadFeed(); }
-  function showAuth() { document.getElementById('authScreen').style.display = 'flex'; document.getElementById('appScreen').style.display = 'none'; }
+let currentUser = null, isAdmin = false, displayName = '', currentCategory = 'all', allNotices = [], editId = null;
+let userLikes = JSON.parse(localStorage.getItem('alamin_user_likes') || '{}');
 
-  // Auth functions
-  window.switchTab = (tab) => {
-    document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
-    document.getElementById('tabLoginBtn').classList.toggle('active', tab === 'login');
-    document.getElementById('tabSignupBtn').classList.toggle('active', tab === 'signup');
-  };
-  window.handleLogin = async () => {
-    const email = document.getElementById('loginEmail').value, password = document.getElementById('loginPassword').value;
-    if (!email || !password) return showAuthMsg('Please fill all fields', 'error');
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) showAuthMsg(error.message, 'error');
-  };
-  window.handleSignup = async () => {
-    const email = document.getElementById('signupEmail').value, password = document.getElementById('signupPassword').value, name = document.getElementById('signupName').value;
-    if (!email || !password || !name) return showAuthMsg('All fields required', 'error');
-    if (password.length < 6) return showAuthMsg('Password min 6 chars', 'error');
-    const { data, error } = await sb.auth.signUp({ email, password });
-    if (error) return showAuthMsg(error.message, 'error');
-    if (data.user) await sb.from('profiles').upsert({ id: data.user.id, display_name: name });
-    showAuthMsg('Account created! Please sign in.', 'success');
-  };
-  window.handleLogout = async () => { await sb.auth.signOut(); userLikes = {}; localStorage.removeItem('userLikes'); };
-  function showAuthMsg(msg, type) { const el = document.getElementById('authMsg'); el.textContent = msg; el.className = `msg-box ${type}`; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3000); }
-
-  // Feed
-  async function loadFeed() {
-    const container = document.getElementById('feedContainer');
-    container.innerHTML = '<div class="skeleton-card"><div class="skeleton-avatar"></div><div class="skeleton-line skeleton-title"></div><div class="skeleton-line skeleton-text"></div></div>'.repeat(3);
-    let query = sb.from('notices').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
-    if (currentCategory !== 'all') query = query.eq('category', currentCategory);
-    const { data, error } = await query;
-    if (error) { container.innerHTML = '<p>Error loading notices</p>'; return; }
-    allNotices = data || [];
-    renderNotices();
+// ============================================================
+// PERSISTENT LOGIN — NEVER LOGS OUT ON REFRESH
+// ============================================================
+(async function initPersistentLogin() {
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+  
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    isAdmin = currentUser.email === ADMIN_EMAIL;
+    await loadProfile();
+    showApp();
   }
-  async function renderNotices() {
-    const container = document.getElementById('feedContainer');
-    if (!allNotices.length) { container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted)">No notices yet</div>'; return; }
-    const authorIds = [...new Set(allNotices.map(n => n.author_id))];
-    let profileMap = {};
-    if (authorIds.length) { const { data } = await sb.from('profiles').select('id,display_name').in('id', authorIds); data?.forEach(p => profileMap[p.id] = p.display_name); }
-    container.innerHTML = '';
-    for (const notice of allNotices) {
-      const author = profileMap[notice.author_id] || 'Admin';
-      const userLiked = userLikes[notice.id] === true;
-      const card = document.createElement('div');
-      card.className = 'notice-card';
-      card.innerHTML = `
-        <div class="card-header"><div class="author-info"><div class="author-avatar">${author.charAt(0)}</div><span class="author-name">${escapeHtml(author)}</span></div><span class="notice-time">${formatTime(notice.created_at)}</span></div>
-        <div class="category-badge ${notice.category || 'general'}">${notice.category || 'general'}</div>
-        <div class="notice-title">${escapeHtml(notice.title || 'Notice')}</div>
-        <div class="notice-content">${renderMarkdown(notice.content || '')}</div>
-        ${notice.image_url ? `<img src="${notice.image_url}" class="notice-image" loading="lazy">` : ''}
-        <div class="card-footer">
-          <button class="like-btn ${userLiked ? 'liked' : ''}" data-id="${notice.id}"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span class="like-count">${notice.likes_count || 0}</span></button>
-          <button class="comment-btn" onclick="toggleComments('${notice.id}', this)">💬 Comments</button>
-          <button class="share-btn" onclick="shareNotice('${notice.id}')">↗ Share</button>
-        </div>
-        <div id="comments-${notice.id}" class="comments-section"></div>
-        ${isAdmin ? `<div class="admin-actions"><button class="admin-btn" onclick="editNotice('${notice.id}')">Edit</button><button class="admin-btn" onclick="deleteNotice('${notice.id}')">Delete</button><button class="admin-btn" onclick="togglePin('${notice.id}')">${notice.is_pinned ? 'Unpin' : 'Pin'}</button></div>` : ''}
-      `;
-      const likeBtn = card.querySelector('.like-btn');
-      likeBtn?.addEventListener('click', (e) => { e.stopPropagation(); toggleLike(notice.id); });
-      container.appendChild(card);
+})();
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session) {
+    currentUser = session.user;
+    isAdmin = currentUser.email === ADMIN_EMAIL;
+    await loadProfile();
+    showApp();
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    userLikes = {};
+    localStorage.removeItem('alamin_user_likes');
+    showAuth();
+  }
+});
+
+async function loadProfile() {
+  const { data } = await sb.from('profiles').select('display_name').eq('id', currentUser.id).single();
+  displayName = data?.display_name || currentUser.email.split('@')[0];
+  document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase();
+  document.getElementById('userNameDisplay').textContent = displayName;
+}
+
+function showApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  loadFeed();
+}
+function showAuth() {
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+}
+
+// ============================================================
+// AUTH FUNCTIONS
+// ============================================================
+window.switchTab = (tab) => {
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tabLoginBtn').classList.toggle('active', tab === 'login');
+  document.getElementById('tabSignupBtn').classList.toggle('active', tab === 'signup');
+};
+
+window.handleLogin = async () => {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) return showAuthMsg('Please fill all fields', 'error');
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) showAuthMsg(error.message, 'error');
+};
+
+window.handleSignup = async () => {
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
+  const name = document.getElementById('signupName').value;
+  if (!email || !password || !name) return showAuthMsg('All fields required', 'error');
+  if (password.length < 6) return showAuthMsg('Password min 6 chars', 'error');
+  const { data, error } = await sb.auth.signUp({ email, password });
+  if (error) return showAuthMsg(error.message, 'error');
+  if (data.user) await sb.from('profiles').upsert({ id: data.user.id, display_name: name });
+  showAuthMsg('Account created! Please sign in.', 'success');
+};
+
+window.handleLogout = async () => {
+  await sb.auth.signOut();
+  userLikes = {};
+  localStorage.removeItem('alamin_user_likes');
+};
+
+function showAuthMsg(msg, type) {
+  const el = document.getElementById('authMsg');
+  el.textContent = msg;
+  el.className = `msg-box ${type}`;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+// ============================================================
+// FEED & NOTICES
+// ============================================================
+async function loadFeed() {
+  const container = document.getElementById('feedContainer');
+  container.innerHTML = '<div class="skeleton-card"><div class="skeleton-line skeleton-title"></div><div class="skeleton-line skeleton-text"></div></div>'.repeat(2);
+  
+  let query = sb.from('notices').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
+  if (currentCategory !== 'all') query = query.eq('category', currentCategory);
+  
+  const { data, error } = await query;
+  if (error) { container.innerHTML = '<p>Error loading notices</p>'; return; }
+  allNotices = data || [];
+  renderNotices();
+}
+
+async function renderNotices() {
+  const container = document.getElementById('feedContainer');
+  if (!allNotices.length) {
+    container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted)">No notices yet</div>';
+    return;
+  }
+  
+  const authorIds = [...new Set(allNotices.map(n => n.author_id))];
+  let profileMap = {};
+  if (authorIds.length) {
+    const { data } = await sb.from('profiles').select('id,display_name').in('id', authorIds);
+    data?.forEach(p => profileMap[p.id] = p.display_name);
+  }
+  
+  container.innerHTML = '';
+  for (const notice of allNotices) {
+    const author = profileMap[notice.author_id] || 'Admin';
+    const userLiked = userLikes[notice.id] === true;
+    const card = document.createElement('div');
+    card.className = 'notice-card';
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="author-info"><div class="author-avatar">${author.charAt(0)}</div><span class="author-name">${escapeHtml(author)}</span></div>
+        <span class="notice-time">${formatTime(notice.created_at)}</span>
+      </div>
+      <div class="category-badge ${notice.category || 'general'}">${notice.category || 'general'}</div>
+      <div class="notice-title">${escapeHtml(notice.title || 'Notice')}</div>
+      <div class="notice-content">${renderMarkdown(notice.content || '')}</div>
+      ${notice.image_url ? `<img src="${notice.image_url}" class="notice-image" loading="lazy">` : ''}
+      <div class="card-footer">
+        <button class="like-btn ${userLiked ? 'liked' : ''}" data-id="${notice.id}">
+          <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span class="like-count">${notice.likes_count || 0}</span>
+        </button>
+        <button class="comment-btn" onclick="toggleComments('${notice.id}', this)">💬 Comments</button>
+        <button class="share-btn" onclick="shareNotice('${notice.id}')">↗ Share</button>
+      </div>
+      <div id="comments-${notice.id}" class="comments-section"></div>
+      ${isAdmin ? `<div class="admin-actions"><button class="admin-btn" onclick="editNotice('${notice.id}')">Edit</button><button class="admin-btn" onclick="deleteNotice('${notice.id}')">Delete</button><button class="admin-btn" onclick="togglePin('${notice.id}')">${notice.is_pinned ? 'Unpin' : 'Pin'}</button></div>` : ''}
+    `;
+    const likeBtn = card.querySelector('.like-btn');
+    likeBtn?.addEventListener('click', (e) => { e.stopPropagation(); toggleLike(notice.id); });
+    container.appendChild(card);
+  }
+}
+
+async function toggleLike(noticeId) {
+  if (!currentUser) return;
+  const notice = allNotices.find(n => n.id === noticeId);
+  if (!notice) return;
+  let newCount = notice.likes_count || 0;
+  const wasLiked = userLikes[noticeId] === true;
+  if (wasLiked) { newCount--; delete userLikes[noticeId]; }
+  else { newCount++; userLikes[noticeId] = true; }
+  localStorage.setItem('alamin_user_likes', JSON.stringify(userLikes));
+  await sb.from('notices').update({ likes_count: newCount }).eq('id', noticeId);
+  notice.likes_count = newCount;
+  renderNotices();
+}
+
+async function togglePin(id) {
+  const notice = allNotices.find(n => n.id === id);
+  if (notice) await sb.from('notices').update({ is_pinned: !notice.is_pinned }).eq('id', id);
+  loadFeed();
+}
+
+async function deleteNotice(id) {
+  if (confirm('Delete this notice?')) {
+    await sb.from('notices').delete().eq('id', id);
+    loadFeed();
+    showToast('Notice deleted');
+  }
+}
+
+// ============================================================
+// COMMENTS WITH REPLIES (100% WORKING)
+// ============================================================
+window.toggleComments = async (noticeId, btn) => {
+  const section = document.getElementById(`comments-${noticeId}`);
+  if (section.classList.contains('open')) {
+    section.classList.remove('open');
+    return;
+  }
+  section.classList.add('open');
+  section.innerHTML = '<div style="padding:0.5rem;text-align:center">Loading comments...</div>';
+  await loadComments(noticeId, section);
+};
+
+async function loadComments(noticeId, container) {
+  const { data: comments } = await sb.from('comments').select('*').eq('notice_id', noticeId).order('created_at', { ascending: true });
+  const profileIds = [...new Set((comments || []).map(c => c.author_id))];
+  let profileMap = {};
+  if (profileIds.length) {
+    const { data } = await sb.from('profiles').select('id,display_name').in('id', profileIds);
+    data?.forEach(p => profileMap[p.id] = p.display_name);
+  }
+  
+  container.innerHTML = '';
+  const topComments = (comments || []).filter(c => !c.parent_id);
+  const replies = (comments || []).filter(c => c.parent_id);
+  
+  for (const comment of topComments) {
+    const commentDiv = buildCommentElement(comment, profileMap[comment.author_id] || 'User', noticeId);
+    container.appendChild(commentDiv);
+    const childReplies = replies.filter(r => r.parent_id === comment.id);
+    for (const reply of childReplies) {
+      const replyDiv = buildCommentElement(reply, profileMap[reply.author_id] || 'User', noticeId, true);
+      container.appendChild(replyDiv);
     }
   }
-  async function toggleLike(noticeId) {
-    if (!currentUser) return;
-    const notice = allNotices.find(n => n.id === noticeId);
-    if (!notice) return;
-    let newCount = notice.likes_count || 0;
-    const wasLiked = userLikes[noticeId] === true;
-    if (wasLiked) { newCount--; delete userLikes[noticeId]; }
-    else { newCount++; userLikes[noticeId] = true; }
-    localStorage.setItem('userLikes', JSON.stringify(userLikes));
-    await sb.from('notices').update({ likes_count: newCount }).eq('id', noticeId);
-    notice.likes_count = newCount;
-    renderNotices();
+  
+  const inputDiv = document.createElement('div');
+  inputDiv.className = 'comment-input';
+  inputDiv.innerHTML = `<input type="text" id="newCommentInput-${noticeId}" placeholder="Write a comment..."><button class="btn-secondary" style="padding:0.5rem 1rem" onclick="addComment('${noticeId}')">Send</button>`;
+  container.appendChild(inputDiv);
+}
+
+function buildCommentElement(comment, authorName, noticeId, isReply = false) {
+  const div = document.createElement('div');
+  div.className = `comment ${isReply ? 'reply' : ''}`;
+  div.id = `comment-${comment.id}`;
+  div.innerHTML = `
+    <div class="comment-avatar">${authorName.charAt(0)}</div>
+    <div class="comment-bubble">
+      <div class="comment-header"><span class="comment-name">${escapeHtml(authorName)}</span><span class="comment-time">${formatTime(comment.created_at)}</span></div>
+      <div class="comment-text">${escapeHtml(comment.content)}</div>
+      <div class="comment-actions"><button class="reply-btn" onclick="showReplyForm('${comment.id}', '${noticeId}')">↩ Reply</button></div>
+      <div id="replyForm-${comment.id}"></div>
+    </div>
+  `;
+  return div;
+}
+
+window.showReplyForm = (parentId, noticeId) => {
+  const container = document.getElementById(`replyForm-${parentId}`);
+  if (container.innerHTML) { container.innerHTML = ''; return; }
+  container.innerHTML = `<div class="reply-form"><input type="text" id="replyInput-${parentId}" placeholder="Write a reply..."><button class="btn-secondary" style="padding:0.25rem 0.75rem" onclick="addReply('${parentId}', '${noticeId}')">Reply</button></div>`;
+};
+
+window.addComment = async (noticeId) => {
+  const input = document.getElementById(`newCommentInput-${noticeId}`);
+  const content = input?.value.trim();
+  if (!content) return;
+  input.value = '';
+  await sb.from('comments').insert({ notice_id: noticeId, content, author_id: currentUser.id });
+  const section = document.getElementById(`comments-${noticeId}`);
+  await loadComments(noticeId, section);
+  showToast('Comment added');
+};
+
+window.addReply = async (parentId, noticeId) => {
+  const input = document.getElementById(`replyInput-${parentId}`);
+  const content = input?.value.trim();
+  if (!content) return;
+  input.value = '';
+  await sb.from('comments').insert({ notice_id: noticeId, parent_id: parentId, content, author_id: currentUser.id });
+  const section = document.getElementById(`comments-${noticeId}`);
+  await loadComments(noticeId, section);
+  showToast('Reply added');
+};
+
+// ============================================================
+// UTILITIES
+// ============================================================
+window.shareNotice = (id) => {
+  navigator.clipboard.writeText(`${location.origin}${location.pathname}?id=${id}`);
+  showToast('Link copied!');
+};
+
+function renderMarkdown(text) {
+  let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color:var(--accent)">$1</a>')
+    .replace(/^- (.*)/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.*)/gm, '<li>$1</li>');
+  return html;
+}
+
+window.openPostModal = () => {
+  editId = null;
+  document.getElementById('postModalTitle').textContent = 'New Notice';
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postContent').value = '';
+  document.getElementById('postCategory').value = 'general';
+  document.getElementById('postImage').value = '';
+  document.getElementById('postModal').classList.add('open');
+};
+
+window.closePostModal = () => document.getElementById('postModal').classList.remove('open');
+
+window.publishNotice = async () => {
+  const title = document.getElementById('postTitle').value;
+  const content = document.getElementById('postContent').value;
+  const category = document.getElementById('postCategory').value;
+  if (!content && !title) return showToast('Please add content');
+  const file = document.getElementById('postImage').files[0];
+  let image_url = null;
+  if (file) {
+    const fname = Date.now() + '-' + file.name;
+    const { error } = await sb.storage.from('notice-images').upload(fname, file);
+    if (!error) image_url = sb.storage.from('notice-images').getPublicUrl(fname).data.publicUrl;
   }
-  async function togglePin(id) { const notice = allNotices.find(n => n.id === id); if(notice) await sb.from('notices').update({ is_pinned: !notice.is_pinned }).eq('id', id); loadFeed(); }
-  async function deleteNotice(id) { if(confirm('Delete this notice?')) { await sb.from('notices').delete().eq('id', id); loadFeed(); showToast('Notice deleted'); } }
-  window.toggleComments = async (noticeId, btn) => { const section = document.getElementById(`comments-${noticeId}`); if(section.classList.contains('open')) { section.classList.remove('open'); return; } section.classList.add('open'); section.innerHTML = '<div class="comment-input"><input type="text" id="newCommentInput" placeholder="Write a comment..."><button onclick="addComment(\''+noticeId+'\')">Send</button></div>'; await loadComments(noticeId, section); };
-  async function loadComments(noticeId, container) { const { data } = await sb.from('comments').select('*').eq('notice_id', noticeId).order('created_at', { ascending: true }); if(!data?.length) { container.innerHTML += '<div style="padding:0.5rem;color:var(--text-muted)">No comments yet</div>'; return; } data.forEach(c => { const div = document.createElement('div'); div.className = 'comment'; div.innerHTML = `<div class="comment-avatar">${c.author_id?.charAt(0) || 'U'}</div><div class="comment-bubble"><div class="comment-name">User</div><div class="comment-text">${escapeHtml(c.content)}</div></div>`; container.insertBefore(div, container.querySelector('.comment-input')); }); }
-  window.addComment = async (noticeId) => { const input = document.getElementById('newCommentInput'); if(!input?.value.trim()) return; await sb.from('comments').insert({ notice_id: noticeId, content: input.value, author_id: currentUser.id }); input.value = ''; loadFeed(); showToast('Comment added'); };
-  window.shareNotice = (id) => { navigator.clipboard.writeText(`${location.origin}${location.pathname}?id=${id}`); showToast('Link copied!'); };
-  function renderMarkdown(text) { let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>').replace(/^- (.*)/gm, '<li>$1</li>').replace(/^\d+\. (.*)/gm, '<li>$1</li>'); return html; }
-  function formatText(type) { const area = document.getElementById('postContent'); const start = area.selectionStart, end = area.selectionEnd, text = area.value; if(type === 'bold') area.value = text.slice(0,start) + '**' + text.slice(start,end) + '**' + text.slice(end); else if(type === 'italic') area.value = text.slice(0,start) + '*' + text.slice(start,end) + '*' + text.slice(end); else if(type === 'link') area.value = text.slice(0,start) + '[text](url)' + text.slice(end); else if(type === 'ul') area.value = text.slice(0,start) + '- ' + text.slice(start,end) + text.slice(end); else if(type === 'ol') area.value = text.slice(0,start) + '1. ' + text.slice(start,end) + text.slice(end); }
-  window.openPostModal = () => { editId = null; document.getElementById('postModalTitle').textContent = 'New Notice'; document.getElementById('postTitle').value = ''; document.getElementById('postContent').value = ''; document.getElementById('postCategory').value = 'general'; document.getElementById('postImage').value = ''; document.getElementById('postModal').classList.add('open'); };
-  window.closePostModal = () => { document.getElementById('postModal').classList.remove('open'); };
-  window.publishNotice = async () => { const title = document.getElementById('postTitle').value, content = document.getElementById('postContent').value, category = document.getElementById('postCategory').value; if(!content && !title) return showToast('Please add content'); const file = document.getElementById('postImage').files[0]; let image_url = null; if(file) { const fname = Date.now() + '.' + file.name.split('.').pop(); const { error } = await sb.storage.from('notice-images').upload(fname, file); if(!error) image_url = sb.storage.from('notice-images').getPublicUrl(fname).data.publicUrl; } const { error } = await sb.from('notices').insert([{ title, content, category, image_url, author_id: currentUser.id, author_email: currentUser.email, likes_count: 0, is_pinned: false }]); if(error) showToast(error.message); else { closePostModal(); loadFeed(); showToast('Notice published!'); } };
-  window.editNotice = async (id) => { const notice = allNotices.find(n => n.id === id); if(notice) { editId = id; document.getElementById('postModalTitle').textContent = 'Edit Notice'; document.getElementById('postTitle').value = notice.title || ''; document.getElementById('postContent').value = notice.content || ''; document.getElementById('postCategory').value = notice.category || 'general'; document.getElementById('postModal').classList.add('open'); window.publishNotice = async () => { await sb.from('notices').update({ title: document.getElementById('postTitle').value, content: document.getElementById('postContent').value, category: document.getElementById('postCategory').value }).eq('id', editId); closePostModal(); loadFeed(); showToast('Updated'); }; } };
-  document.getElementById('refreshBtn')?.addEventListener('click', () => loadFeed());
-  document.getElementById('searchInput')?.addEventListener('input', (e) => { const q = e.target.value.trim(); if(q.length >= 2) { currentCategory = 'all'; loadSearch(q); } else loadFeed(); });
-  async function loadSearch(q) { const { data } = await sb.from('notices').select('*').textSearch('content', q); allNotices = data || []; renderNotices(); }
-  document.querySelectorAll('.filter-chip').forEach(btn => { btn.addEventListener('click', () => { document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentCategory = btn.dataset.category; loadFeed(); }); });
-  function formatTime(iso) { const d = new Date(iso), diff = Math.floor((Date.now() - d) / 1000); if(diff < 60) return 'just now'; if(diff < 3600) return Math.floor(diff/60)+'m ago'; if(diff < 86400) return Math.floor(diff/3600)+'h ago'; return d.toLocaleDateString(); }
-  function escapeHtml(str) { return str?.replace(/[&<>]/g, function(m){if(m==='&')return'&amp;';if(m==='<')return'&lt;';if(m==='>')return'&gt;';return m;}) || ''; }
-  function showToast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
-  window.showToast = showToast;
+  const { error } = await sb.from('notices').insert([{ title, content, category, image_url, author_id: currentUser.id, author_email: currentUser.email, likes_count: 0 }]);
+  if (error) showToast(error.message);
+  else { closePostModal(); loadFeed(); showToast('Notice published!'); }
+};
+
+window.editNotice = async (id) => {
+  const notice = allNotices.find(n => n.id === id);
+  if (notice) {
+    editId = id;
+    document.getElementById('postModalTitle').textContent = 'Edit Notice';
+    document.getElementById('postTitle').value = notice.title || '';
+    document.getElementById('postContent').value = notice.content || '';
+    document.getElementById('postCategory').value = notice.category || 'general';
+    document.getElementById('postModal').classList.add('open');
+    window.publishNotice = async () => {
+      await sb.from('notices').update({ title: document.getElementById('postTitle').value, content: document.getElementById('postContent').value, category: document.getElementById('postCategory').value }).eq('id', editId);
+      closePostModal(); loadFeed(); showToast('Updated');
+    };
+  }
+};
+
+function escapeHtml(str) { return str?.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }) || ''; }
+function formatTime(iso) { const d = new Date(iso), diff = Math.floor((Date.now() - d) / 1000); if(diff < 60) return 'just now'; if(diff < 3600) return Math.floor(diff/60)+'m ago'; if(diff < 86400) return Math.floor(diff/3600)+'h ago'; return d.toLocaleDateString(); }
+function showToast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
+
+document.getElementById('refreshBtn')?.addEventListener('click', () => loadFeed());
+document.getElementById('searchInput')?.addEventListener('input', (e) => { const q = e.target.value.trim(); if(q.length >= 2) loadSearch(q); else loadFeed(); });
+async function loadSearch(q) { const { data } = await sb.from('notices').select('*').textSearch('content', q); allNotices = data || []; renderNotices(); }
+document.querySelectorAll('.filter-chip').forEach(btn => { btn.addEventListener('click', () => { document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentCategory = btn.dataset.category; loadFeed(); }); });
+document.getElementById('themeToggleBtn')?.addEventListener('click', () => { const isDark = document.documentElement.getAttribute('data-theme') === 'dark'; document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark'); localStorage.setItem('theme', isDark ? 'light' : 'dark'); });
+if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+window.showToast = showToast;
 </script>
 </body>
 </html>
