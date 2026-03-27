@@ -4,762 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alamin Notices</title>
+  <meta name="description" content="Official announcement portal by Alamin." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    /* ── DESIGN TOKENS ─────────────────────────────────────────────── */
-    :root {
-      --navy:       #0b1220;
-      --navy-mid:   #111c30;
-      --navy-card:  #162038;
-      --navy-line:  #1e2f4d;
-      --gold:       #c9a84c;
-      --gold-light: #e5c97a;
-      --gold-dim:   rgba(201,168,76,.15);
-      --charcoal:   #8899b0;
-      --text:       #dce6f3;
-      --text-soft:  #7a90aa;
-      --danger:     #e05a5a;
-      --radius:     14px;
-      --transition: .22s cubic-bezier(.4,0,.2,1);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--navy);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* noise grain overlay */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ── SCROLLBAR ─────────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--navy); }
-    ::-webkit-scrollbar-thumb { background: var(--navy-line); border-radius: 99px; }
-
-    /* ── AUTH SCREEN ───────────────────────────────────────────────── */
-    #auth-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 24px;
-      animation: fadeIn .6s ease both;
-    }
-
-    .auth-box {
-      width: 100%;
-      max-width: 400px;
-      background: var(--navy-card);
-      border: 1px solid var(--navy-line);
-      border-radius: 22px;
-      padding: 44px 36px;
-      box-shadow: 0 32px 80px rgba(0,0,0,.5);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .auth-box::before {
-      content: '';
-      position: absolute;
-      top: -60px; left: 50%;
-      transform: translateX(-50%);
-      width: 220px; height: 220px;
-      background: radial-gradient(circle, rgba(201,168,76,.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .auth-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 36px;
-    }
-
-    .auth-logo .brand-mark {
-      width: 52px; height: 52px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px; font-weight: 600;
-      color: var(--navy);
-      box-shadow: 0 8px 24px rgba(201,168,76,.3);
-    }
-
-    .auth-logo h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 600;
-      color: var(--text);
-      letter-spacing: .5px;
-    }
-
-    .auth-logo p {
-      font-size: 12px;
-      color: var(--text-soft);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    /* tabs */
-    .auth-tabs {
-      display: flex;
-      background: var(--navy-mid);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 28px;
-    }
-
-    .auth-tab {
-      flex: 1;
-      padding: 9px;
-      border: none;
-      background: transparent;
-      color: var(--text-soft);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      border-radius: 7px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .auth-tab.active {
-      background: var(--navy-card);
-      color: var(--gold);
-      box-shadow: 0 2px 8px rgba(0,0,0,.3);
-    }
-
-    /* inputs */
-    .field { margin-bottom: 16px; }
-
-    .field label {
-      display: block;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--text-soft);
-      margin-bottom: 7px;
-    }
-
-    .field input {
-      width: 100%;
-      background: var(--navy-mid);
-      border: 1px solid var(--navy-line);
-      border-radius: 10px;
-      padding: 13px 16px;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      outline: none;
-      transition: var(--transition);
-    }
-
-    .field input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,168,76,.1);
-    }
-
-    .field input::placeholder { color: var(--text-soft); opacity: .5; }
-
-    /* primary button */
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      color: var(--navy);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: .5px;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 6px 20px rgba(201,168,76,.25);
-      margin-top: 8px;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 28px rgba(201,168,76,.35);
-    }
-
-    .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-
-    .auth-error {
-      background: rgba(224,90,90,.12);
-      border: 1px solid rgba(224,90,90,.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: #f08080;
-      margin-top: 14px;
-      display: none;
-    }
-
-    /* ── APP SCREEN ────────────────────────────────────────────────── */
-    #app-screen {
-      display: none;
-      animation: fadeIn .5s ease both;
-    }
-
-    /* Header */
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(11,18,32,.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--navy-line);
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-    }
-
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-brand .mark {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px; font-weight: 600;
-      color: var(--navy);
-    }
-
-    .header-brand h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: .3px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--navy-card);
-      border: 1px solid var(--navy-line);
-      border-radius: 99px;
-      padding: 6px 14px 6px 8px;
-      font-size: 12px;
-      color: var(--text-soft);
-    }
-
-    .user-pill .avatar {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold-dim), var(--navy-line));
-      border: 1px solid var(--gold);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-      color: var(--gold);
-      font-weight: 500;
-    }
-
-    .btn-logout {
-      background: transparent;
-      border: 1px solid var(--navy-line);
-      border-radius: 8px;
-      padding: 7px 14px;
-      color: var(--text-soft);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-logout:hover {
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-
-    /* Feed */
-    .feed-container {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 36px 20px 120px;
-    }
-
-    .feed-header {
-      margin-bottom: 28px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--navy-line);
-    }
-
-    .feed-header h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 32px;
-      font-weight: 400;
-      font-style: italic;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .feed-header p {
-      font-size: 12px;
-      color: var(--text-soft);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    /* Notice Card */
-    .notice-card {
-      background: var(--navy-card);
-      border: 1px solid var(--navy-line);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 16px;
-      transition: var(--transition);
-      animation: slideUp .4s ease both;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .notice-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: linear-gradient(to bottom, var(--gold), transparent);
-    }
-
-    .notice-card:hover {
-      border-color: rgba(201,168,76,.25);
-      box-shadow: 0 8px 32px rgba(0,0,0,.25);
-      transform: translateY(-1px);
-    }
-
-    .notice-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .notice-author {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .notice-author .dot {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: var(--gold-dim);
-      border: 1px solid rgba(201,168,76,.3);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px;
-      color: var(--gold);
-      font-weight: 500;
-    }
-
-    .notice-author .name {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--gold-light);
-    }
-
-    .notice-time {
-      font-size: 11px;
-      color: var(--text-soft);
-    }
-
-    .notice-body {
-      font-size: 15px;
-      line-height: 1.75;
-      color: var(--text);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .notice-image {
-      width: 100%;
-      border-radius: 10px;
-      margin-top: 16px;
-      object-fit: cover;
-      max-height: 420px;
-      display: block;
-      border: 1px solid var(--navy-line);
-    }
-
-    .notice-footer {
-      margin-top: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn-like {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: transparent;
-      border: 1px solid var(--navy-line);
-      border-radius: 99px;
-      padding: 6px 14px;
-      color: var(--text-soft);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-like:hover, .btn-like.liked {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: var(--gold-dim);
-    }
-
-    .btn-share {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: transparent;
-      border: 1px solid var(--navy-line);
-      border-radius: 99px;
-      padding: 6px 14px;
-      color: var(--text-soft);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-share:hover {
-      border-color: var(--charcoal);
-      color: var(--text);
-    }
-
-    .btn-delete-notice {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 99px;
-      padding: 6px 10px;
-      color: var(--text-soft);
-      font-size: 11px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-delete-notice:hover {
-      border-color: rgba(224,90,90,.4);
-      color: var(--danger);
-    }
-
-    /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--text-soft);
-    }
-
-    .empty-state .icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: .3;
-    }
-
-    .empty-state h4 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 400;
-      color: var(--charcoal);
-      margin-bottom: 8px;
-    }
-
-    .empty-state p { font-size: 13px; }
-
-    /* Highlight card for deep link */
-    .notice-card.highlight {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,168,76,.12);
-    }
-
-    /* ── FAB ───────────────────────────────────────────────────────── */
-    #fab {
-      display: none; /* shown only for admin */
-      position: fixed;
-      bottom: 32px; right: 28px;
-      width: 58px; height: 58px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      border: none;
-      box-shadow: 0 8px 28px rgba(201,168,76,.45);
-      cursor: pointer;
-      z-index: 200;
-      font-size: 26px;
-      color: var(--navy);
-      transition: var(--transition);
-      align-items: center;
-      justify-content: center;
-    }
-
-    #fab.visible { display: flex; }
-    #fab:hover { transform: scale(1.08) rotate(45deg); box-shadow: 0 12px 36px rgba(201,168,76,.55); }
-
-    /* ── POST MODAL ────────────────────────────────────────────────── */
-    .modal-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(5,10,20,.7);
-      backdrop-filter: blur(6px);
-      z-index: 300;
-      align-items: flex-end;
-      justify-content: center;
-      padding: 0;
-    }
-
-    .modal-overlay.open { display: flex; }
-
-    .modal-sheet {
-      width: 100%;
-      max-width: 560px;
-      background: var(--navy-card);
-      border: 1px solid var(--navy-line);
-      border-radius: 22px 22px 0 0;
-      padding: 28px 28px 40px;
-      animation: slideSheet .35s cubic-bezier(.2,.8,.3,1) both;
-      position: relative;
-    }
-
-    @media(min-width:600px) {
-      .modal-overlay { align-items: center; }
-      .modal-sheet { border-radius: 22px; padding: 36px; }
-    }
-
-    .modal-handle {
-      width: 40px; height: 4px;
-      background: var(--navy-line);
-      border-radius: 99px;
-      margin: 0 auto 24px;
-    }
-
-    @media(min-width:600px) { .modal-handle { display: none; } }
-
-    .modal-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 22px;
-    }
-
-    .modal-title span { color: var(--gold); }
-
-    textarea#post-content {
-      width: 100%;
-      background: var(--navy-mid);
-      border: 1px solid var(--navy-line);
-      border-radius: 12px;
-      padding: 16px;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      line-height: 1.7;
-      resize: vertical;
-      min-height: 130px;
-      outline: none;
-      transition: var(--transition);
-      margin-bottom: 14px;
-    }
-
-    textarea#post-content:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,168,76,.1);
-    }
-
-    textarea#post-content::placeholder { color: var(--text-soft); opacity: .5; }
-
-    .file-upload-area {
-      border: 1.5px dashed var(--navy-line);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-bottom: 18px;
-      position: relative;
-    }
-
-    .file-upload-area:hover { border-color: var(--gold); background: var(--gold-dim); }
-
-    .file-upload-area input[type="file"] {
-      position: absolute; inset: 0;
-      opacity: 0; cursor: pointer;
-      width: 100%; height: 100%;
-    }
-
-    .file-upload-area .upload-icon { font-size: 24px; margin-bottom: 6px; opacity: .5; }
-    .file-upload-area p { font-size: 12px; color: var(--text-soft); }
-    .file-upload-area p strong { color: var(--gold); }
-
-    #image-preview {
-      display: none;
-      width: 100%;
-      border-radius: 10px;
-      max-height: 200px;
-      object-fit: cover;
-      margin-bottom: 14px;
-      border: 1px solid var(--navy-line);
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn-cancel {
-      flex: 1;
-      padding: 13px;
-      border: 1px solid var(--navy-line);
-      border-radius: 10px;
-      background: transparent;
-      color: var(--text-soft);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .btn-cancel:hover { border-color: var(--charcoal); color: var(--text); }
-
-    .btn-post {
-      flex: 2;
-      padding: 13px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
-      color: var(--navy);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 4px 16px rgba(201,168,76,.25);
-    }
-
-    .btn-post:hover { box-shadow: 0 8px 24px rgba(201,168,76,.35); transform: translateY(-1px); }
-    .btn-post:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-
-    .post-error {
-      background: rgba(224,90,90,.12);
-      border: 1px solid rgba(224,90,90,.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: #f08080;
-      margin-top: 14px;
-      display: none;
-    }
-
-    /* Toast */
-    #toast {
-      position: fixed;
-      bottom: 110px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--navy-card);
-      border: 1px solid var(--navy-line);
-      border-radius: 99px;
-      padding: 10px 22px;
-      font-size: 13px;
-      color: var(--text);
-      box-shadow: 0 8px 24px rgba(0,0,0,.4);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s, transform .3s;
-      z-index: 9000;
-      white-space: nowrap;
-    }
-
-    #toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* Loader */
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid var(--navy-line);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      margin: 60px auto;
-    }
-
-    /* ── ANIMATIONS ────────────────────────────────────────────────── */
-    @keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
-    @keyframes slideUp { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:none } }
-    @keyframes slideSheet { from { transform:translateY(40px); opacity:0 } to { transform:none; opacity:1 } }
-    @keyframes spin    { to { transform:rotate(360deg) } }
-
-    /* ── RESPONSIVE ────────────────────────────────────────────────── */
-    @media(max-width:480px) {
-      .auth-box { padding: 32px 22px; }
-      .feed-container { padding: 24px 14px 120px; }
-      .notice-card { padding: 18px; }
-      .site-header { padding: 0 14px; }
-      .user-pill .email-text { display: none; }
-    }
-  </style>
 </head>
-
 <body>
 
-<!-- ══════════════════════════════════════════════════════════════════
+<!-- ══════════════════════════════════════════════════════════
      AUTH SCREEN
-══════════════════════════════════════════════════════════════════ -->
-<div id="auth-screen">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <div class="brand-mark">A</div>
+══════════════════════════════════════════════════════════ -->
+<div id="auth-screen" class="screen active">
+  <div class="auth-wrap">
+
+    <div class="auth-brand">
+      <div class="brand-icon">A</div>
       <h1>Alamin Notices</h1>
       <p>Official Announcement Portal</p>
     </div>
 
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login"  onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn"        id="tab-signup" onclick="switchTab('signup')">Create Account</button>
     </div>
 
+    <!-- Login -->
     <div id="login-form">
       <div class="field">
         <label>Email Address</label>
@@ -767,450 +38,169 @@
       </div>
       <div class="field">
         <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" />
+        <input type="password" id="login-password" placeholder="••••••••"
+               onkeydown="if(event.key==='Enter')handleLogin()" />
       </div>
-      <button class="btn-primary" id="btn-login" onclick="handleLogin()">Sign In →</button>
+      <button class="btn-gold" id="btn-login" onclick="handleLogin()">Sign In →</button>
     </div>
 
+    <!-- Signup -->
     <div id="signup-form" style="display:none">
+      <div class="field">
+        <label>Your Display Name</label>
+        <input type="text" id="signup-name" placeholder="e.g. Alamin" />
+      </div>
       <div class="field">
         <label>Email Address</label>
         <input type="email" id="signup-email" placeholder="your@email.com" />
       </div>
       <div class="field">
         <label>Password <span style="color:var(--text-soft);font-size:10px;">(min 6 chars)</span></label>
-        <input type="password" id="signup-password" placeholder="Create a password" />
+        <input type="password" id="signup-password" placeholder="Create a password"
+               onkeydown="if(event.key==='Enter')handleSignup()" />
       </div>
-      <button class="btn-primary" id="btn-signup" onclick="handleSignup()">Create Account →</button>
+      <button class="btn-gold" id="btn-signup" onclick="handleSignup()">Create Account →</button>
     </div>
 
-    <div class="auth-error" id="auth-error"></div>
+    <div class="msg-box" id="auth-msg"></div>
+
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════
+<!-- ══════════════════════════════════════════════════════════
      APP SCREEN
-══════════════════════════════════════════════════════════════════ -->
-<div id="app-screen">
+══════════════════════════════════════════════════════════ -->
+<div id="app-screen" class="screen">
 
-  <header class="site-header">
-    <div class="header-brand">
-      <div class="mark">A</div>
+  <!-- Header -->
+  <header id="site-header">
+    <div class="h-brand">
+      <div class="h-mark">A</div>
       <h2>Alamin Notices</h2>
     </div>
-    <div class="header-right">
-      <div class="user-pill">
-        <div class="avatar" id="user-avatar">?</div>
-        <span class="email-text" id="user-email-display"></span>
+
+    <div class="h-search">
+      <span class="s-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search notices…" oninput="handleSearch(event)" />
+    </div>
+
+    <div class="h-right">
+      <button class="btn-ghost" id="btn-dashboard" style="display:none" onclick="openDashboard()">📊 Dashboard</button>
+      <button class="btn-ghost" onclick="openSettings()" title="Settings">⚙️</button>
+      <div class="user-chip">
+        <div class="av" id="user-av">?</div>
+        <span class="chip-name" id="user-name"></span>
       </div>
-      <button class="btn-logout" onclick="handleLogout()">Sign out</button>
+      <button class="btn-ghost" onclick="handleLogout()">Sign out</button>
     </div>
   </header>
 
-  <main class="feed-container">
-    <div class="feed-header">
+  <!-- Feed -->
+  <main id="app-body">
+    <div class="feed-heading">
       <h3>Latest Notices</h3>
-      <p id="notice-count">Loading…</p>
+      <span id="notice-count">Loading…</span>
     </div>
+
+    <div id="search-banner" style="display:none">
+      <span id="search-result-text"></span>
+      <button onclick="clearSearch()" title="Clear search">×</button>
+    </div>
+
     <div id="feed"></div>
   </main>
 
 </div>
 
-<!-- FAB (admin only) -->
-<button id="fab" title="Post a Notice" onclick="openModal()">＋</button>
-
-<!-- ══════════════════════════════════════════════════════════════════
-     POST MODAL
-══════════════════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="post-modal" onclick="handleOverlayClick(event)">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title">New <span>Notice</span></div>
-
-    <textarea id="post-content" placeholder="Write your announcement here…" rows="5"></textarea>
-
-    <img id="image-preview" alt="Preview" />
-
-    <div class="file-upload-area" id="upload-area">
-      <input type="file" id="post-image" accept="image/*" onchange="previewImage(event)" />
-      <div class="upload-icon">📎</div>
-      <p><strong>Attach image</strong> — optional</p>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-post" id="btn-post" onclick="handlePost()">Publish Notice</button>
-    </div>
-
-    <div class="post-error" id="post-error"></div>
-  </div>
-</div>
+<!-- FAB -->
+<button id="fab" title="Post a Notice" onclick="openPost()">＋</button>
 
 <!-- Toast -->
 <div id="toast"></div>
 
-<!-- ══════════════════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════════════════ -->
-<script>
-  /* ── CONFIG — REPLACE THESE ─────────────────────────────────────── */
-  const SUPABASE_URL  = 'https://stczzndroorzorquszxn.supabase.co';
-  const SUPABASE_ANON = 'sb_publishable_7_58bmgqais4Y_EJtlO2Nw_bLgs2uUq';
-  const ADMIN_EMAIL   = 'text.me.md.alamin@gmail.com';
-  /* ──────────────────────────────────────────────────────────────── */
 
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+<!-- ══════════════════════════════════════════════════════════
+     POST / EDIT MODAL
+══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="post-modal" onclick="handleOverlayClick(event,'post-modal')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheet-title-text">New <em>Notice</em></div>
 
-  let currentUser = null;
-  let likedSet    = new Set(JSON.parse(localStorage.getItem('liked') || '[]'));
+    <div class="field">
+      <label>Content</label>
+      <textarea id="post-content" rows="5" placeholder="Write your announcement…"></textarea>
+    </div>
 
-  /* ── AUTH ────────────────────────────────────────────────────────── */
-  function switchTab(tab) {
-    document.getElementById('login-form').style.display   = tab === 'login'  ? '' : 'none';
-    document.getElementById('signup-form').style.display  = tab === 'signup' ? '' : 'none';
-    document.getElementById('tab-login').classList.toggle('active',  tab === 'login');
-    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-    clearAuthError();
-  }
+    <img id="img-preview" alt="Preview" />
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="post-image" accept="image/*" onchange="previewImage(event)" />
+      <div class="uz-icon">📎</div>
+      <p><strong>Attach image</strong> — optional (auto-compressed)</p>
+    </div>
 
-  function showAuthError(msg) {
-    const el = document.getElementById('auth-error');
-    el.textContent = msg;
-    el.style.display = 'block';
-  }
+    <div class="field">
+      <label>Schedule (optional — leave blank to publish now)</label>
+      <input type="datetime-local" id="post-schedule" />
+    </div>
 
-  function clearAuthError() {
-    const el = document.getElementById('auth-error');
-    el.style.display = 'none';
-  }
-
-  async function handleLogin() {
-    const email    = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-    const btn      = document.getElementById('btn-login');
-    if (!email || !password) { showAuthError('Please fill in all fields.'); return; }
-    btn.disabled = true; btn.textContent = 'Signing in…';
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    btn.disabled = false; btn.textContent = 'Sign In →';
-    if (error) showAuthError(error.message);
-  }
-
-  async function handleSignup() {
-    const email    = document.getElementById('signup-email').value.trim();
-    const password = document.getElementById('signup-password').value;
-    const btn      = document.getElementById('btn-signup');
-    if (!email || !password) { showAuthError('Please fill in all fields.'); return; }
-    if (password.length < 6)  { showAuthError('Password must be at least 6 characters.'); return; }
-    btn.disabled = true; btn.textContent = 'Creating account…';
-    const { error } = await sb.auth.signUp({ email, password });
-    btn.disabled = false; btn.textContent = 'Create Account →';
-    if (error) showAuthError(error.message);
-    else showAuthError('✓ Account created! You can now sign in.');
-  }
-
-  async function handleLogout() {
-    await sb.auth.signOut();
-  }
-
-  /* ── AUTH STATE LISTENER ─────────────────────────────────────────── */
-  sb.auth.onAuthStateChange(async (_event, session) => {
-    if (session?.user) {
-      currentUser = session.user;
-      showApp();
-    } else {
-      currentUser = null;
-      showAuth();
-    }
-  });
-
-  function showApp() {
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('app-screen').style.display  = 'block';
-
-    const email   = currentUser.email;
-    const initial = email.charAt(0).toUpperCase();
-    document.getElementById('user-avatar').textContent       = initial;
-    document.getElementById('user-email-display').textContent = email;
-
-    if (email === ADMIN_EMAIL) {
-      document.getElementById('fab').classList.add('visible');
-    }
-
-    loadNotices();
-    checkDeepLink();
-  }
-
-  function showAuth() {
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('app-screen').style.display  = 'none';
-    document.getElementById('fab').classList.remove('visible');
-  }
-
-  /* ── NOTICES ─────────────────────────────────────────────────────── */
-  async function loadNotices() {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = '<div class="spinner"></div>';
-
-    const { data, error } = await sb
-      .from('notices')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      feed.innerHTML = `<p style="color:var(--danger);text-align:center;margin-top:40px;">${error.message}</p>`;
-      return;
-    }
-
-    document.getElementById('notice-count').textContent =
-      data.length === 0 ? 'No notices yet'
-      : `${data.length} notice${data.length > 1 ? 's' : ''}`;
-
-    if (data.length === 0) {
-      feed.innerHTML = `
-        <div class="empty-state">
-          <div class="icon">📋</div>
-          <h4>No Notices Yet</h4>
-          <p>New announcements will appear here.</p>
-        </div>`;
-      return;
-    }
-
-    feed.innerHTML = '';
-    data.forEach(notice => feed.appendChild(renderCard(notice)));
-  }
-
-  function renderCard(notice) {
-    const card = document.createElement('div');
-    card.className = 'notice-card';
-    card.id = `notice-${notice.id}`;
-
-    const liked   = likedSet.has(notice.id);
-    const isAdmin = currentUser?.email === ADMIN_EMAIL;
-    const time    = formatTime(notice.created_at);
-    const initial = (notice.author_email || ADMIN_EMAIL).charAt(0).toUpperCase();
-
-    // image URL
-    let imgHTML = '';
-    if (notice.image_url) {
-      imgHTML = `<img class="notice-image" src="${escHtml(notice.image_url)}" alt="Notice image" loading="lazy" />`;
-    }
-
-    card.innerHTML = `
-      <div class="notice-meta">
-        <div class="notice-author">
-          <div class="dot">${initial}</div>
-          <span class="name">${escHtml(notice.author_email || ADMIN_EMAIL)}</span>
-        </div>
-        <span class="notice-time">${time}</span>
+    <div class="field">
+      <label>Reaction Emojis</label>
+      <div class="emoji-config" id="emoji-tags"></div>
+      <div class="emoji-add-row">
+        <input type="text" id="new-emoji" placeholder="➕" maxlength="2" />
+        <button class="btn-sm" onclick="addEmoji()">Add Emoji</button>
       </div>
-      <div class="notice-body">${escHtml(notice.content)}</div>
-      ${imgHTML}
-      <div class="notice-footer">
-        <button class="btn-like ${liked ? 'liked' : ''}" onclick="toggleLike(this,'${notice.id}')">
-          ${liked ? '★' : '☆'} <span class="like-count">${notice.likes || 0}</span>
-        </button>
-        <button class="btn-share" onclick="shareNotice('${notice.id}')">
-          ↗ Share
-        </button>
-        ${isAdmin ? `<button class="btn-delete-notice" onclick="deleteNotice('${notice.id}')">✕ Delete</button>` : ''}
-      </div>`;
+    </div>
 
-    return card;
-  }
+    <div class="msg-box" id="post-error"></div>
 
-  /* ── LIKES ───────────────────────────────────────────────────────── */
-  async function toggleLike(btn, noticeId) {
-    const wasLiked = likedSet.has(noticeId);
-    const span     = btn.querySelector('.like-count');
-    const current  = parseInt(span.textContent, 10) || 0;
+    <div class="sheet-actions">
+      <button class="btn-outline" onclick="closePost()">Cancel</button>
+      <button class="btn-publish" id="btn-publish" onclick="handlePublish()">Publish Notice</button>
+    </div>
+  </div>
+</div>
 
-    if (wasLiked) {
-      likedSet.delete(noticeId);
-      btn.classList.remove('liked');
-      btn.innerHTML = `☆ <span class="like-count">${current - 1}</span>`;
-      await sb.from('notices').update({ likes: current - 1 }).eq('id', noticeId);
-    } else {
-      likedSet.add(noticeId);
-      btn.classList.add('liked');
-      btn.innerHTML = `★ <span class="like-count">${current + 1}</span>`;
-      await sb.from('notices').update({ likes: current + 1 }).eq('id', noticeId);
-    }
-    localStorage.setItem('liked', JSON.stringify([...likedSet]));
-  }
 
-  /* ── SHARE / DEEP LINK ───────────────────────────────────────────── */
-  function shareNotice(id) {
-    const url = `${location.origin}${location.pathname}?id=${id}`;
-    navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard!'));
-  }
+<!-- ══════════════════════════════════════════════════════════
+     SETTINGS MODAL
+══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="settings-modal" onclick="handleOverlayClick(event,'settings-modal')">
+  <div class="sheet" style="max-width:420px">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Your <em>Settings</em></div>
 
-  function checkDeepLink() {
-    const params = new URLSearchParams(location.search);
-    const id = params.get('id');
-    if (!id) return;
-    setTimeout(() => {
-      const el = document.getElementById(`notice-${id}`);
-      if (el) {
-        el.classList.add('highlight');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 600);
-  }
+    <div class="field">
+      <label>Display Name <span style="color:var(--text-soft);font-size:10px;">(shown instead of email)</span></label>
+      <input type="text" id="settings-name" placeholder="Your name" />
+    </div>
 
-  /* ── DELETE (admin) ──────────────────────────────────────────────── */
-  async function deleteNotice(id) {
-    if (!confirm('Delete this notice permanently?')) return;
-    const { error } = await sb.from('notices').delete().eq('id', id);
-    if (error) { showToast('Error deleting notice.'); return; }
-    document.getElementById(`notice-${id}`)?.remove();
-    showToast('Notice deleted.');
-    const feed = document.getElementById('feed');
-    if (!feed.children.length) loadNotices();
-    updateCount(-1);
-  }
+    <div class="msg-box" id="settings-msg"></div>
 
-  function updateCount(delta) {
-    const el = document.getElementById('notice-count');
-    const m  = el.textContent.match(/\d+/);
-    if (m) {
-      const n = parseInt(m[0]) + delta;
-      el.textContent = n <= 0 ? 'No notices yet' : `${n} notice${n > 1 ? 's' : ''}`;
-    }
-  }
+    <div class="sheet-actions">
+      <button class="btn-outline" onclick="closeSettings()">Cancel</button>
+      <button class="btn-publish" id="btn-save-settings" onclick="saveSettings()">Save Changes</button>
+    </div>
+  </div>
+</div>
 
-  /* ── POST MODAL ──────────────────────────────────────────────────── */
-  function openModal() {
-    document.getElementById('post-modal').classList.add('open');
-    document.getElementById('post-content').focus();
-  }
 
-  function closeModal() {
-    document.getElementById('post-modal').classList.remove('open');
-    document.getElementById('post-content').value = '';
-    document.getElementById('post-image').value   = '';
-    document.getElementById('image-preview').style.display = 'none';
-    document.getElementById('upload-area').style.display   = '';
-    document.getElementById('post-error').style.display    = 'none';
-    document.getElementById('btn-post').disabled            = false;
-    document.getElementById('btn-post').textContent         = 'Publish Notice';
-  }
+<!-- ══════════════════════════════════════════════════════════
+     ADMIN DASHBOARD MODAL
+══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="dash-modal" onclick="handleOverlayClick(event,'dash-modal')">
+  <div class="sheet" style="max-width:660px">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Admin <em>Dashboard</em></div>
+    <div id="dash-content"></div>
+    <div class="sheet-actions" style="margin-top:24px">
+      <button class="btn-outline" onclick="closeDashboard()">Close</button>
+    </div>
+  </div>
+</div>
 
-  function handleOverlayClick(e) {
-    if (e.target === document.getElementById('post-modal')) closeModal();
-  }
 
-  function previewImage(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const url  = URL.createObjectURL(file);
-    const img  = document.getElementById('image-preview');
-    img.src    = url;
-    img.style.display = 'block';
-    document.getElementById('upload-area').style.display = 'none';
-  }
-
-  async function handlePost() {
-    if (currentUser?.email !== ADMIN_EMAIL) return;
-
-    const content = document.getElementById('post-content').value.trim();
-    const fileEl  = document.getElementById('post-image');
-    const file    = fileEl.files[0];
-
-    if (!content && !file) {
-      showPostError('Please write something or attach an image.');
-      return;
-    }
-
-    const btn = document.getElementById('btn-post');
-    btn.disabled    = true;
-    btn.textContent = 'Publishing…';
-
-    try {
-      let image_url = null;
-
-      if (file) {
-        const ext   = file.name.split('.').pop();
-        const fname = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { data: upData, error: upErr } = await sb.storage
-          .from('notice-images')
-          .upload(fname, file, { cacheControl: '3600', upsert: false });
-
-        if (upErr) throw upErr;
-
-        const { data: urlData } = sb.storage
-          .from('notice-images')
-          .getPublicUrl(fname);
-        image_url = urlData.publicUrl;
-      }
-
-      const { data: notice, error: insErr } = await sb
-        .from('notices')
-        .insert([{
-          content,
-          image_url,
-          author_email: currentUser.email,
-          likes: 0
-        }])
-        .select()
-        .single();
-
-      if (insErr) throw insErr;
-
-      // prepend card to feed
-      const feed = document.getElementById('feed');
-      const emptyState = feed.querySelector('.empty-state');
-      if (emptyState) feed.innerHTML = '';
-      feed.prepend(renderCard(notice));
-      updateCount(1);
-
-      closeModal();
-      showToast('Notice published successfully!');
-    } catch (err) {
-      showPostError(err.message || 'Something went wrong.');
-      btn.disabled    = false;
-      btn.textContent = 'Publish Notice';
-    }
-  }
-
-  function showPostError(msg) {
-    const el = document.getElementById('post-error');
-    el.textContent   = msg;
-    el.style.display = 'block';
-  }
-
-  /* ── TOAST ───────────────────────────────────────────────────────── */
-  let toastTimer;
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-  }
-
-  /* ── UTILS ───────────────────────────────────────────────────────── */
-  function escHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function formatTime(iso) {
-    const d    = new Date(iso);
-    const now  = new Date();
-    const diff = Math.floor((now - d) / 1000);
-    if (diff < 60)       return 'just now';
-    if (diff < 3600)     return `${Math.floor(diff/60)}m ago`;
-    if (diff < 86400)    return `${Math.floor(diff/3600)}h ago`;
-    if (diff < 604800)   return `${Math.floor(diff/86400)}d ago`;
-    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  }
-
-  /* keyboard shortcut: Esc closes modal */
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModal();
-  });
-</script>
+<script src="app.js"></script>
 </body>
 </html>
