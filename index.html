@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alamin Notices</title>
-  <meta name="description" content="Official announcement portal by Alamin." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Alamin Notices | Official Portal</title>
+  <meta name="description" content="Official announcement portal by Alamin. Post, engage, and stay informed." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -18,16 +18,15 @@
 ══════════════════════════════════════════════════════════ -->
 <div id="auth-screen" class="screen active">
   <div class="auth-wrap">
-
     <div class="auth-brand">
-      <div class="brand-icon">A</div>
+      <img src="1774627514585.png" alt="Logo" style="width: 56px; height: 56px; border-radius: 16px; object-fit: cover; margin: 0 auto 14px; display: block;">
       <h1>Alamin Notices</h1>
       <p>Official Announcement Portal</p>
     </div>
 
     <div class="tab-row">
-      <button class="tab-btn active" id="tab-login"  onclick="switchTab('login')">Sign In</button>
-      <button class="tab-btn"        id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+      <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Create Account</button>
     </div>
 
     <!-- Login -->
@@ -63,7 +62,6 @@
     </div>
 
     <div class="msg-box" id="auth-msg"></div>
-
   </div>
 </div>
 
@@ -75,7 +73,7 @@
   <!-- Header -->
   <header id="site-header">
     <div class="h-brand">
-      <div class="h-mark">A</div>
+      <img src="1774627514585.png" alt="Alamin Logo" style="width: 34px; height: 34px; border-radius: 9px; object-fit: cover;">
       <h2>Alamin Notices</h2>
     </div>
 
@@ -109,7 +107,6 @@
 
     <div id="feed"></div>
   </main>
-
 </div>
 
 <!-- FAB -->
@@ -117,7 +114,6 @@
 
 <!-- Toast -->
 <div id="toast"></div>
-
 
 <!-- ══════════════════════════════════════════════════════════
      POST / EDIT MODAL
@@ -162,7 +158,6 @@
   </div>
 </div>
 
-
 <!-- ══════════════════════════════════════════════════════════
      SETTINGS MODAL
 ══════════════════════════════════════════════════════════ -->
@@ -185,7 +180,6 @@
   </div>
 </div>
 
-
 <!-- ══════════════════════════════════════════════════════════
      ADMIN DASHBOARD MODAL
 ══════════════════════════════════════════════════════════ -->
@@ -199,7 +193,6 @@
     </div>
   </div>
 </div>
-
 
 <script src="app.js"></script>
 </body>
