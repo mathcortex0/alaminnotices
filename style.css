@@ -2,139 +2,47 @@
     --charcoal: #121212;
     --navy: #1A2238;
     --gold: #FFD700;
-    --gold-hover: #e6c200;
-    --glass: rgba(255, 255, 255, 0.05);
     --text: #F5F5F5;
+    --error: #ff4d4d;
 }
 
-* { box-sizing: border-box; transition: all 0.3s ease; }
-
-body {
-    background-color: var(--charcoal);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-}
-
+* { box-sizing: border-box; transition: 0.3s; }
+body { background: var(--charcoal); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; }
 .hidden { display: none !important; }
 
-/* Auth Overlay */
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--charcoal);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
+/* Auth Layout */
+.overlay { position: fixed; inset: 0; background: var(--charcoal); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.auth-card { background: var(--navy); padding: 2.5rem; border-radius: 16px; border: 1px solid rgba(255,215,0,0.3); text-align: center; width: 90%; max-width: 400px; }
+.logo-large { width: 80px; margin-bottom: 1rem; filter: drop-shadow(0 0 8px var(--gold)); }
 
-.auth-card {
-    text-align: center;
-    padding: 3rem;
-    background: var(--navy);
-    border-radius: 20px;
-    border: 1px solid var(--gold);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
+.auth-tabs { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+.auth-tabs button { background: none; border: none; color: #888; cursor: pointer; padding: 5px 10px; font-weight: 600; }
+.auth-tabs button.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
 
-.logo-large { width: 100px; margin-bottom: 1.5rem; filter: drop-shadow(0 0 10px var(--gold)); }
-
-/* Buttons */
-.btn-primary {
-    background: var(--gold);
-    color: var(--charcoal);
-    border: none;
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-primary:hover { background: var(--gold-hover); transform: translateY(-2px); }
-
-.btn-outline {
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-}
+.auth-form input { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #333; background: #0a0a0a; color: white; }
+#auth-msg { color: var(--error); font-size: 0.85rem; min-height: 1.2rem; }
 
 /* Navbar */
-.navbar {
-    background: var(--navy);
-    padding: 1rem 5%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid var(--glass);
-}
+.navbar { background: var(--navy); padding: 0.8rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,215,0,0.1); position: sticky; top: 0; }
+.logo-small { height: 35px; margin-right: 10px; }
+.brand-name { color: var(--gold); font-weight: 600; letter-spacing: 1px; }
 
-.logo-small { height: 40px; margin-right: 12px; }
-.brand-name { font-weight: 600; color: var(--gold); letter-spacing: 1px; }
+/* Feed & Cards */
+.feed-container { max-width: 650px; margin: 2rem auto; padding: 0 15px; }
+.notice-card { background: var(--navy); border-radius: 12px; padding: 20px; margin-bottom: 1.5rem; border-left: 4px solid var(--gold); animation: slideUp 0.4s ease; }
+.notice-card h3 { margin-top: 0; color: var(--gold); }
+.notice-card img { width: 100%; border-radius: 8px; margin: 15px 0; border: 1px solid #333; }
+.notice-card small { color: #888; display: block; margin-top: 10px; }
 
-/* Feed */
-.feed-container { max-width: 700px; margin: 2rem auto; padding: 0 20px; }
+/* Admin Tools */
+.fab { position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px; border-radius: 50%; background: var(--gold); border: none; font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+.modal-content { background: var(--navy); padding: 2rem; border-radius: 15px; width: 90%; max-width: 500px; border: 1px solid var(--gold); }
+.modal-content textarea { width: 100%; background: #0a0a0a; border: 1px solid #333; color: white; padding: 10px; border-radius: 8px; margin: 10px 0; }
+.modal-content input[type="text"] { width: 100%; background: #0a0a0a; border: 1px solid #333; color: white; padding: 10px; border-radius: 8px; }
 
-.notice-card {
-    background: var(--navy);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 2rem;
-    border-left: 4px solid var(--gold);
-}
+/* Buttons */
+.btn-primary { background: var(--gold); color: var(--charcoal); border: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
+.btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
 
-.notice-card img {
-    width: 100%;
-    border-radius: 8px;
-    margin: 15px 0;
-}
-
-/* FAB */
-.fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: var(--gold);
-    font-size: 30px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-}
-
-/* Modal */
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 200;
-}
-
-.modal-content {
-    background: var(--navy);
-    padding: 2rem;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-}
-
-.modal-content input, .modal-content textarea {
-    width: 100%;
-    background: var(--charcoal);
-    border: 1px solid var(--glass);
-    color: white;
-    padding: 12px;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-}
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
