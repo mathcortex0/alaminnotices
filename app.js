@@ -1,438 +1,308 @@
-/* ============================================================
+/* ================================================================
    ALAMIN NOTICES — app.js
-   ============================================================ */
-
-/* ── CONFIG ─────────────────────────────────────────────────── */
+   ================================================================ */
 const SUPABASE_URL  = 'https://stczzndroorzorquszxn.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_7_58bmgqais4Y_EJtlO2Nw_bLgs2uUq';
 const ADMIN_EMAIL   = 'text.me.md.alamin@gmail.com';
 
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 
-/* ── STATE ───────────────────────────────────────────────────── */
-let currentUser    = null;
-let isAdmin        = false;
-let displayName    = 'User';
-let allNotices     = [];
-let reactedMap     = JSON.parse(localStorage.getItem('reacted') || '{}');
-// reactedMap[noticeId] = Set of emojis user reacted with
-// stored as { noticeId: ['❤️','🔥'] }
+let currentUser = null, isAdmin = false, displayName = 'User';
+let allNotices = [], profileCache = {}, searchActive = false, editingId = null;
 
-let configuredEmojis = JSON.parse(localStorage.getItem('emojis') || '["❤️","🔥","👏","😮"]');
-let editingNoticeId  = null;
-let searchActive     = false;
-let authInitialized  = false;
+const urlParams  = new URLSearchParams(location.search);
+const deepLinkId = urlParams.get('id');
 
-/* ── INIT: CHECK EXISTING SESSION (PERSIST LOGIN) ───────────── */
-(async function checkExistingSession() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    isAdmin = currentUser.email === ADMIN_EMAIL;
-    await loadProfile();
-    showApp();
-  } else {
-    showScreen('auth-screen');
-  }
-})();
-
-/* ── AUTH STATE LISTENER ─────────────────────────────────────── */
 sb.auth.onAuthStateChange(async (_e, session) => {
-  if (authInitialized) return;
   if (session?.user) {
-    authInitialized = true;
     currentUser = session.user;
     isAdmin = currentUser.email === ADMIN_EMAIL;
-    await loadProfile();
-    showApp();
-  } else if (!authInitialized) {
+    await ensureProfile();
+    if (deepLinkId) showSingleNotice(deepLinkId);
+    else bootApp();
+  } else {
+    currentUser = null; isAdmin = false;
     showScreen('auth-screen');
   }
 });
 
-/* ── SCREENS ─────────────────────────────────────────────────── */
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function showApp() {
+function bootApp() {
   showScreen('app-screen');
-  document.getElementById('user-av').textContent    = displayName.charAt(0).toUpperCase();
-  document.getElementById('user-name').textContent  = displayName;
-  if (isAdmin) {
-    document.getElementById('fab').classList.add('visible');
-    document.getElementById('btn-dashboard').style.display = 'flex';
-  }
+  document.getElementById('user-av-txt').textContent   = displayName.charAt(0).toUpperCase();
+  document.getElementById('user-name-txt').textContent = displayName;
+  const dash = document.getElementById('btn-dashboard');
+  if (dash) dash.style.display = isAdmin ? 'flex' : 'none';
+  if (isAdmin) document.getElementById('fab').classList.add('show');
   loadFeed();
-  checkDeepLink();
 }
 
-/* ── PROFILE ─────────────────────────────────────────────────── */
-async function loadProfile() {
+async function ensureProfile() {
   const { data } = await sb.from('profiles').select('display_name').eq('id', currentUser.id).single();
-  if (data) displayName = data.display_name;
+  if (data) { displayName = data.display_name; }
   else {
-    // Create default profile
-    const name = currentUser.email.split('@')[0];
-    await sb.from('profiles').insert({ id: currentUser.id, display_name: name });
-    displayName = name;
+    const fb = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+    await sb.from('profiles').insert({ id: currentUser.id, display_name: fb });
+    displayName = fb;
   }
+  profileCache[currentUser.id] = displayName;
 }
 
-/* ── AUTH ────────────────────────────────────────────────────── */
+/* AUTH */
 function switchTab(tab) {
-  ['login','signup'].forEach(t => {
-    document.getElementById(`${t}-form`).style.display = t === tab ? '' : 'none';
-    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
-  });
-  clearMsg('auth-msg');
+  document.getElementById('login-form').style.display  = tab === 'login'  ? '' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? '' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',  tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  hide('auth-msg');
 }
-
 async function handleLogin() {
-  const email = v('login-email'), password = v('login-password');
-  if (!email || !password) return showMsg('auth-msg', 'Please fill all fields.', 'error');
-  setBtn('btn-login', 'Signing in…', true);
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  setBtn('btn-login', 'Sign In →', false);
+  const email = val('login-email'), pw = val('login-password');
+  if (!email || !pw) return showMsg('auth-msg','Fill in all fields.','error');
+  setBtn('btn-login','Signing in…',true);
+  const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+  setBtn('btn-login','Sign In →',false);
   if (error) showMsg('auth-msg', error.message, 'error');
 }
-
 async function handleSignup() {
-  const email = v('signup-email'), password = v('signup-password'), name = v('signup-name');
-  if (!email || !password || !name) return showMsg('auth-msg', 'Please fill all fields.', 'error');
-  if (password.length < 6) return showMsg('auth-msg', 'Password must be at least 6 characters.', 'error');
-  setBtn('btn-signup', 'Creating…', true);
-  const { data, error } = await sb.auth.signUp({ email, password });
-  setBtn('btn-signup', 'Create Account →', false);
+  const name = val('signup-name'), email = val('signup-email'), pw = val('signup-password');
+  if (!name||!email||!pw) return showMsg('auth-msg','Fill in all fields.','error');
+  if (pw.length < 6) return showMsg('auth-msg','Password needs 6+ chars.','error');
+  setBtn('btn-signup','Creating…',true);
+  const { data, error } = await sb.auth.signUp({ email, password: pw });
+  setBtn('btn-signup','Create Account →',false);
   if (error) return showMsg('auth-msg', error.message, 'error');
-  // Save display name right after signup
-  if (data.user) {
-    await sb.from('profiles').upsert({ id: data.user.id, display_name: name });
-  }
-  showMsg('auth-msg', '✓ Account created! You can now sign in.', 'success');
+  if (data?.user) await sb.from('profiles').upsert({ id: data.user.id, display_name: name });
+  showMsg('auth-msg','Account created! Sign in now.','success');
+  switchTab('login');
 }
-
-async function handleLogout() {
-  await sb.auth.signOut();
-  authInitialized = false;
-  currentUser = null;
-  isAdmin = false;
-  showScreen('auth-screen');
+async function handleGoogle() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: location.origin + location.pathname }
+  });
+  if (error) showMsg('auth-msg', error.message, 'error');
 }
+async function handleLogout() { await sb.auth.signOut(); location.reload(); }
 
-/* ── FEED ────────────────────────────────────────────────────── */
+/* FEED */
 async function loadFeed(query = null) {
   const feed = document.getElementById('feed');
   feed.innerHTML = '<div class="spinner"></div>';
   searchActive = !!query;
-
-  let req = sb.from('notices').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
-
+  let req;
   if (query) {
-    // Full-text search across all notices (including expired)
-    req = sb.from('notices')
-      .select('*')
-      .textSearch('content', query, { type: 'websearch' })
-      .order('created_at', { ascending: false });
+    req = sb.from('notices').select('*').textSearch('content', query, { type: 'websearch' }).order('created_at', { ascending: false });
+  } else {
+    req = sb.from('notices').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
   }
-
   const { data, error } = await req;
-  if (error) { feed.innerHTML = `<p style="color:var(--danger);text-align:center;padding:40px">${error.message}</p>`; return; }
-
+  if (error) { feed.innerHTML = errHtml(error.message); return; }
   allNotices = data || [];
-
-  // Load profiles for all authors in one query
-  const authorIds = [...new Set(allNotices.map(n => n.author_id).filter(Boolean))];
-  let profileMap = {};
-  if (authorIds.length) {
-    const { data: profiles } = await sb.from('profiles').select('id,display_name').in('id', authorIds);
-    (profiles || []).forEach(p => { profileMap[p.id] = p.display_name; });
-  }
-
-  // Load view counts if admin
+  await loadProfiles(allNotices.map(n => n.author_id).filter(Boolean));
   let viewMap = {};
   if (isAdmin && allNotices.length) {
     const ids = allNotices.map(n => n.id);
     const { data: views } = await sb.from('notice_views').select('notice_id').in('notice_id', ids);
-    (views || []).forEach(v => { viewMap[v.notice_id] = (viewMap[v.notice_id] || 0) + 1; });
+    (views||[]).forEach(v => { viewMap[v.notice_id] = (viewMap[v.notice_id]||0)+1; });
   }
-
-  const activeCount = allNotices.filter(n => !isExpired(n) && isPublished(n)).length;
-  document.getElementById('notice-count').textContent =
-    query ? `${allNotices.length} result${allNotices.length !== 1 ? 's' : ''} for "${query}"`
-    : activeCount === 0 ? 'No notices yet'
-    : `${activeCount} active notice${activeCount !== 1 ? 's' : ''}`;
-
-  // Search banner
+  let lovedSet = new Set();
+  if (currentUser && allNotices.length) {
+    const ids = allNotices.map(n => n.id);
+    const { data: loved } = await sb.from('reactions').select('notice_id').eq('user_id', currentUser.id).in('notice_id', ids);
+    (loved||[]).forEach(r => lovedSet.add(r.notice_id));
+  }
+  const active = allNotices.filter(n => !isExpired(n) && isPublished(n)).length;
+  document.getElementById('notice-count').textContent = query
+    ? `${allNotices.length} result${allNotices.length!==1?'s':''}`
+    : active === 0 ? 'No notices yet' : `${active} active`;
   const banner = document.getElementById('search-banner');
-  if (query) {
-    banner.style.display = 'flex';
-    document.getElementById('search-result-text').textContent = `Showing all results for "${query}"`;
-  } else {
-    banner.style.display = 'none';
-  }
-
+  if (query) { banner.classList.add('show'); document.getElementById('search-result-text').textContent = `Results for "${query}"`; }
+  else banner.classList.remove('show');
   if (!allNotices.length) {
-    feed.innerHTML = `<div class="empty-state"><div class="e-icon">📋</div><h4>${query ? 'No results found' : 'No Notices Yet'}</h4><p>${query ? 'Try different keywords.' : 'Announcements will appear here.'}</p></div>`;
+    feed.innerHTML = `<div class="empty">${iconEmpty(16)}<h4>${query?'No results found':'No Notices Yet'}</h4><p>${query?'Try different keywords.':'Announcements will appear here.'}</p></div>`;
     return;
   }
-
   feed.innerHTML = '';
-  let delay = 0;
-  for (const notice of allNotices) {
-    const authorName = profileMap[notice.author_id] || 'Admin';
-    const views = viewMap[notice.id] || 0;
-    const card  = buildCard(notice, authorName, views);
-    card.style.animationDelay = `${delay}ms`;
-    delay += 40;
+  allNotices.forEach((n, i) => {
+    const card = buildCard(n, profileCache[n.author_id]||'Alamin', viewMap[n.id]||0, lovedSet.has(n.id));
+    card.style.animationDelay = `${i*32}ms`;
     feed.appendChild(card);
-    // Record view (non-blocking)
-    if (currentUser && !isExpired(notice) && isPublished(notice)) {
-      recordView(notice.id);
-    }
-  }
+    if (!isExpired(n) && isPublished(n)) recordView(n.id);
+  });
 }
-
 function isExpired(n)   { return n.expires_at && new Date(n.expires_at) < new Date(); }
 function isPublished(n) { return !n.publish_at || new Date(n.publish_at) <= new Date(); }
-
+async function loadProfiles(uids) {
+  const needed = [...new Set(uids)].filter(id => id && !profileCache[id]);
+  if (!needed.length) return;
+  const { data } = await sb.from('profiles').select('id,display_name').in('id', needed);
+  (data||[]).forEach(p => { profileCache[p.id] = p.display_name; });
+}
 async function recordView(noticeId) {
-  await sb.from('notice_views').upsert(
-    { notice_id: noticeId, user_id: currentUser.id },
-    { onConflict: 'notice_id,user_id', ignoreDuplicates: true }
-  );
+  if (!currentUser) return;
+  await sb.from('notice_views').upsert({ notice_id: noticeId, user_id: currentUser.id }, { onConflict: 'notice_id,user_id', ignoreDuplicates: true });
 }
 
-/* ── CARD BUILDER ────────────────────────────────────────────── */
-function buildCard(notice, authorName, views = 0) {
+/* CARD */
+function buildCard(n, authorName, views, isLoved, standalone = false) {
   const card = document.createElement('div');
-  card.className = 'notice-card' +
-    (notice.is_pinned ? ' pinned' : '') +
-    (isExpired(notice) ? ' expired-card' : '');
-  card.id = `card-${notice.id}`;
-
-  const expired   = isExpired(notice);
-  const scheduled = !isPublished(notice);
+  const expired = isExpired(n), scheduled = !isPublished(n);
+  card.className = 'notice-card' + (n.is_pinned&&!expired?' pinned':'') + (expired?' expired-fade':'');
+  card.id = `card-${n.id}`;
   let badge = '';
-  if (notice.is_pinned && !expired)  badge = '<div class="pin-badge">📌 Pinned</div>';
-  if (expired)                        badge = '<div class="expired-badge">Archived</div>';
-  if (scheduled)                      badge = `<div class="scheduled-badge">⏰ Scheduled</div>`;
-
-  const imgHTML = notice.image_url
-    ? `<img class="card-img" src="${esc(notice.image_url)}" alt="Notice image" loading="lazy" />`
-    : '';
-
-  // Reactions
-  const reactions = notice.reactions || {};
-  const userReacted = reactedMap[notice.id] ? new Set(reactedMap[notice.id]) : new Set();
-  const reactHTML = configuredEmojis.map(emoji => {
-    const count = reactions[emoji] || 0;
-    const active = userReacted.has(emoji) ? 'reacted' : '';
-    return `<button class="reaction-btn ${active}" onclick="toggleReaction('${notice.id}','${emoji}',this)">${emoji} <span class="r-count">${count || ''}</span></button>`;
-  }).join('');
-
-  // Admin stats
-  const statsHTML = isAdmin
-    ? `<div class="admin-stats">
-        <div class="stat-pill">👁 <span>${views}</span> views</div>
-        ${notice.is_pinned
-          ? `<button class="btn-action" onclick="togglePin('${notice.id}',false)">📌 Unpin</button>`
-          : `<button class="btn-action" onclick="togglePin('${notice.id}',true)">📌 Pin</button>`}
-        <button class="btn-action" onclick="openEdit('${notice.id}')">✏️ Edit</button>
-        <button class="btn-action danger" onclick="deleteNotice('${notice.id}')">✕ Delete</button>
-       </div>`
-    : '';
-
+  if (n.is_pinned&&!expired&&!scheduled) badge = `<div class="badge pin">${iconPin(12)} Pinned</div>`;
+  if (expired)   badge = `<div class="badge archive">${iconArchive(12)} Archived</div>`;
+  if (scheduled) badge = `<div class="badge sched">${iconClock(12)} Scheduled</div>`;
+  const imgHTML = n.image_url ? `<img class="card-img" src="${esc(n.image_url)}" alt="image" loading="lazy" />` : '';
+  const adminRow = isAdmin ? `
+    <div class="admin-row">
+      <div class="stat-pill">${iconEye(12)}&nbsp;<b>${views}</b> views</div>
+      <button class="btn-pill gold-h" onclick="togglePin('${n.id}',${!n.is_pinned})">${iconPin(12)} ${n.is_pinned?'Unpin':'Pin'}</button>
+      <button class="btn-pill gold-h" onclick="openEdit('${n.id}')">${iconEdit(12)} Edit</button>
+      <button class="btn-pill del" onclick="deleteNotice('${n.id}')">${iconTrash(12)} Delete</button>
+    </div>` : '';
   card.innerHTML = `
     ${badge}
-    <div class="card-meta">
+    <div class="card-head">
       <div class="card-author">
         <div class="card-av">${authorName.charAt(0).toUpperCase()}</div>
-        <span class="card-author-name">${esc(authorName)}</span>
+        <span class="card-name">${esc(authorName)}</span>
       </div>
-      <span class="card-time">${formatTime(notice.created_at)}</span>
+      <span class="card-time">${formatTime(n.created_at)}</span>
     </div>
-    <div class="card-body">${esc(notice.content)}</div>
+    <div class="card-body">${esc(n.content)}</div>
     ${imgHTML}
-    <div class="reactions-row">${reactHTML}</div>
-    ${statsHTML}
-    <div class="card-actions">
-      <button class="btn-action comments-toggle" onclick="toggleComments('${notice.id}',this)">💬 Comments</button>
-      <button class="btn-action" onclick="shareNotice('${notice.id}')">↗ Share</button>
+    ${adminRow}
+    <div class="card-foot">
+      <button class="btn-love ${isLoved?'loved':''}" id="love-btn-${n.id}" onclick="toggleLove('${n.id}',this)">
+        ${iconHeart(isLoved)}&nbsp;<span id="love-count-${n.id}">${n.love_count||0}</span>
+      </button>
+      <button class="btn-action-pill" id="ct-${n.id}" onclick="toggleComments('${n.id}',this)">
+        ${iconComment()} Comments
+      </button>
+      <button class="btn-action-pill" onclick="shareNotice('${n.id}')">
+        ${iconShare()} Share
+      </button>
     </div>
-    <div class="comments-section" id="comments-${notice.id}"></div>`;
-
+    <div class="comments-wrap" id="comments-${n.id}"></div>`;
   return card;
 }
 
-/* ── REACTIONS ───────────────────────────────────────────────── */
-async function toggleReaction(noticeId, emoji, btn) {
-  const userReacted = reactedMap[noticeId] ? new Set(reactedMap[noticeId]) : new Set();
-  const notice      = allNotices.find(n => n.id === noticeId);
-  if (!notice) return;
-
-  const reactions = { ...(notice.reactions || {}) };
-  const wasActive = userReacted.has(emoji);
-
-  if (wasActive) {
-    userReacted.delete(emoji);
-    reactions[emoji] = Math.max(0, (reactions[emoji] || 1) - 1);
-    btn.classList.remove('reacted');
+/* LOVE */
+async function toggleLove(noticeId, btn) {
+  if (!currentUser) return;
+  const isLoved = btn.classList.contains('loved');
+  const countEl = document.getElementById(`love-count-${noticeId}`);
+  const cur = parseInt(countEl?.textContent)||0;
+  const newCount = isLoved ? Math.max(0, cur-1) : cur+1;
+  btn.classList.toggle('loved', !isLoved);
+  btn.innerHTML = `${iconHeart(!isLoved)}&nbsp;<span id="love-count-${noticeId}">${newCount}</span>`;
+  btn.classList.toggle('loved', !isLoved);
+  btn.classList.add('heart-pop');
+  setTimeout(() => btn.classList.remove('heart-pop'), 300);
+  const notice = allNotices.find(n => n.id === noticeId);
+  if (notice) notice.love_count = newCount;
+  if (isLoved) {
+    await Promise.all([
+      sb.from('reactions').delete().eq('notice_id', noticeId).eq('user_id', currentUser.id),
+      sb.from('notices').update({ love_count: newCount }).eq('id', noticeId)
+    ]);
   } else {
-    userReacted.add(emoji);
-    reactions[emoji] = (reactions[emoji] || 0) + 1;
-    btn.classList.add('reacted');
+    await Promise.all([
+      sb.from('reactions').upsert({ notice_id: noticeId, user_id: currentUser.id }, { ignoreDuplicates: true }),
+      sb.from('notices').update({ love_count: newCount }).eq('id', noticeId)
+    ]);
   }
-
-  const countEl = btn.querySelector('.r-count');
-  countEl.textContent = reactions[emoji] || '';
-
-  // Persist locally
-  reactedMap[noticeId] = [...userReacted];
-  localStorage.setItem('reacted', JSON.stringify(reactedMap));
-
-  // Update DB
-  notice.reactions = reactions;
-  await sb.from('notices').update({ reactions }).eq('id', noticeId);
 }
 
-/* ── PIN ─────────────────────────────────────────────────────── */
+/* PIN */
 async function togglePin(noticeId, pin) {
   await sb.from('notices').update({ is_pinned: pin }).eq('id', noticeId);
-  showToast(pin ? 'Notice pinned!' : 'Notice unpinned.');
+  showToast(pin ? 'Notice pinned!' : 'Unpinned.');
   loadFeed();
 }
 
-/* ── COMMENTS ────────────────────────────────────────────────── */
+/* COMMENTS */
 async function toggleComments(noticeId, btn) {
-  const section = document.getElementById(`comments-${noticeId}`);
-  const isOpen  = section.classList.contains('open');
-
-  if (isOpen) {
-    section.classList.remove('open');
-    btn.classList.remove('open');
-    return;
-  }
-
+  const wrap = document.getElementById(`comments-${noticeId}`);
+  const open = wrap.classList.contains('open');
+  if (open) { wrap.classList.remove('open'); btn.classList.remove('open'); return; }
   btn.classList.add('open');
-  section.classList.add('open');
-  section.innerHTML = '<div class="spinner" style="width:24px;height:24px;margin:16px auto;border-width:2px;"></div>';
-  await renderComments(noticeId, section);
+  wrap.classList.add('open');
+  wrap.innerHTML = '<div class="spinner" style="width:22px;height:22px;margin:14px auto;border-width:2px"></div>';
+  await renderComments(noticeId, wrap);
 }
-
 async function renderComments(noticeId, container) {
-  const { data: comments, error } = await sb
-    .from('comments')
-    .select('*')
-    .eq('notice_id', noticeId)
-    .is('parent_id', null)
-    .order('created_at', { ascending: true });
-
-  if (error) { container.innerHTML = `<p style="color:var(--danger);font-size:13px;">${error.message}</p>`; return; }
-
-  // Load all replies
-  const topIds = (comments || []).map(c => c.id);
-  let replies = [];
-  if (topIds.length) {
-    const { data: r } = await sb.from('comments').select('*').in('parent_id', topIds).order('created_at', { ascending: true });
-    replies = r || [];
-  }
-
-  // Load profiles
-  const allIds  = [...(comments || []), ...replies].map(c => c.author_id).filter(Boolean);
-  const uids    = [...new Set(allIds)];
-  let pMap = {};
-  if (uids.length) {
-    const { data: ps } = await sb.from('profiles').select('id,display_name').in('id', uids);
-    (ps || []).forEach(p => { pMap[p.id] = p.display_name; });
-  }
-
+  const [{ data: tops }, { data: replies }] = await Promise.all([
+    sb.from('comments').select('*').eq('notice_id', noticeId).is('parent_id', null).order('created_at'),
+    sb.from('comments').select('*').eq('notice_id', noticeId).not('parent_id','is',null).order('created_at')
+  ]);
+  const all = [...(tops||[]), ...(replies||[])];
+  await loadProfiles(all.map(c => c.author_id));
   container.innerHTML = '';
-
-  if (!comments || !comments.length) {
-    container.innerHTML = '<p style="font-size:13px;color:var(--text-soft);margin-bottom:12px;">No comments yet.</p>';
+  if (!(tops||[]).length) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-soft);margin-bottom:10px">No comments yet.</p>';
   } else {
-    comments.forEach(c => {
-      container.appendChild(buildComment(c, pMap[c.author_id] || 'User', false, noticeId));
-      replies.filter(r => r.parent_id === c.id).forEach(r => {
-        container.appendChild(buildComment(r, pMap[r.author_id] || 'User', true, noticeId));
-      });
+    (tops||[]).forEach(c => {
+      container.appendChild(buildComment(c, false, noticeId));
+      (replies||[]).filter(r => r.parent_id === c.id).forEach(r => container.appendChild(buildComment(r, true, noticeId)));
     });
   }
-
-  // Add comment input
   const row = document.createElement('div');
-  row.className = 'comment-input-row';
-  row.innerHTML = `
-    <input type="text" placeholder="Write a comment…" id="cinput-${noticeId}" onkeydown="if(event.key==='Enter')submitComment('${noticeId}',null)" />
-    <button class="btn-send" onclick="submitComment('${noticeId}',null)">Send</button>`;
+  row.className = 'comment-input';
+  row.innerHTML = `<input id="ci-${noticeId}" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')postComment('${noticeId}',null)" /><button class="btn-send" onclick="postComment('${noticeId}',null)">Send</button>`;
   container.appendChild(row);
 }
-
-function buildComment(c, name, isReply, noticeId) {
+function buildComment(c, isReply, noticeId) {
+  const name = profileCache[c.author_id]||'User';
+  const canDel = isAdmin || c.author_id === currentUser?.id;
   const div = document.createElement('div');
-  div.className = `comment-item${isReply ? ' reply' : ''}`;
+  div.className = `comment${isReply?' reply':''}`;
   div.id = `comment-${c.id}`;
-  const canDelete = isAdmin || c.author_id === currentUser?.id;
-
   div.innerHTML = `
     <div class="c-av">${name.charAt(0).toUpperCase()}</div>
     <div class="c-bubble">
-      <div class="c-meta">
-        <span class="c-name">${esc(name)}</span>
-        <span class="c-time">${formatTime(c.created_at)}</span>
-      </div>
+      <div class="c-meta"><span class="c-name">${esc(name)}</span><span class="c-time">${formatTime(c.created_at)}</span></div>
       <div class="c-text">${esc(c.content)}</div>
       <div class="c-actions">
-        ${!isReply ? `<button class="c-btn" onclick="showReplyBox('${c.id}','${noticeId}')">↩ Reply</button>` : ''}
-        ${canDelete ? `<button class="c-btn" onclick="deleteComment('${c.id}','${noticeId}')">✕ Delete</button>` : ''}
+        ${!isReply?`<button class="c-btn" onclick="showReplyBox('${c.id}','${noticeId}')">↩ Reply</button>`:''}
+        ${canDel?`<button class="c-btn del" onclick="deleteComment('${c.id}','${noticeId}')">✕ Delete</button>`:''}
       </div>
-      <div id="reply-box-${c.id}"></div>
+      <div id="rbox-${c.id}"></div>
     </div>`;
   return div;
 }
-
-function showReplyBox(commentId, noticeId) {
-  const box = document.getElementById(`reply-box-${commentId}`);
-  if (box.innerHTML) { box.innerHTML = ''; return; }
-  box.innerHTML = `
-    <div class="comment-input-row reply-row" style="margin-left:0;margin-top:8px;">
-      <input type="text" placeholder="Write a reply…" id="rinput-${commentId}" onkeydown="if(event.key==='Enter')submitComment('${noticeId}','${commentId}')" />
-      <button class="btn-send" onclick="submitComment('${noticeId}','${commentId}')">Send</button>
-    </div>`;
-  document.getElementById(`rinput-${commentId}`)?.focus();
+function showReplyBox(cid, noticeId) {
+  const box = document.getElementById(`rbox-${cid}`);
+  if (box.innerHTML) { box.innerHTML=''; return; }
+  box.innerHTML = `<div class="comment-input ri" style="margin-top:8px;margin-left:0"><input id="ri-${cid}" placeholder="Reply…" onkeydown="if(event.key==='Enter')postComment('${noticeId}','${cid}')" /><button class="btn-send" onclick="postComment('${noticeId}','${cid}')">Send</button></div>`;
+  document.getElementById(`ri-${cid}`)?.focus();
 }
-
-async function submitComment(noticeId, parentId) {
-  const inputId = parentId ? `rinput-${parentId}` : `cinput-${noticeId}`;
-  const input   = document.getElementById(inputId);
+async function postComment(noticeId, parentId) {
+  const inputId = parentId ? `ri-${parentId}` : `ci-${noticeId}`;
+  const input = document.getElementById(inputId);
   const content = input?.value.trim();
-  if (!content) return;
-
+  if (!content||!currentUser) return;
   input.value = '';
-  const { error } = await sb.from('comments').insert({
-    notice_id: noticeId,
-    parent_id: parentId || null,
-    author_id: currentUser.id,
-    content
-  });
-
+  const { error } = await sb.from('comments').insert({ notice_id: noticeId, parent_id: parentId||null, author_id: currentUser.id, content });
   if (error) { showToast('Could not post comment.'); return; }
-
-  const section = document.getElementById(`comments-${noticeId}`);
-  await renderComments(noticeId, section);
-  showToast('Comment posted!');
+  await renderComments(noticeId, document.getElementById(`comments-${noticeId}`));
 }
-
 async function deleteComment(commentId, noticeId) {
   await sb.from('comments').delete().eq('id', commentId);
   document.getElementById(`comment-${commentId}`)?.remove();
   showToast('Comment deleted.');
 }
 
-/* ── DELETE NOTICE ───────────────────────────────────────────── */
+/* DELETE NOTICE */
 async function deleteNotice(id) {
   if (!confirm('Delete this notice permanently?')) return;
   await sb.from('notices').delete().eq('id', id);
@@ -441,138 +311,142 @@ async function deleteNotice(id) {
   showToast('Notice deleted.');
 }
 
-/* ── SHARE / DEEP LINK ───────────────────────────────────────── */
+/* SINGLE NOTICE VIEW (deep link) */
+async function showSingleNotice(id) {
+  // Show app header too
+  showScreen('single-screen');
+  // render header info
+  setTimeout(() => {
+    const av = document.getElementById('user-av-txt2');
+    const nm = document.getElementById('user-name-txt2');
+    if (av) av.textContent = displayName.charAt(0).toUpperCase();
+    if (nm) nm.textContent = displayName;
+    const db = document.getElementById('btn-dashboard2');
+    if (db) db.style.display = isAdmin ? 'flex' : 'none';
+    if (isAdmin) { const f = document.getElementById('fab2'); if(f) f.classList.add('show'); }
+  }, 0);
+
+  const body = document.getElementById('single-body');
+  body.innerHTML = '<div class="spinner"></div>';
+  const { data: n, error } = await sb.from('notices').select('*').eq('id', id).single();
+  if (error || !n) {
+    body.innerHTML = `<button class="back-btn" onclick="goBack()">${iconBack()} Back to all notices</button><div class="empty">${iconEmpty(16)}<h4>Notice not found</h4><p>It may have been deleted or expired.</p></div>`;
+    return;
+  }
+  await loadProfiles([n.author_id]);
+  const authorName = profileCache[n.author_id]||'Alamin';
+  let views = 0;
+  if (isAdmin) {
+    const { count } = await sb.from('notice_views').select('*',{count:'exact',head:true}).eq('notice_id', id);
+    views = count||0;
+  }
+  let isLoved = false;
+  if (currentUser) {
+    const { data: r } = await sb.from('reactions').select('id').eq('notice_id', id).eq('user_id', currentUser.id).single();
+    isLoved = !!r;
+  }
+  allNotices = [n];
+  body.innerHTML = '';
+  const backBtn = document.createElement('button');
+  backBtn.className = 'back-btn';
+  backBtn.onclick = goBack;
+  backBtn.innerHTML = `${iconBack()} Back to all notices`;
+  body.appendChild(backBtn);
+  const card = buildCard(n, authorName, views, isLoved, true);
+  body.appendChild(card);
+  recordView(id);
+}
+function goBack() {
+  history.pushState({}, '', location.pathname);
+  deepLinkId && (window.location.search = '');
+  bootApp();
+}
+
+/* SHARE */
 function shareNotice(id) {
   const url = `${location.origin}${location.pathname}?id=${id}`;
   navigator.clipboard.writeText(url).then(() => showToast('Link copied!'));
 }
 
-function checkDeepLink() {
-  const id = new URLSearchParams(location.search).get('id');
-  if (!id) return;
-  setTimeout(() => {
-    const el = document.getElementById(`card-${id}`);
-    if (el) { el.classList.add('highlight'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  }, 700);
-}
-
-/* ── POST MODAL ──────────────────────────────────────────────── */
+/* POST MODAL */
 function openPost() {
-  editingNoticeId = null;
-  document.getElementById('sheet-title-text').innerHTML = 'New <em>Notice</em>';
-  document.getElementById('btn-publish').textContent     = 'Publish Notice';
-  document.getElementById('post-content').value          = '';
-  document.getElementById('post-image').value            = '';
+  editingId = null;
+  document.getElementById('modal-title').innerHTML = 'New <em>Notice</em>';
+  document.getElementById('btn-publish').textContent = 'Publish Notice';
+  document.getElementById('post-content').value = '';
+  document.getElementById('post-image').value = '';
   document.getElementById('img-preview').classList.remove('show');
-  document.getElementById('upload-zone').style.display  = '';
-  document.getElementById('post-schedule').value         = '';
-  clearMsg('post-error');
-  renderEmojiConfig();
+  document.getElementById('upload-zone').style.display = '';
+  document.getElementById('post-schedule').value = '';
+  hide('post-error');
   document.getElementById('post-modal').classList.add('open');
-  document.getElementById('post-content').focus();
+  setTimeout(() => document.getElementById('post-content').focus(), 80);
 }
-
 function openEdit(id) {
-  const notice = allNotices.find(n => n.id === id);
-  if (!notice) return;
-  editingNoticeId = id;
-  document.getElementById('sheet-title-text').innerHTML  = 'Edit <em>Notice</em>';
-  document.getElementById('btn-publish').textContent      = 'Save Changes';
-  document.getElementById('post-content').value           = notice.content || '';
-  document.getElementById('post-schedule').value          = '';
+  const n = allNotices.find(x => x.id === id); if (!n) return;
+  editingId = id;
+  document.getElementById('modal-title').innerHTML = 'Edit <em>Notice</em>';
+  document.getElementById('btn-publish').textContent = 'Save Changes';
+  document.getElementById('post-content').value = n.content||'';
+  document.getElementById('post-image').value = '';
   document.getElementById('img-preview').classList.remove('show');
-  document.getElementById('upload-zone').style.display   = '';
-  clearMsg('post-error');
-  renderEmojiConfig();
+  document.getElementById('upload-zone').style.display = '';
+  document.getElementById('post-schedule').value = '';
+  hide('post-error');
   document.getElementById('post-modal').classList.add('open');
 }
-
-function closePost() {
-  document.getElementById('post-modal').classList.remove('open');
-}
-
-function handleOverlayClick(e, modalId) {
-  if (e.target.id === modalId) document.getElementById(modalId).classList.remove('open');
-}
-
+function closePost() { document.getElementById('post-modal').classList.remove('open'); }
 function previewImage(e) {
   const file = e.target.files[0]; if (!file) return;
   const prev = document.getElementById('img-preview');
-  prev.src   = URL.createObjectURL(file);
-  prev.classList.add('show');
+  prev.src = URL.createObjectURL(file); prev.classList.add('show');
   document.getElementById('upload-zone').style.display = 'none';
 }
-
 async function handlePublish() {
-  const content  = v('post-content');
-  const fileEl   = document.getElementById('post-image');
-  const file     = fileEl.files[0];
-  const schedStr = v('post-schedule');
-
-  if (!content && !file) return showMsg('post-error', 'Write something or attach an image.', 'error');
-
-  const btn = document.getElementById('btn-publish');
-  setBtn('btn-publish', 'Publishing…', true);
-
+  const content = val('post-content');
+  const file = document.getElementById('post-image').files[0];
+  const schedStr = val('post-schedule');
+  if (!content && !file) return showMsg('post-error','Write something or attach an image.','error');
+  setBtn('btn-publish','Publishing…',true);
   try {
-    let image_url = editingNoticeId ? (allNotices.find(n => n.id === editingNoticeId)?.image_url || null) : null;
-
+    let image_url = editingId ? (allNotices.find(n=>n.id===editingId)?.image_url||null) : null;
     if (file) {
-      // Compress image before upload
-      const compressed = await compressImage(file, 1200, 0.82);
-      const ext   = file.name.split('.').pop();
-      const fname = `${Date.now()}.${ext}`;
-      const { error: upErr } = await sb.storage.from('notice-images').upload(fname, compressed, { cacheControl: '3600', upsert: false });
+      const blob = await compressImage(file, 1280, 0.82);
+      const fname = `${Date.now()}.${file.name.split('.').pop()}`;
+      const { error: upErr } = await sb.storage.from('notice-images').upload(fname, blob, { cacheControl: '3600' });
       if (upErr) throw upErr;
-      const { data: urlData } = sb.storage.from('notice-images').getPublicUrl(fname);
-      image_url = urlData.publicUrl;
+      image_url = sb.storage.from('notice-images').getPublicUrl(fname).data.publicUrl;
     }
-
-    const publish_at = schedStr ? new Date(schedStr).toISOString() : new Date().toISOString();
-    const expires_at = new Date(new Date(publish_at).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    const reactions  = buildEmptyReactions();
-
-    if (editingNoticeId) {
-      const { error } = await sb.from('notices').update({ content, image_url }).eq('id', editingNoticeId);
+    if (editingId) {
+      const { error } = await sb.from('notices').update({ content, image_url, updated_at: new Date().toISOString() }).eq('id', editingId);
       if (error) throw error;
       showToast('Notice updated!');
     } else {
-      const { error } = await sb.from('notices').insert([{
-        content, image_url,
-        author_id: currentUser.id,
-        author_email: currentUser.email,
-        publish_at, expires_at,
-        is_pinned: false,
-        reactions
-      }]);
+      const publish_at = schedStr ? new Date(schedStr).toISOString() : new Date().toISOString();
+      const expires_at = new Date(new Date(publish_at).getTime() + 7*24*60*60*1000).toISOString();
+      const { error } = await sb.from('notices').insert([{ content, image_url, author_id: currentUser.id, is_pinned: false, publish_at, expires_at, love_count: 0, reactions: {} }]);
       if (error) throw error;
       showToast('Notice published!');
     }
-
-    closePost();
-    loadFeed();
-  } catch (err) {
-    showMsg('post-error', err.message || 'Something went wrong.', 'error');
-    setBtn('btn-publish', editingNoticeId ? 'Save Changes' : 'Publish Notice', false);
+    closePost(); loadFeed();
+  } catch(e) {
+    showMsg('post-error', e.message||'Something went wrong.','error');
+    setBtn('btn-publish', editingId?'Save Changes':'Publish Notice', false);
   }
 }
 
-/* ── IMAGE COMPRESSION ───────────────────────────────────────── */
+/* IMAGE COMPRESSION */
 function compressImage(file, maxPx, quality) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        let { width, height } = img;
-        if (width > maxPx || height > maxPx) {
-          if (width > height) { height = Math.round(height * maxPx / width); width = maxPx; }
-          else                { width  = Math.round(width  * maxPx / height); height = maxPx; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        canvas.toBlob(blob => resolve(blob || file), file.type || 'image/jpeg', quality);
+        let {width:w, height:h} = img;
+        if (w>maxPx||h>maxPx) { if(w>h){h=Math.round(h*maxPx/w);w=maxPx;}else{w=Math.round(w*maxPx/h);h=maxPx;} }
+        const c = document.createElement('canvas'); c.width=w; c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        c.toBlob(b=>resolve(b||file), file.type||'image/jpeg', quality);
       };
       img.src = e.target.result;
     };
@@ -580,168 +454,129 @@ function compressImage(file, maxPx, quality) {
   });
 }
 
-/* ── EMOJI CONFIG (admin) ────────────────────────────────────── */
-function renderEmojiConfig() {
-  const wrap = document.getElementById('emoji-tags');
-  wrap.innerHTML = '';
-  configuredEmojis.forEach(emoji => {
-    const tag = document.createElement('div');
-    tag.className = 'emoji-tag';
-    tag.innerHTML = `<span>${emoji}</span><button onclick="removeEmoji('${emoji}')">×</button>`;
-    wrap.appendChild(tag);
-  });
-}
-
-function addEmoji() {
-  const val = document.getElementById('new-emoji').value.trim();
-  if (!val || configuredEmojis.includes(val)) return;
-  configuredEmojis.push(val);
-  localStorage.setItem('emojis', JSON.stringify(configuredEmojis));
-  document.getElementById('new-emoji').value = '';
-  renderEmojiConfig();
-}
-
-function removeEmoji(emoji) {
-  configuredEmojis = configuredEmojis.filter(e => e !== emoji);
-  localStorage.setItem('emojis', JSON.stringify(configuredEmojis));
-  renderEmojiConfig();
-}
-
-function buildEmptyReactions() {
-  const r = {};
-  configuredEmojis.forEach(e => { r[e] = 0; });
-  return r;
-}
-
-/* ── SEARCH ──────────────────────────────────────────────────── */
+/* SEARCH */
 let searchTimer;
 function handleSearch(e) {
   clearTimeout(searchTimer);
   const q = e.target.value.trim();
-  searchTimer = setTimeout(() => {
-    if (q.length >= 2) loadFeed(q);
-    else if (searchActive) loadFeed();
-  }, 400);
+  searchTimer = setTimeout(() => { if (q.length>=2) loadFeed(q); else if (searchActive) loadFeed(); }, 380);
 }
+function clearSearch() { document.getElementById('search-input').value=''; loadFeed(); }
 
-function clearSearch() {
-  document.getElementById('search-input').value = '';
-  loadFeed();
-}
-
-/* ── SETTINGS MODAL ──────────────────────────────────────────── */
+/* SETTINGS */
 function openSettings() {
   document.getElementById('settings-name').value = displayName;
+  hide('settings-msg');
   document.getElementById('settings-modal').classList.add('open');
 }
-
-function closeSettings() {
-  document.getElementById('settings-modal').classList.remove('open');
-}
-
+function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
 async function saveSettings() {
-  const name = document.getElementById('settings-name').value.trim();
-  if (!name) return showMsg('settings-msg', 'Name cannot be empty.', 'error');
-  setBtn('btn-save-settings', 'Saving…', true);
+  const name = val('settings-name');
+  if (!name) return showMsg('settings-msg','Name cannot be empty.','error');
+  setBtn('btn-save-settings','Saving…',true);
   const { error } = await sb.from('profiles').upsert({ id: currentUser.id, display_name: name });
-  setBtn('btn-save-settings', 'Save Changes', false);
+  setBtn('btn-save-settings','Save Changes',false);
   if (error) return showMsg('settings-msg', error.message, 'error');
-  displayName = name;
-  document.getElementById('user-av').textContent   = name.charAt(0).toUpperCase();
-  document.getElementById('user-name').textContent = name;
-  closeSettings();
-  showToast('Display name updated!');
-  loadFeed();
+  displayName = name; profileCache[currentUser.id] = name;
+  document.getElementById('user-av-txt').textContent   = name.charAt(0).toUpperCase();
+  document.getElementById('user-name-txt').textContent = name;
+  closeSettings(); showToast('Name updated!');
 }
 
-/* ── ADMIN DASHBOARD ─────────────────────────────────────────── */
+/* DASHBOARD */
 async function openDashboard() {
   document.getElementById('dash-modal').classList.add('open');
-  document.getElementById('dash-content').innerHTML = '<div class="spinner" style="margin:40px auto;"></div>';
-
-  // Total notices
-  const { count: total } = await sb.from('notices').select('*', { count: 'exact', head: true });
-  const { count: active } = await sb.from('notices').select('*', { count: 'exact', head: true })
-    .gt('expires_at', new Date().toISOString());
-  const { count: totalViews } = await sb.from('notice_views').select('*', { count: 'exact', head: true });
-
-  // Per-notice view counts
-  const { data: notices } = await sb.from('notices').select('id, content, created_at').order('created_at', { ascending: false }).limit(20);
-  const ids = (notices || []).map(n => n.id);
-  let viewMap = {};
+  const dc = document.getElementById('dash-content');
+  dc.innerHTML = '<div class="spinner" style="margin:40px auto"></div>';
+  const [
+    { count: total },
+    { count: active },
+    { count: totalViews },
+    { data: notices }
+  ] = await Promise.all([
+    sb.from('notices').select('*',{count:'exact',head:true}),
+    sb.from('notices').select('*',{count:'exact',head:true}).gt('expires_at', new Date().toISOString()),
+    sb.from('notice_views').select('*',{count:'exact',head:true}),
+    sb.from('notices').select('id,content,created_at,is_pinned,love_count').order('created_at',{ascending:false}).limit(25)
+  ]);
+  const ids = (notices||[]).map(n=>n.id);
+  let vMap = {};
   if (ids.length) {
-    const { data: views } = await sb.from('notice_views').select('notice_id').in('notice_id', ids);
-    (views || []).forEach(v => { viewMap[v.notice_id] = (viewMap[v.notice_id] || 0) + 1; });
+    const { data: vs } = await sb.from('notice_views').select('notice_id').in('notice_id', ids);
+    (vs||[]).forEach(v => { vMap[v.notice_id]=(vMap[v.notice_id]||0)+1; });
   }
-
-  const rows = (notices || []).map(n => `
+  const rows = (notices||[]).map(n=>`
     <tr>
-      <td>${esc(n.content.substring(0, 60))}${n.content.length > 60 ? '…' : ''}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((n.content||'').substring(0,55))}${(n.content||'').length>55?'…':''}</td>
       <td>${formatTime(n.created_at)}</td>
-      <td class="views-cell">${viewMap[n.id] || 0}</td>
-     </tr>`).join('');
-
-  document.getElementById('dash-content').innerHTML = `
+      <td class="td-views">${vMap[n.id]||0}</td>
+      <td>${n.love_count||0}</td>
+      <td style="display:flex;gap:6px">
+        <button class="td-act" onclick="dashPin('${n.id}',${!n.is_pinned})" title="${n.is_pinned?'Unpin':'Pin'}">${iconPin(13)}</button>
+        <button class="td-act del" onclick="dashDelete('${n.id}')" title="Delete">${iconTrash(13)}</button>
+      </td>
+    </tr>`).join('');
+  dc.innerHTML = `
     <div class="dash-grid">
-      <div class="dash-tile"><div class="dt-val">${total || 0}</div><div class="dt-label">Total Notices</div></div>
-      <div class="dash-tile"><div class="dt-val">${active || 0}</div><div class="dt-label">Active Notices</div></div>
-      <div class="dash-tile"><div class="dt-val">${totalViews || 0}</div><div class="dt-label">Total Views</div></div>
+      <div class="dash-tile"><div class="dash-val">${total||0}</div><div class="dash-label">Total Notices</div></div>
+      <div class="dash-tile"><div class="dash-val">${active||0}</div><div class="dash-label">Active</div></div>
+      <div class="dash-tile"><div class="dash-val">${totalViews||0}</div><div class="dash-label">Total Views</div></div>
     </div>
     <table class="dash-table">
-      <thead><tr><th>Notice</th><th>Posted</th><th>Views</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="3" style="color:var(--text-soft)">No notices yet.</td></tr>'}</tbody>
+      <thead><tr><th>Notice</th><th>Posted</th><th>Views</th><th>Loves</th><th>Actions</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="5" style="color:var(--text-soft)">No notices yet.</td></tr>'}</tbody>
     </table>`;
 }
-
-function closeDashboard() {
-  document.getElementById('dash-modal').classList.remove('open');
+async function dashPin(id, pin) {
+  await sb.from('notices').update({ is_pinned: pin }).eq('id', id);
+  showToast(pin?'Pinned!':'Unpinned.'); openDashboard(); loadFeed();
 }
-
-/* ── UTILS ───────────────────────────────────────────────────── */
-function v(id)  { return document.getElementById(id)?.value?.trim() || ''; }
-function esc(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function showMsg(id, msg, type) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = msg;
-  el.className   = `msg-box ${type}`;
-  el.style.display = 'block';
+async function dashDelete(id) {
+  if (!confirm('Delete this notice?')) return;
+  await sb.from('notices').delete().eq('id', id);
+  showToast('Deleted.'); openDashboard(); loadFeed();
 }
+function closeDashboard() { document.getElementById('dash-modal').classList.remove('open'); }
 
-function clearMsg(id) {
-  const el = document.getElementById(id);
-  if (el) el.style.display = 'none';
-}
-
-function setBtn(id, text, disabled) {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  btn.textContent = text;
-  btn.disabled    = disabled;
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function formatTime(iso) {
-  const d = new Date(iso), now = new Date();
-  const diff = Math.floor((now - d) / 1000);
-  if (diff < 60)     return 'just now';
-  if (diff < 3600)   return `${Math.floor(diff/60)}m ago`;
-  if (diff < 86400)  return `${Math.floor(diff/3600)}h ago`;
-  if (diff < 604800) return `${Math.floor(diff/86400)}d ago`;
-  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-}
-
+/* OVERLAY */
+function overlayClick(e, id) { if (e.target.id===id) document.getElementById(id).classList.remove('open'); }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
-  }
+  if (e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'));
 });
+
+/* SVG ICONS */
+const sv = (d,s=15)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+function iconHeart(filled,s=15){return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${filled?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;}
+function iconComment(s=15){return sv('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',s)}
+function iconShare(s=15){return sv('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',s)}
+function iconPin(s=15){return sv('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',s)}
+function iconEdit(s=15){return sv('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',s)}
+function iconTrash(s=15){return sv('<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>',s)}
+function iconEye(s=15){return sv('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',s)}
+function iconBack(s=15){return sv('<polyline points="15 18 9 12 15 6"/>',s)}
+function iconArchive(s=15){return sv('<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>',s)}
+function iconClock(s=15){return sv('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',s)}
+function iconSearch(s=15){return sv('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',s)}
+function iconSettings(s=15){return sv('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',s)}
+function iconSignOut(s=15){return sv('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',s)}
+function iconDash(s=15){return sv('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',s)}
+function iconPlus(s=18){return sv('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',s)}
+function iconEmpty(s=48){return sv('<circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',s)}
+
+/* UTILS */
+function val(id)  { return document.getElementById(id)?.value?.trim()||''; }
+function esc(s)   { if(!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function hide(id) { const el=document.getElementById(id); if(el) el.style.display='none'; }
+function errHtml(m){ return `<p style="color:var(--danger);text-align:center;padding:40px;font-size:14px">${m}</p>`; }
+function showMsg(id,msg,type){ const el=document.getElementById(id); if(!el) return; el.textContent=msg; el.className=`msg-box ${type}`; el.style.display='block'; }
+function setBtn(id,text,disabled){ const b=document.getElementById(id); if(!b) return; b.textContent=text; b.disabled=disabled; }
+let toastT;
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function formatTime(iso){
+  const d=new Date(iso),now=new Date(),diff=Math.floor((now-d)/1000);
+  if(diff<60) return 'just now';
+  if(diff<3600) return `${Math.floor(diff/60)}m ago`;
+  if(diff<86400) return `${Math.floor(diff/3600)}h ago`;
+  if(diff<604800) return `${Math.floor(diff/86400)}d ago`;
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
