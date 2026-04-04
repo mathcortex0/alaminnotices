@@ -1,216 +1,512 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Alamin Notices</title>
-  <meta name="description" content="Official announcement portal by Alamin."/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="styles.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>KinetiPrep - Exam Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fc 0%, #eef2f8 100%);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+        .logo-text {
+            font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0f2b3d, #1b7e9f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 40px;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .nav-btn.primary {
+            background: #1e6f5c;
+            color: white;
+        }
+        .nav-btn.primary:hover {
+            background: #0e5a48;
+        }
+        .nav-btn.outline {
+            border: 1px solid #cbd5e1;
+            background: white;
+        }
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f1f5f9;
+            padding: 6px 16px;
+            border-radius: 40px;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.8rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            border: 1px solid #e2edf2;
+        }
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.8rem;
+            margin-top: 1.5rem;
+        }
+        .exam-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e2edf2;
+            cursor: pointer;
+        }
+        .exam-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #eef2ff;
+            color: #1e4a76;
+        }
+        .btn {
+            background: #1e6f5c;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-secondary {
+            background: #334155;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            font-family: inherit;
+        }
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2edf2;
+        }
+        .timer {
+            font-family: monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: #0f172a;
+            color: #facc15;
+            padding: 6px 14px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1rem; }
+            .navbar { flex-direction: column; }
+        }
+        .admin-panel {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 1.5rem;
+        }
+    </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════════════
-     AUTH SCREEN
-════════════════════════════════════════════════════ -->
-<div id="auth-screen" class="screen active">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <img src="logo.png" alt="Alamin Notices" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-      <div style="display:none;width:62px;height:62px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold-lt));align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--navy);margin:0 auto 13px;box-shadow:var(--shadow-gold)">A</div>
-      <h1>Alamin Notices</h1>
-      <p>Official Announcement Portal</p>
+<div class="navbar">
+    <div class="logo-area">
+        <img src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/kkk.png" alt="KinetiPrep" class="logo" onerror="this.src='https://placehold.co/48x48?text=KP'">
+        <span class="logo-text">KinetiPrep</span>
     </div>
-
-    <div class="tab-row">
-      <button class="tab-btn active" id="tab-login"  onclick="switchTab('login')">Sign In</button>
-      <button class="tab-btn"        id="tab-signup" onclick="switchTab('signup')">Create Account</button>
+    <div class="nav-links" id="navLinks">
+        <button class="nav-btn" onclick="showExams()">📚 Exams</button>
+        <button class="nav-btn" id="authBtn" onclick="showAuthModal()">Sign In</button>
     </div>
-
-    <!-- Login -->
-    <div id="login-form">
-      <div class="field"><label>Email Address</label>
-        <input type="email" id="login-email" placeholder="your@email.com"/>
-      </div>
-      <div class="field"><label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')handleLogin()"/>
-      </div>
-      <button class="btn-gold" id="btn-login" onclick="handleLogin()">Sign In →</button>
-    </div>
-
-    <!-- Signup -->
-    <div id="signup-form" style="display:none">
-      <div class="field"><label>Display Name</label>
-        <input type="text" id="signup-name" placeholder="e.g. Alamin"/>
-      </div>
-      <div class="field"><label>Email Address</label>
-        <input type="email" id="signup-email" placeholder="your@email.com"/>
-      </div>
-      <div class="field"><label>Password <span style="color:var(--text-soft);font-size:10px">(min 6 chars)</span></label>
-        <input type="password" id="signup-password" placeholder="Create a password" onkeydown="if(event.key==='Enter')handleSignup()"/>
-      </div>
-      <button class="btn-gold" id="btn-signup" onclick="handleSignup()">Create Account →</button>
-    </div>
-
-    <div class="divider">or</div>
-    <button class="btn-google" onclick="handleGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      Continue with Google
-    </button>
-
-    <div class="msg-box" id="auth-msg"></div>
-  </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════
-     APP SCREEN (main feed)
-════════════════════════════════════════════════════ -->
-<div id="app-screen" class="screen">
-  <header id="site-header">
-    <div class="h-logo">
-      <img src="logo.png" alt="logo" onerror="this.style.display='none'"/>
-      <span class="h-logo-text">Alamin Notices</span>
+<div class="container" id="appContainer">
+    <div id="dynamicContent">
+        <!-- Welcome screen -->
+        <div class="card" style="text-align: center;">
+            <h2>📘 Welcome to KinetiPrep</h2>
+            <p>Smart exam platform — practice, compete, lead.</p>
+            <button class="btn" onclick="showAuthModal()" style="margin-top: 1rem;">Get Started →</button>
+        </div>
     </div>
-
-    <div class="h-search">
-      <span class="h-search-icon">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </span>
-      <input type="text" id="search-input" placeholder="Search notices…" oninput="handleSearch(event)"/>
-    </div>
-
-    <div class="h-right">
-      <!-- Dashboard: admin only -->
-      <button class="h-icon-btn" id="btn-dashboard" style="display:none" onclick="openDashboard()" title="Dashboard">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </button>
-      <!-- Settings -->
-      <button class="h-icon-btn" onclick="openSettings()" title="Settings">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      </button>
-      <!-- User chip -->
-      <div class="user-chip">
-        <div class="user-av" id="user-av-txt">?</div>
-        <span class="user-name-txt" id="user-name-txt"></span>
-      </div>
-      <!-- Sign out -->
-      <button class="h-icon-btn sign-out" onclick="handleLogout()" title="Sign out">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
-    </div>
-  </header>
-
-  <main id="app-body">
-    <div class="feed-top">
-      <h2>Latest Notices</h2>
-      <span id="notice-count">Loading…</span>
-    </div>
-    <div id="search-banner">
-      <span id="search-result-text"></span>
-      <button onclick="clearSearch()">×</button>
-    </div>
-    <div id="feed"></div>
-  </main>
 </div>
 
-<!-- ════════════════════════════════════════════════════
-     SINGLE NOTICE SCREEN (deep link)
-════════════════════════════════════════════════════ -->
-<div id="single-screen" class="screen">
-  <header id="site-header" style="position:sticky;top:0;z-index:200;height:60px;background:rgba(8,15,28,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--navy-line);display:flex;align-items:center;padding:0 20px;gap:12px">
-    <div class="h-logo">
-      <img src="logo.png" alt="logo" onerror="this.style.display='none'"/>
-      <span class="h-logo-text">Alamin Notices</span>
+<!-- Auth Modal -->
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <h3 id="authTitle">Sign In</h3>
+        <input type="email" id="authEmail" placeholder="Email" autocomplete="email">
+        <input type="password" id="authPassword" placeholder="Password">
+        <input type="text" id="authName" placeholder="Full Name (for signup)" style="display:none;">
+        <button class="btn" id="authSubmitBtn" style="width:100%">Sign In</button>
+        <p id="toggleAuthMsg" style="margin-top: 1rem; text-align:center; cursor:pointer; color:#1e6f5c;">Create new account</p>
+        <button class="btn-secondary" style="margin-top: 0.5rem; width:100%" onclick="closeModal('authModal')">Cancel</button>
     </div>
-    <div class="h-right" style="margin-left:auto">
-      <button class="h-icon-btn" id="btn-dashboard2" style="display:none" onclick="openDashboard()" title="Dashboard">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </button>
-      <button class="h-icon-btn" onclick="openSettings()" title="Settings">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      </button>
-      <div class="user-chip">
-        <div class="user-av" id="user-av-txt2">?</div>
-        <span class="user-name-txt" id="user-name-txt2"></span>
-      </div>
-      <button class="h-icon-btn sign-out" onclick="handleLogout()" title="Sign out">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
-    </div>
-  </header>
-  <main id="single-body"></main>
 </div>
 
-<!-- FAB (admin) -->
-<button id="fab" title="New Notice" onclick="openPost()">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-</button>
-
-<!-- Toast -->
-<div id="toast"></div>
-
-<!-- ════════════════════════════════════════════════════
-     POST / EDIT MODAL
-════════════════════════════════════════════════════ -->
-<div class="overlay" id="post-modal" onclick="overlayClick(event,'post-modal')">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title" id="modal-title">New <em>Notice</em></div>
-    <div class="field"><label>Content</label>
-      <textarea id="post-content" rows="5" placeholder="Write your announcement…"></textarea>
+<!-- Exam Entry Modal -->
+<div id="examEntryModal" class="modal">
+    <div class="modal-content">
+        <h3>🔐 Enter Exam Code</h3>
+        <input type="text" id="examCode" placeholder="CSV Code (e.g., PHYSICS101)">
+        <button class="btn" onclick="validateAndStartExam()">Start Exam</button>
+        <button class="btn-secondary" onclick="closeModal('examEntryModal')">Cancel</button>
     </div>
-    <img id="img-preview" alt="Preview"/>
-    <div class="upload-zone" id="upload-zone">
-      <input type="file" id="post-image" accept="image/*" onchange="previewImage(event)"/>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 8px;opacity:.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <p><strong>Attach image</strong> — optional, auto-compressed</p>
-    </div>
-    <div class="field"><label>Schedule (leave blank to publish now)</label>
-      <input type="datetime-local" id="post-schedule"/>
-    </div>
-    <div class="msg-box" id="post-error"></div>
-    <div class="sheet-actions">
-      <button class="btn-cancel" onclick="closePost()">Cancel</button>
-      <button class="btn-publish" id="btn-publish" onclick="handlePublish()">Publish Notice</button>
-    </div>
-  </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════
-     SETTINGS MODAL
-════════════════════════════════════════════════════ -->
-<div class="overlay" id="settings-modal" onclick="overlayClick(event,'settings-modal')">
-  <div class="sheet" style="max-width:420px">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Your <em>Settings</em></div>
-    <div class="field"><label>Display Name <span style="color:var(--text-soft);font-size:10px">(shown publicly, not your email)</span></label>
-      <input type="text" id="settings-name" placeholder="Your name"/>
+<!-- Exam Taking Modal (full exam UI) -->
+<div id="examTakingModal" class="modal" style="overflow-y: auto;">
+    <div class="modal-content" style="max-width: 850px; width:95%">
+        <div id="examHeader"></div>
+        <div id="examQuestions"></div>
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <button class="btn-secondary" onclick="submitExam()">Submit Exam</button>
+        </div>
     </div>
-    <div class="msg-box" id="settings-msg"></div>
-    <div class="sheet-actions">
-      <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
-      <button class="btn-publish" id="btn-save-settings" onclick="saveSettings()">Save Changes</button>
-    </div>
-  </div>
 </div>
 
-<!-- ════════════════════════════════════════════════════
-     ADMIN DASHBOARD MODAL
-════════════════════════════════════════════════════ -->
-<div class="overlay" id="dash-modal" onclick="overlayClick(event,'dash-modal')">
-  <div class="sheet" style="max-width:660px">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Admin <em>Dashboard</em></div>
-    <div id="dash-content"></div>
-    <div class="sheet-actions" style="margin-top:20px">
-      <button class="btn-cancel" onclick="closeDashboard()">Close</button>
-    </div>
-  </div>
-</div>
+<script>
+    const SUPABASE_URL = 'https://mtvsiblpujxdasvbihol.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_2jmfkbdD46rK05Tz_LlYqw_tS-fcrJx';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<script src="app.js"></script>
+    let currentUser = null;
+    let currentUserRole = 'student';
+    let currentExamContext = null; // { exam, questions, timeLeft, interval, answers }
+    
+    // Session persistence
+    async function checkSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            await fetchUserRole();
+            updateUIForUser();
+            showExams();
+        } else {
+            currentUser = null;
+            updateUIForUser();
+            showExams();
+        }
+    }
+
+    async function fetchUserRole() {
+        if (!currentUser) return;
+        const { data } = await supabase.from('profiles').select('role').eq('id', currentUser.id).single();
+        if (data) currentUserRole = data.role;
+        else currentUserRole = 'student';
+    }
+
+    function updateUIForUser() {
+        const nav = document.getElementById('navLinks');
+        if (currentUser) {
+            nav.innerHTML = `<button class="nav-btn" onclick="showExams()">📚 Exams</button>
+                             <button class="nav-btn" onclick="showLeaderboardGlobal()">🏆 Leaderboard</button>
+                             ${currentUserRole === 'admin' ? '<button class="nav-btn primary" onclick="showAdminPanel()">⚙️ Admin</button>' : ''}
+                             <div class="user-badge">👤 ${currentUser.email.split('@')[0]} <button class="nav-btn" onclick="logout()">🚪</button></div>`;
+        } else {
+            nav.innerHTML = `<button class="nav-btn" onclick="showExams()">Exams</button><button class="nav-btn primary" id="authBtn" onclick="showAuthModal()">Sign In</button>`;
+        }
+    }
+
+    async function logout() {
+        await supabase.auth.signOut();
+        currentUser = null;
+        updateUIForUser();
+        showExams();
+    }
+
+    // Auth modal handling
+    let isLoginMode = true;
+    function showAuthModal() {
+        isLoginMode = true;
+        document.getElementById('authTitle').innerText = 'Sign In';
+        document.getElementById('authName').style.display = 'none';
+        document.getElementById('authSubmitBtn').innerText = 'Sign In';
+        document.getElementById('toggleAuthMsg').innerText = 'New user? Create account';
+        document.getElementById('authModal').style.display = 'flex';
+    }
+    document.getElementById('toggleAuthMsg').onclick = () => {
+        isLoginMode = !isLoginMode;
+        if (!isLoginMode) {
+            document.getElementById('authTitle').innerText = 'Create Account';
+            document.getElementById('authName').style.display = 'block';
+            document.getElementById('authSubmitBtn').innerText = 'Sign Up';
+            document.getElementById('toggleAuthMsg').innerText = 'Already have an account? Sign In';
+        } else {
+            document.getElementById('authTitle').innerText = 'Sign In';
+            document.getElementById('authName').style.display = 'none';
+            document.getElementById('authSubmitBtn').innerText = 'Sign In';
+            document.getElementById('toggleAuthMsg').innerText = 'New user? Create account';
+        }
+    };
+    document.getElementById('authSubmitBtn').onclick = async () => {
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+        if (isLoginMode) {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) alert(error.message);
+            else { closeModal('authModal'); checkSession(); }
+        } else {
+            const fullName = document.getElementById('authName').value;
+            const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
+            if (error) alert(error.message);
+            else { alert('Account created! Please sign in.'); isLoginMode = true; showAuthModal(); }
+        }
+    };
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; if (currentExamContext?.interval) clearInterval(currentExamContext.interval); }
+
+    // Main functions
+    async function showExams() {
+        document.getElementById('dynamicContent').innerHTML = `<div class="card"><h2>📋 Available Exams</h2><div class="exam-grid" id="examGrid"></div></div>`;
+        let query = supabase.from('exams').select('*').eq('is_active', true);
+        if (currentUserRole !== 'admin') query = query.lte('available_until', new Date().toISOString()); // show only active deadline? actually we show all active but can enforce
+        const { data: exams, error } = await supabase.from('exams').select('*').eq('is_active', true);
+        if (error) console.error(error);
+        const grid = document.getElementById('examGrid');
+        if (!exams || exams.length === 0) grid.innerHTML = '<p>No exams available right now.</p>';
+        else {
+            exams.forEach(exam => {
+                const card = document.createElement('div');
+                card.className = 'exam-card';
+                card.innerHTML = `<h3>${exam.title}</h3><p>${exam.description || 'MCQ Exam'}</p><div class="badge">⏱️ ${exam.time_limit_minutes} min</div><div class="badge" style="background:#fef9e3">📅 Until ${new Date(exam.available_until).toLocaleDateString()}</div><button class="btn" style="margin-top:12px" onclick="promptExamCode('${exam.csv_code}')">Take Exam</button>`;
+                grid.appendChild(card);
+            });
+        }
+        if (currentUserRole === 'admin') {
+            document.getElementById('dynamicContent').innerHTML += `<div class="admin-panel" style="margin-top:2rem"><h3>🛠️ Admin Quick Create</h3><button class="btn" onclick="showCreateExamForm()">+ New Exam</button><button class="btn-secondary" onclick="showAdminPanel()">Full Admin Panel</button></div>`;
+        }
+    }
+
+    window.promptExamCode = (code) => {
+        document.getElementById('examCode').value = code;
+        document.getElementById('examEntryModal').style.display = 'flex';
+    };
+    window.validateAndStartExam = async () => {
+        const code = document.getElementById('examCode').value.trim();
+        const { data: exam, error } = await supabase.from('exams').select('*').eq('csv_code', code).single();
+        if (error || !exam) { alert('Invalid exam code'); return; }
+        if (new Date(exam.available_until) < new Date()) { alert('Exam deadline passed'); return; }
+        const { data: existing } = await supabase.from('attempts').select('id, is_completed').eq('user_id', currentUser.id).eq('exam_id', exam.id).maybeSingle();
+        if (existing && existing.is_completed) { alert('You already completed this exam'); closeModal('examEntryModal'); return; }
+        if (existing && !existing.is_completed) { alert('You have an unfinished attempt. Continue?'); }
+        // fetch questions
+        const { data: questions } = await supabase.from('questions').select('*').eq('exam_id', exam.id).order('question_number');
+        if (!questions || questions.length === 0) { alert('No questions found for this exam'); return; }
+        startExamSession(exam, questions);
+        closeModal('examEntryModal');
+    };
+
+    function startExamSession(exam, questions) {
+        if (currentExamContext?.interval) clearInterval(currentExamContext.interval);
+        const timeLimit = exam.time_limit_minutes * 60;
+        let timeLeft = timeLimit;
+        const answers = {};
+        const renderExam = () => {
+            let html = `<div style="display:flex; justify-content:space-between;"><h2>${exam.title}</h2><span class="timer" id="examTimer">${formatTime(timeLeft)}</span></div><div id="questionsList"></div>`;
+            document.getElementById('examHeader').innerHTML = html;
+            let qHtml = '';
+            questions.forEach((q, idx) => {
+                const saved = answers[q.id] || '';
+                qHtml += `<div style="margin-bottom:2rem;border-bottom:1px solid #ddd;padding-bottom:1rem"><strong>Q${idx+1}. ${q.question_text}</strong><br>
+                <label><input type="radio" name="q${q.id}" value="A" ${saved === 'A' ? 'checked' : ''}> A. ${q.option_a}</label><br>
+                <label><input type="radio" name="q${q.id}" value="B" ${saved === 'B' ? 'checked' : ''}> B. ${q.option_b}</label><br>
+                <label><input type="radio" name="q${q.id}" value="C" ${saved === 'C' ? 'checked' : ''}> C. ${q.option_c}</label><br>
+                <label><input type="radio" name="q${q.id}" value="D" ${saved === 'D' ? 'checked' : ''}> D. ${q.option_d}</label><br></div>`;
+            });
+            document.getElementById('questionsList').innerHTML = qHtml;
+            document.querySelectorAll('input[type=radio]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const name = e.target.name;
+                    const qid = parseInt(name.substring(1));
+                    answers[qid] = e.target.value;
+                });
+            });
+        };
+        const interval = setInterval(() => {
+            if (timeLeft <= 0) { clearInterval(interval); submitExamForce(exam, questions, answers); }
+            else { timeLeft--; const timerSpan = document.getElementById('examTimer'); if (timerSpan) timerSpan.innerText = formatTime(timeLeft); }
+        }, 1000);
+        currentExamContext = { exam, questions, timeLeft, interval, answers, renderFn: renderExam };
+        document.getElementById('examTakingModal').style.display = 'flex';
+        renderExam();
+    }
+
+    function formatTime(sec) { let m = Math.floor(sec/60); let s = sec%60; return `${m}:${s<10?'0'+s:s}`; }
+
+    async function submitExam() {
+        if (!currentExamContext) return;
+        clearInterval(currentExamContext.interval);
+        await finalSubmit(currentExamContext.exam, currentExamContext.questions, currentExamContext.answers);
+    }
+    async function submitExamForce(exam, questions, answers) {
+        await finalSubmit(exam, questions, answers);
+    }
+    async function finalSubmit(exam, questions, answersObj) {
+        let correct = 0, wrong = 0;
+        const answersMap = {};
+        for (let q of questions) {
+            const selected = answersObj[q.id];
+            answersMap[q.id] = selected || null;
+            if (!selected) continue;
+            if (selected === q.correct_answer) correct++;
+            else wrong++;
+        }
+        const skipped = questions.length - (correct + wrong);
+        const score = correct - (wrong * 0.25);
+        const finalScore = Math.max(0, score);
+        const { error } = await supabase.from('attempts').insert({
+            user_id: currentUser.id,
+            exam_id: exam.id,
+            submitted_at: new Date(),
+            score: finalScore,
+            correct_count: correct,
+            wrong_count: wrong,
+            skipped_count: skipped,
+            answers: answersMap,
+            is_completed: true
+        });
+        if (error) console.error(error);
+        alert(`Exam submitted! Score: ${finalScore.toFixed(2)} / ${questions.length}`);
+        closeModal('examTakingModal');
+        currentExamContext = null;
+        showExams();
+    }
+
+    async function showLeaderboardGlobal() {
+        const { data: exams } = await supabase.from('exams').select('id, title');
+        let html = `<div class="card"><h2>🏆 Exam Leaderboards</h2>`;
+        for (let exam of exams) {
+            const { data: ranks } = await supabase.from('leaderboard').select('full_name, score, rank').eq('exam_id', exam.id).limit(10);
+            html += `<h3>${exam.title}</h3><table class="leaderboard-table"><tr><th>Rank</th><th>Name</th><th>Score</th></tr>`;
+            if (ranks && ranks.length) ranks.forEach(r => { html += `<tr><td>${r.rank}</td><td>${r.full_name || 'Student'}</td><td>${r.score}</td></tr>`; });
+            else html += `<tr><td colspan="3">No attempts yet</td></tr>`;
+            html += `</table><br>`;
+        }
+        html += `</div>`;
+        document.getElementById('dynamicContent').innerHTML = html;
+    }
+
+    function showAdminPanel() { window.location.reload(); alert('Admin panel: Use SQL or direct insert. For quick create, fill form.'); showCreateExamForm(); }
+    function showCreateExamForm() {
+        document.getElementById('dynamicContent').innerHTML = `<div class="card"><h2>✏️ Create New Exam</h2><input id="examTitle" placeholder="Exam Title"><input id="examDesc" placeholder="Description"><input id="timeMins" type="number" placeholder="Time (minutes)"><input id="deadlineDate" type="datetime-local"><input id="csvCode" placeholder="Unique CSV Code"><textarea id="csvData" rows="8" placeholder="CSV format: Question,Option A,Option B,Option C,Option D,Correct Answer,Explanation&#10;Example: What is 2+2?,3,4,5,6,B,simple"></textarea><button class="btn" onclick="createExamFromCSV()">Create Exam</button></div>`;
+    }
+    window.createExamFromCSV = async () => {
+        const title = document.getElementById('examTitle').value;
+        const desc = document.getElementById('examDesc').value;
+        const mins = parseInt(document.getElementById('timeMins').value);
+        const deadline = document.getElementById('deadlineDate').value;
+        const code = document.getElementById('csvCode').value;
+        const csvText = document.getElementById('csvData').value;
+        if (!title || !mins || !deadline || !code || !csvText) { alert('Fill all fields'); return; }
+        const { data: exam, error } = await supabase.from('exams').insert({ title, description: desc, time_limit_minutes: mins, available_until: deadline, csv_code: code, created_by: currentUser.id, total_questions: 0 }).select().single();
+        if (error) { alert(error.message); return; }
+        const lines = csvText.split('\n').filter(l => l.trim() && !l.startsWith('Question'));
+        let qNum = 1;
+        for (let line of lines) {
+            const parts = line.split(',').map(p => p.trim());
+            if (parts.length < 7) continue;
+            const [qText, optA, optB, optC, optD, correct, expl] = parts;
+            await supabase.from('questions').insert({ exam_id: exam.id, question_number: qNum++, question_text: qText, option_a: optA, option_b: optB, option_c: optC, option_d: optD, correct_answer: correct, explanation: expl });
+        }
+        await supabase.from('exams').update({ total_questions: qNum-1 }).eq('id', exam.id);
+        alert(`Exam "${title}" created with ${qNum-1} questions!`);
+        showExams();
+    };
+
+    checkSession();
+    window.showExams = showExams;
+    window.showLeaderboardGlobal = showLeaderboardGlobal;
+    window.showAdminPanel = showAdminPanel;
+    window.showCreateExamForm = showCreateExamForm;
+</script>
 </body>
 </html>
