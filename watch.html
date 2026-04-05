@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>OpenVector · Watch</title>
+
+<!-- SEO: prevent indexing of watch pages -->
+<meta name="robots" content="noindex, nofollow">
+<!-- OG: no YouTube preview leakage -->
+<meta property="og:title" content="OpenVector Academy">
+<meta property="og:description" content="Course content — members only.">
+<meta property="og:image" content="">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; outline:none; }
+  :root {
+    --bg: #07090f; --s1: #0e1119; --s2: #141820;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --teal: #00e5c3; --teal-glow: rgba(0,229,195,0.18); --teal-dim: rgba(0,229,195,0.08);
+    --white: #f0f4ff; --gray: #6b7589; --gray2: #9aa3b5;
+  }
+  html, body { width:100%; height:100%; background:var(--bg); font-family:'DM Sans',sans-serif; color:var(--white); overflow:hidden; }
+  body { display:flex; flex-direction:column; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    height:56px; flex-shrink:0;
+    background:var(--s1); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 24px; z-index:100;
+  }
+  .brand { font-family:'Syne',sans-serif; font-weight:800; font-size:1.05rem; letter-spacing:-0.02em; color:var(--white); display:flex; align-items:center; gap:9px; }
+  .brand-dot { width:7px; height:7px; background:var(--teal); border-radius:50%; box-shadow:0 0 8px var(--teal); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .members-tag { font-family:'DM Sans',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal); background:var(--teal-dim); border:1px solid rgba(0,229,195,0.2); padding:3px 10px; border-radius:20px; }
+
+  /* ── SHELL ── */
+  .shell { flex:1; display:flex; min-height:0; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width:300px; flex-shrink:0;
+    background:var(--s1); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; overflow:hidden;
+    transition:transform 0.3s ease;
+  }
+  .sidebar-head { padding:18px 20px 14px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .sidebar-head h2 { font-family:'Syne',sans-serif; font-size:0.9rem; font-weight:700; color:var(--white); margin-bottom:3px; }
+  .sidebar-head p { font-size:0.7rem; color:var(--gray); }
+  .track-list { flex:1; overflow-y:auto; padding:8px; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+  .track-list::-webkit-scrollbar { width:3px; }
+  .track-list::-webkit-scrollbar-thumb { background:var(--border); }
+
+  .track-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:9px; cursor:pointer; transition:background 0.15s; border:1px solid transparent; margin-bottom:3px; }
+  .track-item:hover { background:var(--s2); }
+  .track-item.active { background:var(--teal-dim); border-color:rgba(0,229,195,0.18); }
+  .track-num { font-size:0.68rem; font-weight:600; color:var(--gray); width:20px; text-align:center; flex-shrink:0; font-family:'DM Mono',monospace; }
+  .track-item.active .track-num { color:var(--teal); }
+  .track-thumb { width:48px; height:30px; border-radius:5px; background:#1a2030; flex-shrink:0; object-fit:cover; }
+  .track-info { flex:1; min-width:0; }
+  .track-title { font-size:0.76rem; font-weight:600; color:var(--gray2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }
+  .track-item.active .track-title { color:var(--white); }
+  .track-sub { font-size:0.65rem; color:var(--gray); margin-top:2px; }
+  .eq-bars { display:none; gap:2px; align-items:flex-end; height:13px; flex-shrink:0; }
+  .track-item.active .eq-bars { display:flex; }
+  .bar { width:3px; background:var(--teal); border-radius:1px; animation:eq 0.9s ease-in-out infinite; }
+  .bar:nth-child(1){height:5px;animation-delay:0s} .bar:nth-child(2){height:10px;animation-delay:.2s} .bar:nth-child(3){height:6px;animation-delay:.4s}
+  @keyframes eq { 0%,100%{transform:scaleY(0.5)} 50%{transform:scaleY(1.4)} }
+
+  /* ── MAIN ── */
+  .main { flex:1; min-width:0; display:flex; flex-direction:column; padding:20px; gap:12px; overflow:hidden; }
+
+  /* ── PLAYER ── */
+  .player-wrap {
+    position:relative; width:100%; aspect-ratio:16/9;
+    background:#000; border-radius:14px; overflow:hidden;
+    border:1px solid var(--border); flex-shrink:0;
+    box-shadow:0 24px 60px rgba(0,0,0,0.6);
+    user-select:none; -webkit-user-select:none;
+  }
+  .player-wrap:fullscreen, .player-wrap:-webkit-full-screen {
+    width:100%!important; height:100%!important;
+    border-radius:0!important; border:none!important; aspect-ratio:unset!important;
+  }
+  #yt-player { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+
+  /* Thumbnail */
+  .thumb-cover { position:absolute; inset:0; z-index:50; background:#000; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity 0.35s; }
+  .thumb-cover.gone { opacity:0; pointer-events:none; }
+  .thumb-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.4; filter:blur(3px); transform:scale(1.06); }
+  .thumb-play { position:relative; z-index:2; width:70px; height:70px; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; box-shadow:0 0 40px rgba(0,229,195,0.5); transition:transform 0.2s; }
+  .thumb-cover:hover .thumb-play { transform:scale(1.1); }
+  .thumb-play i { font-size:1.8rem; color:#000; margin-left:5px; }
+
+  /* Spinner */
+  .spinner { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:36px; height:36px; border:3px solid rgba(255,255,255,0.06); border-top-color:var(--teal); border-radius:50%; animation:spin 0.75s linear infinite; z-index:8; display:none; }
+  @keyframes spin { to { transform:translate(-50%,-50%) rotate(360deg); } }
+
+  /* UI layer */
+  .ui-layer { position:absolute; inset:0; z-index:10; display:flex; flex-direction:column; pointer-events:none; opacity:0; transition:opacity 0.2s; background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.12) 40%, transparent 65%); }
+  .player-wrap:hover .ui-layer, .player-wrap.show-ui .ui-layer { opacity:1; }
+  .gesture { position:absolute; inset:0; z-index:20; pointer-events:auto; cursor:pointer; }
+
+  /* Center button */
+  .center-btn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.85); width:60px; height:60px; border-radius:50%; background:rgba(0,0,0,0.72); border:1.5px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; opacity:0; transition:all 0.2s; pointer-events:none; z-index:40; backdrop-filter:blur(6px); }
+  .center-btn.show { opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
+  .center-btn i { font-size:1.5rem; color:#fff; }
+
+  /* Skip flash */
+  .skip-flash { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.9); background:rgba(0,0,0,0.78); border:1px solid var(--teal); padding:9px 18px; border-radius:30px; display:flex; align-items:center; gap:8px; opacity:0; pointer-events:none; z-index:45; backdrop-filter:blur(6px); transition:all 0.15s; }
+  .skip-flash.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .skip-flash i { color:var(--teal); font-size:1rem; }
+  .skip-flash span { font-size:0.88rem; font-weight:600; color:#fff; }
+
+  /* Control bar */
+  .ctrl-bar { margin-top:auto; padding:0 18px 14px; pointer-events:none; opacity:0; transition:opacity 0.2s; position:relative; z-index:30; }
+  .ctrl-bar.show { opacity:1; pointer-events:auto; }
+
+  /* Progress */
+  .prog-wrap { width:100%; height:20px; display:flex; align-items:center; margin-bottom:8px; cursor:pointer; position:relative; }
+  .prog-track { width:100%; height:4px; background:rgba(255,255,255,0.18); border-radius:2px; position:relative; transition:height 0.15s; }
+  .prog-wrap:hover .prog-track { height:5px; }
+  .prog-fill { height:100%; width:0%; background:var(--teal); border-radius:2px; position:relative; box-shadow:0 0 8px rgba(0,229,195,0.4); }
+  .prog-fill::after { content:''; position:absolute; right:-6px; top:50%; transform:translateY(-50%) scale(0); width:13px; height:13px; background:var(--teal); border-radius:50%; box-shadow:0 0 0 3px rgba(0,229,195,0.25); transition:transform 0.15s; }
+  .prog-wrap:hover .prog-fill::after, .prog-wrap.dragging .prog-fill::after { transform:translateY(-50%) scale(1); }
+
+  .ctrl-row { display:flex; align-items:center; justify-content:space-between; height:34px; gap:4px; }
+  .ctrl-left, .ctrl-right { display:flex; align-items:center; gap:4px; }
+
+  .ibtn { background:transparent; border:none; color:rgba(255,255,255,0.85); width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s; font-size:0.88rem; }
+  .ibtn:hover { background:rgba(255,255,255,0.1); color:var(--teal); }
+
+  .time-disp { font-size:0.76rem; font-weight:500; color:rgba(255,255,255,0.85); min-width:94px; font-variant-numeric:tabular-nums; padding:0 4px; letter-spacing:0.02em; }
+
+  .vol-group { display:flex; align-items:center; gap:4px; }
+  .vol-slider { width:70px; height:3px; accent-color:var(--teal); background:rgba(255,255,255,0.18); border-radius:2px; cursor:pointer; appearance:none; -webkit-appearance:none; }
+  .vol-slider::-webkit-slider-thumb { appearance:none; width:11px; height:11px; border-radius:50%; background:var(--teal); cursor:pointer; }
+
+  .tbtn { background:rgba(255,255,255,0.08); border:none; color:#fff; font-size:0.7rem; font-weight:700; padding:4px 9px; border-radius:5px; cursor:pointer; transition:all 0.15s; min-width:38px; text-align:center; }
+  .tbtn:hover { background:var(--teal); color:#000; }
+
+  /* Lecture info */
+  .lecture-info { background:var(--s1); border-radius:12px; padding:14px 18px; border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-shrink:0; }
+  .lec-text h3 { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--white); margin-bottom:3px; line-height:1.3; }
+  .lec-text p { font-size:0.78rem; color:var(--gray2); display:flex; align-items:center; gap:5px; }
+  .lec-text i { color:var(--teal); font-size:0.7rem; }
+
+  /* Error / loading state */
+  .state-screen { position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; z-index:999; }
+  .state-screen.hidden { display:none; }
+  .state-icon { font-size:2.5rem; color:var(--teal); animation:pulse 1.5s ease-in-out infinite; }
+  .state-title { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:700; }
+  .state-sub { font-size:0.85rem; color:var(--gray); }
+
+  /* Block layer — ultimate shield */
+  .shield { position:absolute; inset:0; z-index:60; pointer-events:none; }
+
+  /* Mobile sidebar */
+  .sidebar-toggle { display:none; background:var(--s2); border:1px solid var(--border); color:var(--gray2); padding:5px 12px; border-radius:6px; font-size:0.75rem; cursor:pointer; align-items:center; gap:6px; }
+
+  @media(max-width:860px) {
+    .sidebar { position:fixed; left:0; top:56px; bottom:0; z-index:200; transform:translateX(-100%); }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-toggle { display:flex; }
+    .main { padding:12px; }
+  }
+  @media(max-width:480px) {
+    .vol-slider { width:50px; }
+    .time-disp { min-width:80px; font-size:0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading / Error screen -->
+<div class="state-screen" id="stateScreen">
+  <i class="fas fa-circle-notch fa-spin state-icon" id="stateIcon"></i>
+  <div class="state-title" id="stateTitle">Loading…</div>
+  <div class="state-sub" id="stateSub">Fetching your content</div>
+</div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="brand"><div class="brand-dot"></div> OpenVector Academy</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-list"></i> Playlist</button>
+    <span class="members-tag">Members Only</span>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <h2 id="courseTitle">Course Playlist</h2>
+      <p id="courseSub">Loading…</p>
+    </div>
+    <div class="track-list" id="trackList"></div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="player-wrap" id="playerWrap">
+      <div id="yt-player"></div>
+      <div class="spinner" id="spinner"></div>
+
+      <div class="thumb-cover" id="thumbCover">
+        <img src="" id="thumbBg" class="thumb-bg" alt="" draggable="false">
+        <div class="thumb-play"><i class="fas fa-play"></i></div>
+      </div>
+
+      <div class="ui-layer">
+        <div class="gesture" id="gesture"></div>
+        <div class="center-btn" id="centerBtn">
+          <i class="fas fa-play" id="bigPlay"></i>
+          <i class="fas fa-pause" id="bigPause" style="display:none"></i>
+        </div>
+        <div class="skip-flash" id="skipFlash">
+          <i class="fas fa-rotate-right" id="skipIcon"></i>
+          <span id="skipText">+10s</span>
+        </div>
+        <div class="ctrl-bar" id="ctrlBar">
+          <div class="prog-wrap" id="progWrap">
+            <div class="prog-track" id="progTrack">
+              <div class="prog-fill" id="progFill"></div>
+            </div>
+          </div>
+          <div class="ctrl-row">
+            <div class="ctrl-left">
+              <button class="ibtn" id="playBtn"><i class="fas fa-play" id="playIco"></i><i class="fas fa-pause" id="pauseIco" style="display:none"></i></button>
+              <button class="ibtn" id="rewBtn"><i class="fas fa-rotate-left"></i></button>
+              <button class="ibtn" id="fwdBtn"><i class="fas fa-rotate-right"></i></button>
+              <span class="time-disp" id="timeDisp">00:00 / 00:00</span>
+            </div>
+            <div class="ctrl-right">
+              <div class="vol-group">
+                <button class="ibtn" id="muteBtn">
+                  <i class="fas fa-volume-high" id="volHi"></i>
+                  <i class="fas fa-volume-xmark" id="volMute" style="display:none"></i>
+                </button>
+                <input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="100">
+              </div>
+              <button class="tbtn" id="speedBtn">1x</button>
+              <button class="ibtn" id="fsBtn"><i class="fas fa-expand"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shield: nothing on the iframe is clickable -->
+      <div class="shield"></div>
+    </div>
+
+    <div class="lecture-info">
+      <div class="lec-text">
+        <h3 id="lecTitle">—</h3>
+        <p><i class="fas fa-book-open"></i><span id="lecSub">Loading…</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   CONFIG — same values as admin.html
+══════════════════════════════════════════ */
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const DB_TABLE     = 'masked_videos';
+/* ══════════════════════════════════════════ */
+
+/* ── READ CODE FROM URL: /watch/CODE ── */
+function getCodeFromPath() {
+  const parts = window.location.pathname.split('/');
+  const idx = parts.indexOf('watch');
+  return idx !== -1 ? parts[idx + 1] : null;
+}
+
+/* ── FETCH VIDEO BY CODE ── */
+async function fetchVideo(code) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${DB_TABLE}?code=eq.${encodeURIComponent(code)}&select=*&limit=1`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) throw new Error('Network error');
+  const rows = await res.json();
+  return rows[0] || null;
+}
+
+/* ── FETCH ALL VIDEOS (for sidebar) ── */
+async function fetchAll() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${DB_TABLE}?order=created_at.asc&select=*`,
+    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+  );
+  if (!res.ok) throw new Error('Network error');
+  return res.json();
+}
+
+/* ── DOM REFS ── */
+const playerWrap = document.getElementById('playerWrap');
+const gesture    = document.getElementById('gesture');
+const centerBtn  = document.getElementById('centerBtn');
+const bigPlay    = document.getElementById('bigPlay');
+const bigPause   = document.getElementById('bigPause');
+const skipFlash  = document.getElementById('skipFlash');
+const skipIcon   = document.getElementById('skipIcon');
+const skipText   = document.getElementById('skipText');
+const ctrlBar    = document.getElementById('ctrlBar');
+const playBtn    = document.getElementById('playBtn');
+const playIco    = document.getElementById('playIco');
+const pauseIco   = document.getElementById('pauseIco');
+const rewBtn     = document.getElementById('rewBtn');
+const fwdBtn     = document.getElementById('fwdBtn');
+const timeDisp   = document.getElementById('timeDisp');
+const progWrap   = document.getElementById('progWrap');
+const progTrack  = document.getElementById('progTrack');
+const progFill   = document.getElementById('progFill');
+const volSlider  = document.getElementById('volSlider');
+const muteBtn    = document.getElementById('muteBtn');
+const volHi      = document.getElementById('volHi');
+const volMute    = document.getElementById('volMute');
+const speedBtn   = document.getElementById('speedBtn');
+const fsBtn      = document.getElementById('fsBtn');
+const spinner    = document.getElementById('spinner');
+const thumbCover = document.getElementById('thumbCover');
+const thumbBg    = document.getElementById('thumbBg');
+const trackList  = document.getElementById('trackList');
+const lecTitle   = document.getElementById('lecTitle');
+const lecSub     = document.getElementById('lecSub');
+const stateScreen= document.getElementById('stateScreen');
+const stateIcon  = document.getElementById('stateIcon');
+const stateTitle = document.getElementById('stateTitle');
+const stateSub   = document.getElementById('stateSub');
+const courseSub  = document.getElementById('courseSub');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar    = document.getElementById('sidebar');
+
+/* ── STATE ── */
+let player, isDragging = false, hideTimer, cbTimer, curIdx = 0, allVideos = [];
+const speeds = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+let speedIdx = 2;
+
+/* ── FORMAT TIME ── */
+function fmt(s) {
+  if (!s || s < 0) return '00:00';
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return `${m<10?'0'+m:m}:${sec<10?'0'+sec:sec}`;
+}
+
+/* ── ERROR SCREEN ── */
+function showError(msg) {
+  stateIcon.className = 'fas fa-circle-exclamation state-icon';
+  stateIcon.style.color = '#ff4f5e';
+  stateIcon.style.animation = 'none';
+  stateTitle.textContent = 'Content not found';
+  stateSub.textContent = msg;
+  stateScreen.classList.remove('hidden');
+}
+
+/* ── INIT ── */
+async function init() {
+  const code = getCodeFromPath();
+  if (!code) return showError('No video code in URL.');
+
+  try {
+    const [video, allRows] = await Promise.all([fetchVideo(code), fetchAll()]);
+    if (!video) return showError('This link is invalid or has been removed.');
+
+    allVideos = allRows;
+    curIdx = allRows.findIndex(r => r.code === code);
+    if (curIdx < 0) curIdx = 0;
+
+    // Hide loading
+    stateScreen.classList.add('hidden');
+
+    // Set title
+    document.title = `${video.title} · OpenVector`;
+    document.getElementById('courseTitle').textContent = 'Course Playlist';
+    courseSub.textContent = `${allRows.length} video${allRows.length !== 1 ? 's' : ''}`;
+
+    // Build sidebar
+    buildSidebar(allRows, curIdx);
+
+    // Set lecture info
+    lecTitle.textContent = video.title;
+    lecSub.textContent = video.title;
+
+    // Set thumbnail
+    thumbBg.src = `https://img.youtube.com/vi/${video.video_id}/maxresdefault.jpg`;
+
+    // Load YouTube API
+    loadYT(video.video_id);
+
+  } catch(e) {
+    showError('Could not load content. Check your connection.');
+    console.error(e);
+  }
+}
+
+/* ── BUILD SIDEBAR ── */
+function buildSidebar(rows, activeIdx) {
+  trackList.innerHTML = rows.map((r, i) => `
+    <div class="track-item ${i === activeIdx ? 'active' : ''}" id="ti-${i}" onclick="switchTo(${i})">
+      <span class="track-num">${String(i+1).padStart(2,'0')}</span>
+      <img class="track-thumb" src="https://img.youtube.com/vi/${r.video_id}/mqdefault.jpg" alt="" draggable="false">
+      <div class="track-info">
+        <div class="track-title">${escHtml(r.title)}</div>
+        <div class="track-sub">Lecture ${i+1}</div>
+      </div>
+      <div class="eq-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    </div>
+  `).join('');
+}
+
+/* ── SWITCH VIDEO ── */
+function switchTo(idx) {
+  if (idx < 0 || idx >= allVideos.length) return;
+  const v = allVideos[idx];
+  curIdx = idx;
+  lecTitle.textContent = v.title;
+  lecSub.textContent = v.title;
+  thumbBg.src = `https://img.youtube.com/vi/${v.video_id}/maxresdefault.jpg`;
+  thumbCover.classList.remove('gone');
+  if (player && player.stopVideo) player.stopVideo();
+  if (player && player.cueVideoById) player.cueVideoById(v.video_id);
+  document.querySelectorAll('.track-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+    if (i === idx) el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  });
+  // Update URL without reload
+  const newCode = v.code;
+  history.replaceState(null, '', `/watch/${newCode}`);
+  document.title = `${v.title} · OpenVector`;
+  // Close mobile sidebar
+  sidebar.classList.remove('open');
+}
+
+/* ── YOUTUBE ── */
+function loadYT(videoId) {
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+  window._initialVideoId = videoId;
+}
+
+window.onYouTubeIframeAPIReady = function() {
+  player = new YT.Player('yt-player', {
+    height:'100%', width:'100%',
+    videoId: window._initialVideoId,
+    playerVars: {
+      autoplay:0, controls:0, rel:0,
+      modestbranding:1, iv_load_policy:3,
+      fs:0, disablekb:1, playsinline:1,
+      showinfo:0, origin:window.location.origin,
+      /* 
+        rel:0    → no related videos (no channel links)
+        fs:0     → no native fullscreen button (ours only)
+        controls:0 → entire native YT UI hidden
+        modestbranding:1 → removes clickable YT logo
+        iv_load_policy:3 → no annotations/cards
+        disablekb:1 → keyboard handled by us, not YT
+        pointer-events:none on iframe → zero direct iframe clicks
+      */
+    },
+    events: {
+      onReady: () => { player.setVolume(100); requestAnimationFrame(tickProgress); },
+      onStateChange: (e) => {
+        const S = YT.PlayerState;
+        if (e.data === S.PLAYING) {
+          thumbCover.classList.add('gone');
+          setIcons(true); spinner.style.display='none'; showUI();
+        } else if (e.data === S.PAUSED) {
+          setIcons(false); showUI(); centerBtn.classList.add('show');
+        } else if (e.data === S.BUFFERING) {
+          spinner.style.display = 'block';
+        } else if (e.data === S.ENDED) {
+          if (curIdx < allVideos.length - 1) switchTo(curIdx + 1);
+        }
+      }
+    }
+  });
+};
+
+/* ── TICK PROGRESS ── */
+function tickProgress() {
+  if (player && player.getCurrentTime && !isDragging) {
+    const cur = player.getCurrentTime() || 0;
+    const dur = player.getDuration() || 1;
+    progFill.style.width = `${(cur/dur)*100}%`;
+    timeDisp.textContent = `${fmt(cur)} / ${fmt(dur)}`;
+  }
+  requestAnimationFrame(tickProgress);
+}
+
+/* ── ICONS ── */
+function setIcons(playing) {
+  playIco.style.display  = playing ? 'none' : 'block';
+  pauseIco.style.display = playing ? 'block' : 'none';
+  bigPlay.style.display  = playing ? 'none' : 'block';
+  bigPause.style.display = playing ? 'block' : 'none';
+}
+
+/* ── SHOW UI ── */
+function showUI() {
+  playerWrap.classList.add('show-ui'); ctrlBar.classList.add('show');
+  clearTimeout(hideTimer); clearTimeout(cbTimer);
+  if (!isDragging) {
+    hideTimer = setTimeout(() => {
+      if (player?.getPlayerState() === YT.PlayerState.PLAYING) {
+        playerWrap.classList.remove('show-ui'); ctrlBar.classList.remove('show'); centerBtn.classList.remove('show');
+      }
+    }, 4000);
+  }
+}
+
+function togglePlay() {
+  if (!player) return;
+  player.getPlayerState() === YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo();
+}
+
+function skip(s) {
+  if (!player) return;
+  player.seekTo(player.getCurrentTime() + s, true);
+  skipIcon.className = s < 0 ? 'fas fa-rotate-left' : 'fas fa-rotate-right';
+  skipText.textContent = s < 0 ? `${s}s` : `+${s}s`;
+  skipFlash.classList.add('show');
+  centerBtn.classList.remove('show');
+  clearTimeout(window._st);
+  window._st = setTimeout(() => skipFlash.classList.remove('show'), 650);
+}
+
+/* ── EVENTS ── */
+playerWrap.addEventListener('mousemove', () => { showUI(); if (player?.getPlayerState() === YT.PlayerState.PAUSED) centerBtn.classList.add('show'); });
+playerWrap.addEventListener('mouseleave', () => { centerBtn.classList.remove('show'); if (!isDragging) playerWrap.classList.remove('show-ui'); });
+
+gesture.addEventListener('click', (e) => {
+  if (e.target.closest('.ctrl-bar')) return;
+  togglePlay(); showUI(); centerBtn.classList.add('show');
+  clearTimeout(cbTimer);
+  cbTimer = setTimeout(() => { if (player?.getPlayerState() === YT.PlayerState.PLAYING) centerBtn.classList.remove('show'); }, 4000);
+});
+
+centerBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+playBtn.addEventListener('click',   (e) => { e.stopPropagation(); togglePlay(); });
+rewBtn.addEventListener('click',    (e) => { e.stopPropagation(); skip(-10); });
+fwdBtn.addEventListener('click',    (e) => { e.stopPropagation(); skip(10); });
+thumbCover.addEventListener('click', () => { thumbCover.classList.add('gone'); player?.playVideo(); });
+
+/* Volume */
+volSlider.addEventListener('input', (e) => {
+  if (!player) return;
+  const v = +e.target.value;
+  player.setVolume(v);
+  volHi.style.display   = v===0 ? 'none' : 'block';
+  volMute.style.display = v===0 ? 'block' : 'none';
+});
+muteBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (!player) return;
+  if (player.isMuted()) { player.unMute(); volSlider.value=player.getVolume(); volHi.style.display='block'; volMute.style.display='none'; }
+  else { player.mute(); volSlider.value=0; volHi.style.display='none'; volMute.style.display='block'; }
+});
+
+/* Speed */
+speedBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  speedIdx = (speedIdx+1) % speeds.length;
+  player?.setPlaybackRate(speeds[speedIdx]);
+  speedBtn.textContent = speeds[speedIdx] + 'x';
+});
+
+/* Fullscreen */
+fsBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (!document.fullscreenElement) { playerWrap.requestFullscreen().catch(()=>{}); fsBtn.querySelector('i').className='fas fa-compress'; }
+  else { document.exitFullscreen(); fsBtn.querySelector('i').className='fas fa-expand'; }
+});
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) fsBtn.querySelector('i').className='fas fa-expand'; });
+
+/* Progress scrub */
+function seekTo(x) {
+  const rect = progTrack.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+  player?.seekTo(pct * (player.getDuration() || 0), true);
+}
+progWrap.addEventListener('mousedown',  () => { isDragging=true; progWrap.classList.add('dragging'); });
+document.addEventListener('mousemove',  (e) => { if (isDragging) seekTo(e.clientX); });
+document.addEventListener('mouseup',    () => { if (isDragging) { isDragging=false; progWrap.classList.remove('dragging'); } });
+progTrack.addEventListener('click',     (e) => seekTo(e.clientX));
+progWrap.addEventListener('touchstart', () => { isDragging=true; progWrap.classList.add('dragging'); }, {passive:true});
+progWrap.addEventListener('touchmove',  (e) => { if (isDragging) { e.preventDefault(); seekTo(e.touches[0].clientX); } }, {passive:false});
+progWrap.addEventListener('touchend',   () => { isDragging=false; progWrap.classList.remove('dragging'); });
+
+/* Double-tap mobile */
+let lastTap = 0;
+gesture.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  const now = Date.now(), gap = now - lastTap;
+  if (gap < 280 && gap > 0) {
+    const x = e.changedTouches[0].clientX, w = window.innerWidth;
+    if (x < w*0.3) skip(-10); else if (x > w*0.7) skip(10); else togglePlay();
+  } else {
+    showUI(); centerBtn.classList.add('show');
+    cbTimer = setTimeout(() => { if (player?.getPlayerState()===YT.PlayerState.PLAYING) centerBtn.classList.remove('show'); }, 4000);
+  }
+  lastTap = now;
+});
+
+/* Keyboard */
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName==='INPUT') return;
+  switch(e.code) {
+    case 'Space':      e.preventDefault(); togglePlay(); break;
+    case 'ArrowLeft':  e.preventDefault(); skip(-10); break;
+    case 'ArrowRight': e.preventDefault(); skip(10); break;
+    case 'ArrowUp':    e.preventDefault(); if(player){const v=Math.min(player.getVolume()+5,100);player.setVolume(v);volSlider.value=v;} break;
+    case 'ArrowDown':  e.preventDefault(); if(player){const v=Math.max(player.getVolume()-5,0);player.setVolume(v);volSlider.value=v;} break;
+    case 'KeyF':  fsBtn.click(); break;
+    case 'KeyM':  muteBtn.click(); break;
+    case 'KeyN':  if(curIdx<allVideos.length-1) switchTo(curIdx+1); break;
+    case 'KeyP':  if(curIdx>0) switchTo(curIdx-1); break;
+  }
+});
+
+/* Anti-piracy lockdown */
+document.addEventListener('contextmenu', (e) => { if (e.target.closest('.player-wrap')) e.preventDefault(); });
+document.addEventListener('dragstart',   (e) => { if (e.target.closest('.player-wrap')) e.preventDefault(); });
+playerWrap.addEventListener('selectstart', (e) => e.preventDefault());
+
+/* Mobile sidebar toggle */
+sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+document.addEventListener('click', (e) => { if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) sidebar.classList.remove('open'); });
+
+/* ── UTILS ── */
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ── RUN ── */
+init();
+</script>
+</body>
+</html>
