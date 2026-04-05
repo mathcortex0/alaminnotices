@@ -270,16 +270,24 @@
 /* ══════════════════════════════════════════
    CONFIG — same values as admin.html
 ══════════════════════════════════════════ */
-const SUPABASE_URL = 'https://mtvsiblpujxdasvbihol.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_2jmfkbdD46rK05Tz_LlYqw_tS-fcrJx';
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
 const DB_TABLE     = 'masked_videos';
 /* ══════════════════════════════════════════ */
 
 /* ── READ CODE FROM URL: /watch/CODE ── */
 function getCodeFromPath() {
-  const parts = window.location.pathname.split('/');
-  const idx = parts.indexOf('watch');
-  return idx !== -1 ? parts[idx + 1] : null;
+  // Works for: /watch/CODE, /watch/CODE/, watch.html served at /watch/CODE
+  const path = window.location.pathname.replace(/\/$/, ''); // strip trailing slash
+  const parts = path.split('/').filter(Boolean); // remove empty segments
+  // parts = ['watch', 'CODE']
+  const watchIdx = parts.indexOf('watch');
+  if (watchIdx !== -1 && parts[watchIdx + 1]) {
+    return parts[watchIdx + 1].trim();
+  }
+  // Fallback: last non-empty segment if URL is just /CODE
+  const last = parts[parts.length - 1];
+  return (last && last !== 'watch.html') ? last : null;
 }
 
 /* ── FETCH VIDEO BY CODE ── */
@@ -367,7 +375,7 @@ function showError(msg) {
 /* ── INIT ── */
 async function init() {
   const code = getCodeFromPath();
-  if (!code) return showError('No video code in URL.');
+  if (!code) return showError(`No video code found. URL: ${window.location.pathname}`);
 
   try {
     const [video, allRows] = await Promise.all([fetchVideo(code), fetchAll()]);
