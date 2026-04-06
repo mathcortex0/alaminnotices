@@ -28,12 +28,12 @@
       --prose: 'Source Serif 4', Georgia, serif;
       --ui: 'DM Sans', system-ui, sans-serif;
       
-      --header-height: 80px;
+      --header-height: 90px;
     }
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 90px;
+      scroll-padding-top: 100px;
     }
 
     body {
@@ -55,7 +55,7 @@
       max-width: 100%;
     }
 
-    /* ---------- MASTHEAD: BIG LOGO + NAME ---------- */
+    /* ---------- MASTHEAD: BIG LOGO + NAME SIDE BY SIDE ---------- */
     .masthead {
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
@@ -78,23 +78,23 @@
       justify-content: space-between;
     }
 
-    /* LEFT: BIG logo + name in straight line */
+    /* LEFT: BIG logo + name side by side (horizontal) */
     .masthead-brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
       flex-shrink: 0;
     }
 
     .brand-logo-img {
-      height: 52px;
+      height: 60px;
       width: auto;
       display: block;
     }
 
     .brand-name {
       font-family: var(--serif);
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       font-weight: 900;
       letter-spacing: -0.01em;
       color: var(--ink);
@@ -111,7 +111,7 @@
 
     .nav-strip {
       display: flex;
-      gap: 2px;
+      gap: 4px;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -127,12 +127,12 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--ink-2);
-      padding: 8px 14px;
+      padding: 8px 16px;
       border: none;
       background: none;
       cursor: pointer;
       white-space: nowrap;
-      border-bottom: 1.5px solid transparent;
+      border-bottom: 2px solid transparent;
       transition: all 0.2s;
     }
 
@@ -150,13 +150,13 @@
     .util-group {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 20px;
       flex-shrink: 0;
     }
 
     .util-link {
       font-family: var(--ui);
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.6px;
       text-transform: uppercase;
@@ -169,8 +169,8 @@
     }
 
     .search-icon {
-      width: 17px;
-      height: 17px;
+      width: 18px;
+      height: 18px;
       stroke: currentColor;
       stroke-width: 2;
       fill: none;
@@ -182,15 +182,15 @@
     .mobile-controls {
       display: none;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
     }
 
     .hamburger {
       background: none;
       border: none;
       cursor: pointer;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       display: flex;
       flex-direction: column;
       justify-content: space-around;
@@ -205,8 +205,8 @@
     }
 
     .mobile-search-icon {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       stroke: var(--ink-2);
       stroke-width: 2;
       fill: none;
@@ -259,13 +259,13 @@
     }
 
     .menu-header .brand-name {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
     }
 
     .close-menu {
       background: none;
       border: none;
-      font-size: 26px;
+      font-size: 28px;
       cursor: pointer;
       color: var(--ink-2);
     }
@@ -719,14 +719,14 @@
         display: flex;
       }
       .brand-logo-img {
-        height: 40px;
+        height: 44px;
       }
       .brand-name {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         white-space: normal;
       }
       .masthead-brand {
-        gap: 10px;
+        gap: 12px;
       }
       .hero-stack {
         flex-direction: column;
@@ -758,7 +758,7 @@
         font-size: 1rem;
       }
       .brand-logo-img {
-        height: 34px;
+        height: 36px;
       }
       .masthead-brand {
         gap: 8px;
@@ -770,7 +770,7 @@
 
 <header class="masthead">
   <div class="masthead-inner">
-    <!-- LEFT: BIG logo + name in straight line -->
+    <!-- LEFT: BIG LOGO + NAME SIDE BY SIDE (HORIZONTAL) -->
     <div class="masthead-brand">
       <img src="images/lol.png" class="brand-logo-img" alt="The Alamin Gazette" 
            onerror="this.style.display='none';document.getElementById('fallbackBrandName').style.display='inline-block';">
@@ -916,13 +916,6 @@
     const d = Math.floor(h / 24);
     if (d < 7) return `${d}d ago`;
     return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  function fullDate(iso) {
-    return new Date(iso).toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
-    });
   }
 
   function articleURL(slug) { return `article.html?id=${slug}`; }
