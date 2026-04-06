@@ -34,22 +34,18 @@
       transition: width .08s linear;
     }
 
-    /* ── MASTHEAD ──────────────────────────────── */
+    /* MASTHEAD */
     .masthead {
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
-      padding: 12px 28px;
+      padding: 0 28px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0; z-index: 100;
-      box-shadow: 0 1px 8px rgba(0,0,0,.05);
-      transition: padding .3s, box-shadow .3s;
-    }
-    .masthead.scrolled {
-      padding: 7px 28px;
-      box-shadow: 0 2px 16px rgba(0,0,0,.09);
+      box-shadow: 0 1px 10px rgba(0,0,0,.06);
     }
     .back-link {
       font-family: var(--ui);
@@ -66,26 +62,14 @@
       min-width: 110px;
     }
     .back-link:hover { color: var(--crimson); }
-
-    .mast-logo-wrap { text-align: center; }
-    .mast-logo-img {
-      height: 36px;
-      width: auto;
-      display: block;
-      margin: 0 auto;
-      transition: height .3s;
-    }
-    .masthead.scrolled .mast-logo-img { height: 26px; }
+    .mast-logo-img { height: 30px; width: auto; }
     .mast-logo-txt {
       font-family: var(--serif);
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 900;
       color: var(--ink);
       text-decoration: none;
-      transition: font-size .3s;
-      display: block;
     }
-    .masthead.scrolled .mast-logo-txt { font-size: 1.1rem; }
 
     /* CHIPS */
     .chip { font-family:var(--ui); font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 9px; border-radius:2px; display:inline-block; }
@@ -174,85 +158,23 @@
     .article-hero-img { width: 100%; border-radius: 3px; margin-bottom: 10px; box-shadow: 0 6px 32px rgba(0,0,0,.12); }
     .img-caption { font-family: var(--ui); font-size: 11px; color: var(--ink-3); text-align: center; margin-bottom: 38px; font-style: italic; }
 
-    /* ── BODY COPY ──────────────────────────────── */
+    /* BODY COPY */
     .article-body {
       font-family: var(--prose);
-      font-size: clamp(1.05rem, 1.5vw, 1.1rem);
+      font-size: 1.1rem;
       line-height: 1.85;
       color: #181818;
-      letter-spacing: 0.01em;
     }
     .article-body p { margin-bottom: 1.65em; }
-
-    /* Drop cap — first paragraph only */
-    .article-body > p:first-of-type::first-letter {
+    .article-body p:first-of-type::first-letter {
       font-family: var(--serif);
-      font-size: 4.2rem;
+      font-size: 4.5rem;
       font-weight: 900;
       float: left;
-      line-height: .82;
-      margin: .06em .12em -.02em 0;
+      line-height: .8;
+      margin: .05em .1em 0 0;
       color: var(--crimson);
-      padding-bottom: 2px;
     }
-
-    /* Bold & inline formatting */
-    .article-body strong, .article-body b {
-      font-weight: 700;
-      color: var(--ink);
-    }
-    .article-body em, .article-body i {
-      font-style: italic;
-    }
-    .article-body a {
-      color: var(--crimson);
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 3px;
-    }
-    .article-body a:hover { text-decoration: none; }
-
-    /* Subheadings inside article */
-    .article-body h2 {
-      font-family: var(--serif);
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: var(--ink);
-      margin: 2.2em 0 .7em;
-      line-height: 1.25;
-      letter-spacing: -.2px;
-    }
-    .article-body h3 {
-      font-family: var(--ui);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--ink);
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      margin: 2em 0 .6em;
-    }
-
-    /* Pull quote */
-    .article-body blockquote {
-      border: none;
-      border-left: 3px solid var(--crimson);
-      margin: 2.2em 0;
-      padding: 4px 0 4px 24px;
-      font-family: var(--serif);
-      font-size: 1.35rem;
-      font-style: italic;
-      font-weight: 400;
-      color: var(--ink-2);
-      line-height: 1.5;
-    }
-    .article-body blockquote::before { content: none; }
-
-    /* Lists */
-    .article-body ul, .article-body ol {
-      padding-left: 1.6em;
-      margin-bottom: 1.65em;
-    }
-    .article-body li { margin-bottom: .5em; }
 
     /* BOTTOM SHARE */
     .bottom-share {
@@ -311,15 +233,26 @@
     .go-home { font-family:var(--ui); font-size:11.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:14px 38px; background:var(--navy); color:#c8d4e8; text-decoration:none; display:inline-block; transition:all .25s; border-radius:2px; }
     .go-home:hover { background:var(--crimson); color:#fff; }
 
+    @media(max-width:768px) {
+      .footer-grid { grid-template-columns:1fr 1fr; }
+    }
     @media(max-width:640px) {
+      .masthead { padding: 0 16px; }
+      .back-link span { display:none; }
       .article-outer,.related-outer { padding-left:16px; padding-right:16px; }
       h1.article-title { font-size:1.7rem; }
+      .article-deck { font-size:1rem; }
+      .article-body { font-size:1rem; }
+      .article-meta-bar { flex-direction:column; align-items:flex-start; gap:10px; }
       .related-grid { grid-template-columns:1fr; }
       .related-card { border-right:none; border-bottom:1px solid var(--rule); }
       .related-card:last-child { border-bottom:none; }
       .footer-grid { grid-template-columns:1fr; }
       .share-bar { flex-wrap:wrap; }
-      .masthead { padding: 10px 16px; }
+      .bottom-share { flex-direction:column; gap:10px; }
+    }
+    @media(max-width:400px) {
+      h1.article-title { font-size:1.5rem; }
     }
   </style>
 </head>
@@ -327,20 +260,17 @@
 
 <div id="read-progress"></div>
 
-<!-- MASTHEAD -->
-<header class="masthead" id="masthead">
+<header class="masthead">
   <a href="index.html" class="back-link">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
     All Stories
   </a>
-  <div class="mast-logo-wrap">
-    <a href="index.html" style="text-decoration:none;">
-      <img src="images/lol.png" class="mast-logo-img"
-           onerror="this.style.display='none';document.getElementById('mast-wm').style.display='block';" alt="The Alamin Gazette">
-      <span class="mast-logo-txt" id="mast-wm" style="display:none;">The Alamin Gazette</span>
-    </a>
-  </div>
-  <div style="min-width:110px;"></div>
+  <a href="index.html" style="text-decoration:none;">
+    <img src="images/lol.png" class="mast-logo-img"
+         onerror="this.style.display='none';document.getElementById('mast-wm').style.display='block';" alt="The Alamin Gazette">
+    <span class="mast-logo-txt" id="mast-wm" style="display:none;">The Alamin Gazette</span>
+  </a>
+  <div style="min-width:120px;"></div>
 </header>
 
 <article class="article-outer" id="article-outer">
@@ -399,21 +329,9 @@ const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
 const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
+// Read slug — supports both ?id= and direct
 const params = new URLSearchParams(location.search);
 const slug = params.get('id') || params.get('slug') || '';
-
-// ── SCROLL: shrink header + reading progress ───────
-window.addEventListener('scroll', () => {
-  document.getElementById('masthead')
-    .classList.toggle('scrolled', window.scrollY > 60);
-
-  const el = document.getElementById('article-outer');
-  if (!el) return;
-  const pct = Math.min(100, Math.max(0,
-    (-el.getBoundingClientRect().top / (el.offsetHeight - window.innerHeight)) * 100
-  ));
-  document.getElementById('read-progress').style.width = pct + '%';
-});
 
 // Helpers
 function chipClass(c) {
@@ -434,26 +352,22 @@ function timeAgo(iso) {
 }
 
 function formatPublished(iso) {
+  // Always show exact date + time
   const d = new Date(iso);
   const date = d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const time = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', timeZoneName:'short' });
   return `${date} at ${time}`;
 }
 
-function readTime(content) {
-  const words = (content || '').replace(/<[^>]+>/g, '').split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
-}
-
 function formatContent(content) {
   if (!content) return '';
-  // If it already contains HTML tags, pass through directly
-  if (/<[a-z]/i.test(content)) return content;
-  // Otherwise convert plain text paragraphs
-  return content.split(/\n\s*\n/)
-    .filter(p => p.trim())
-    .map(p => `<p>${p.trim().replace(/\n/g,'<br>')}</p>`)
-    .join('');
+  if (!/<[a-z]/i.test(content)) {
+    return content.split(/\n\s*\n/)
+      .filter(p => p.trim())
+      .map(p => `<p>${p.trim().replace(/\n/g,'<br>')}</p>`)
+      .join('');
+  }
+  return content;
 }
 
 function showToast(msg) {
@@ -468,6 +382,16 @@ const shareNative = (title) => navigator.share ? navigator.share({title, url: sh
 const twitterShare = (title) => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareURL())}`,'_blank');
 const fbShare = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareURL())}`,'_blank');
 const waShare = (title) => window.open(`https://wa.me/?text=${encodeURIComponent(title+' '+shareURL())}`,'_blank');
+
+// Reading progress
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('article-outer');
+  if (!el) return;
+  const pct = Math.min(100, Math.max(0,
+    (-el.getBoundingClientRect().top / (el.offsetHeight - window.innerHeight)) * 100
+  ));
+  document.getElementById('read-progress').style.width = pct + '%';
+});
 
 // Related articles
 async function loadRelated(category, currentSlug) {
@@ -517,8 +441,10 @@ async function loadArticle() {
     return;
   }
 
+  // Page title
   document.title = `${data.title} — The Alamin Gazette`;
 
+  // OG / Twitter meta
   const metas = [
     ['og:type','article'], ['og:title', data.title],
     ['og:description', data.excerpt || (data.content||'').replace(/<[^>]+>/g,'').slice(0,160)],
@@ -536,7 +462,7 @@ async function loadArticle() {
   const pubFull = formatPublished(data.created_at);
   const ago = timeAgo(data.created_at);
   const timeDisplay = ago ? ago : pubFull;
-  const mins = readTime(data.content);
+  const timeTooltip = pubFull;
 
   document.getElementById('article-outer').innerHTML = `
     <div class="article-kicker">
@@ -553,10 +479,9 @@ async function loadArticle() {
         <span class="meta-author">By ${data.author || 'Alamin Gazette Staff'}</span>
         <span class="meta-sep">|</span>
         <span class="meta-time">
-          <abbr title="${pubFull}">${timeDisplay}</abbr>
+          Published <abbr title="${timeTooltip}">${timeDisplay}</abbr>
         </span>
-        <span class="meta-sep">|</span>
-        <span class="meta-time">${mins} min read</span>
+        ${ago ? `<span class="meta-sep">|</span><span class="meta-time" style="color:var(--ink-3);font-size:11px;">${timeTooltip}</span>` : ''}
       </div>
       <div class="share-bar">
         <button class="sp" onclick="twitterShare('${st}')">
