@@ -7,6 +7,34 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- CLOUDFLARE ROUTER - Handles both /story/slug and ?id=slug -->
+    <script>
+        (function() {
+            // Try to get slug from query parameter first
+            let slug = new URLSearchParams(window.location.search).get('id');
+            const path = window.location.pathname;
+            
+            // If no query param, check if we're on a /story/ route
+            if (!slug && path.startsWith('/story/')) {
+                slug = path.replace('/story/', '').replace(/\/$/, '');
+                if (slug && slug !== '') {
+                    // Redirect to clean URL format with query param
+                    window.location.replace(`/article.html?id=${encodeURIComponent(slug)}`);
+                    return; // Stop execution, redirect happening
+                }
+            }
+            
+            // If we still don't have a slug, something's wrong
+            if (!slug) {
+                console.error('No article slug found');
+                window.currentSlug = null;
+            } else {
+                window.currentSlug = slug;
+            }
+        })();
+    </script>
+    
     <style>
         :root{
             --ink:#0d0d0d;--ink-muted:#4a4a4a;--ink-light:#7a7a7a;
@@ -17,19 +45,18 @@
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:var(--body);background:var(--paper);color:var(--ink);font-size:18px;line-height:1.7;}
 
-        /* PROGRESS */
+        /* progress bar */
         #progress{position:fixed;top:0;left:0;height:3px;background:var(--crimson);width:0%;z-index:200;transition:width .1s linear;}
 
-        /* MASTHEAD */
+        /* masthead */
         .masthead{border-bottom:2px solid var(--ink);padding:14px 30px;background:var(--paper);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.06);}
-        .logo-img{height:38px;width:auto;}
+        .logo-img{height:38px;width:auto;object-fit:contain;}
         .logo-text{font-family:var(--serif);font-size:1.6rem;font-weight:900;color:var(--ink);text-decoration:none;}
         .back-btn{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-muted);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .2s;white-space:nowrap;}
         .back-btn:hover{color:var(--crimson);}
 
-        /* ARTICLE */
+        /* article */
         .article-wrap{max-width:740px;margin:0 auto;padding:50px 30px 80px;}
-
         .cat-chip{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;padding:4px 10px;display:inline-block;margin-bottom:18px;border-radius:2px;}
         .cat-world{background:#0a1628;color:#aabcd4;} .cat-economy{background:#1a5c3a;color:#a8d4b8;}
         .cat-innovation{background:#0057a8;color:#a0c8f0;} .cat-defense{background:#5a1a2a;color:#d4a0aa;}
@@ -55,11 +82,9 @@
         .article-body p{margin-bottom:1.6em;}
         .article-body p:first-child::first-letter{font-family:var(--serif);font-size:4.2rem;font-weight:900;float:left;line-height:.82;margin:.06em .1em 0 0;color:var(--crimson);}
 
-        /* BOTTOM SHARE */
         .bottom-share{margin-top:50px;padding:28px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
         .bottom-share p{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-muted);}
 
-        /* RELATED */
         .related-section{max-width:740px;margin:0 auto;padding:0 30px 60px;}
         .related-header{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;border-top:2px solid var(--ink);padding-top:28px;}
         .related-label{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--crimson);}
@@ -73,8 +98,7 @@
         .related-card h4{font-family:var(--serif);font-size:.95rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:6px;}
         .related-card .r-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-light);}
 
-        /* FOOTER */
-        footer{background:var(--navy);color:#b0bcc8;padding:54px 30px 30px;}
+        footer{background:var(--navy);color:#b0bcc8;padding:54px 30px 30px;margin-top:40px;}
         .footer-inner{max-width:1280px;margin:0 auto;}
         .footer-top{display:grid;grid-template-columns:280px 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.1);}
         .footer-brand p{font-family:var(--body);font-size:.85rem;color:#8898aa;margin-top:12px;line-height:1.6;}
@@ -84,21 +108,16 @@
         .footer-col a:hover{color:#e0e8f0;}
         .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-family:var(--sans);font-size:11px;color:#4a5a6a;}
 
-        /* TOAST */
         .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#f5f0e8;font-family:var(--sans);font-size:13px;padding:12px 24px;border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:999;opacity:0;transition:all .35s;pointer-events:none;}
         .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
         .not-found{text-align:center;padding:80px 20px;}
-        .not-found h1{font-size:5rem;color:var(--rule);margin-bottom:10px;}
-        .not-found p{font-family:var(--sans);color:var(--ink-muted);margin-bottom:24px;}
         .btn-home{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 36px;background:var(--navy);color:#c8d4e8;text-decoration:none;display:inline-block;transition:all .25s;border-radius:2px;}
         .btn-home:hover{background:var(--crimson);color:white;}
 
         @media(max-width:700px){
-            .related-grid{grid-template-columns:1fr;} .related-card{border-right:none;border-bottom:1px solid var(--rule);} .related-card:last-child{border-bottom:none;}
+            .related-grid{grid-template-columns:1fr;} .related-card{border-right:none;border-bottom:1px solid var(--rule);}
             h1{font-size:2rem;} .article-wrap{padding:28px 18px 60px;} .related-section{padding:0 18px 50px;}
-            .masthead{padding:14px 18px;} .share-group{flex-wrap:wrap;}
-            .footer-top{grid-template-columns:1fr;}
+            .masthead{padding:14px 18px;} .footer-top{grid-template-columns:1fr;}
         }
     </style>
 </head>
@@ -119,7 +138,7 @@
 </header>
 
 <article class="article-wrap" id="article-wrap">
-    <div style="text-align:center;padding:60px 0;color:var(--ink-light);font-family:var(--sans);font-size:13px;letter-spacing:1px;">Loading…</div>
+    <div style="text-align:center;padding:60px 0;color:var(--ink-light);font-family:var(--sans);font-size:13px;letter-spacing:1px;">Loading article…</div>
 </article>
 
 <div id="related-section"></div>
@@ -159,8 +178,8 @@
     const SUPA_KEY='sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
     const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
-    // Read slug from query param (?id=) — set by _redirects from /story/:slug
-    const slug=new URLSearchParams(window.location.search).get('id');
+    // Get slug from the global variable set by the router
+    const slug = window.currentSlug;
 
     const catCls=c=>({'World Affairs':'cat-world','Economy & Markets':'cat-economy','Innovation':'cat-innovation','Defense & Security':'cat-defense','Society':'cat-society'}[c]||'cat-default');
     const fmtDate=d=>new Date(d).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -176,7 +195,6 @@
         return content;
     }
 
-    // Reading progress
     window.addEventListener('scroll',()=>{
         const el=document.getElementById('article-wrap');
         if(!el)return;
@@ -218,7 +236,7 @@
             return;
         }
 
-        const{data,error}=await sb.from('posts').select('*').eq('slug',slug).single();
+        const{data,error}=await sb.from('posts').select('*').eq('slug',slug).eq('is_published',true).single();
 
         if(error||!data){
             document.getElementById('article-wrap').innerHTML=`<div class="not-found"><h1>404</h1><p>This story could not be found.</p><a href="/" class="btn-home">Return to Homepage</a></div>`;
@@ -226,14 +244,6 @@
         }
 
         document.title=`${data.title} — The Alamin Gazette`;
-
-        // OG meta tags
-        [['og:title',data.title],['og:description',data.excerpt||data.content?.slice(0,160)||''],['og:image',data.image_url||''],['og:url',shareURL()],['twitter:card','summary_large_image'],['twitter:title',data.title]].forEach(([n,c])=>{
-            const m=document.createElement('meta');
-            m.setAttribute(n.startsWith('twitter')?'name':'property',n);
-            m.setAttribute('content',c);
-            document.head.appendChild(m);
-        });
 
         const safeTitle=data.title.replace(/'/g,"\\'");
         const pubDate=fmtDate(data.created_at);
@@ -250,18 +260,10 @@
                     <time datetime="${data.created_at}">${pubDate}</time>
                 </div>
                 <div class="share-group">
-                    <button class="share-pill" onclick="shareTwitter('${safeTitle}')">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> X
-                    </button>
-                    <button class="share-pill" onclick="shareFacebook()">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> FB
-                    </button>
-                    <button class="share-pill" onclick="shareWhatsApp('${safeTitle}')">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/></svg> WA
-                    </button>
-                    <button class="share-pill copy" onclick="copyLink()">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Copy
-                    </button>
+                    <button class="share-pill" onclick="shareTwitter('${safeTitle}')">🐦 X</button>
+                    <button class="share-pill" onclick="shareFacebook()">📘 FB</button>
+                    <button class="share-pill" onclick="shareWhatsApp('${safeTitle}')">💬 WA</button>
+                    <button class="share-pill copy" onclick="copyLink()">🔗 Copy</button>
                 </div>
             </div>
 
@@ -273,10 +275,8 @@
             <div class="bottom-share">
                 <p>Share this story</p>
                 <div class="share-group">
-                    <button class="share-pill" onclick="shareNative('${safeTitle}')">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share
-                    </button>
-                    <button class="share-pill copy" onclick="copyLink()">Copy Link</button>
+                    <button class="share-pill" onclick="shareNative('${safeTitle}')">📤 Share</button>
+                    <button class="share-pill copy" onclick="copyLink()">📋 Copy Link</button>
                 </div>
             </div>
 
