@@ -1,515 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpenVector · Link Generator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; outline:none; }
-
-  :root {
-    --bg: #07090f;
-    --s1: #0e1119;
-    --s2: #141820;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.12);
-    --teal: #00e5c3;
-    --teal-glow: rgba(0,229,195,0.18);
-    --teal-dim: rgba(0,229,195,0.08);
-    --red: #ff4f5e;
-    --yellow: #ffc947;
-    --white: #f0f4ff;
-    --gray: #6b7589;
-    --gray2: #9aa3b5;
-  }
-
-  html, body { min-height:100vh; background:var(--bg); font-family:'DM Sans', sans-serif; color:var(--white); }
-
-  /* Grain overlay */
-  body::before {
-    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.4;
-  }
-
-  /* Glow blob */
-  body::after {
-    content:''; position:fixed; width:600px; height:600px;
-    background: radial-gradient(circle, rgba(0,229,195,0.05) 0%, transparent 70%);
-    top:-100px; left:-100px; pointer-events:none; z-index:0;
-  }
-
-  .page { position:relative; z-index:1; max-width:720px; margin:0 auto; padding:60px 24px 80px; }
-
-  /* Header */
-  .header { margin-bottom:52px; }
-  .badge {
-    display:inline-flex; align-items:center; gap:7px;
-    background:var(--teal-dim); border:1px solid rgba(0,229,195,0.2);
-    color:var(--teal); font-size:0.68rem; font-weight:600; letter-spacing:0.12em;
-    text-transform:uppercase; padding:5px 12px; border-radius:20px;
-    margin-bottom:20px;
-  }
-  .badge-dot { width:6px; height:6px; background:var(--teal); border-radius:50%; animation:pulse 2s ease-in-out infinite; box-shadow:0 0 8px var(--teal); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  h1 {
-    font-family:'Syne', sans-serif; font-weight:800; font-size:2.4rem;
-    line-height:1.1; letter-spacing:-0.03em; color:var(--white);
-    margin-bottom:12px;
-  }
-  h1 span { color:var(--teal); }
-  .sub { font-size:0.92rem; color:var(--gray2); line-height:1.6; max-width:480px; }
-
-  /* Card */
-  .card {
-    background:var(--s1); border:1px solid var(--border);
-    border-radius:16px; padding:32px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
-    margin-bottom:20px;
-  }
-
-  .field-label {
-    font-size:0.72rem; font-weight:600; letter-spacing:0.1em;
-    text-transform:uppercase; color:var(--gray); margin-bottom:10px;
-    display:flex; align-items:center; gap:8px;
-  }
-  .field-label i { color:var(--teal); font-size:0.7rem; }
-
-  .input-wrap {
-    display:flex; align-items:center; gap:0;
-    background:var(--s2); border:1px solid var(--border2);
-    border-radius:10px; overflow:hidden;
-    transition:border-color 0.2s, box-shadow 0.2s;
-  }
-  .input-wrap:focus-within {
-    border-color:rgba(0,229,195,0.4);
-    box-shadow:0 0 0 3px rgba(0,229,195,0.08);
-  }
-  .input-icon {
-    padding:0 14px; color:var(--gray); font-size:0.85rem; flex-shrink:0;
-  }
-  input[type=text] {
-    flex:1; background:transparent; border:none;
-    color:var(--white); font-family:'DM Sans', sans-serif;
-    font-size:0.9rem; padding:14px 0; caret-color:var(--teal);
-  }
-  input[type=text]::placeholder { color:var(--gray); }
-
-  .title-row { display:flex; gap:12px; margin-top:20px; }
-  .title-row .input-wrap { flex:1; }
-
-  .gen-btn {
-    width:100%; margin-top:24px;
-    background:var(--teal); color:#000;
-    border:none; font-family:'Syne', sans-serif; font-weight:700;
-    font-size:0.95rem; letter-spacing:0.02em;
-    padding:15px; border-radius:10px; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    transition:all 0.2s; box-shadow:0 4px 20px rgba(0,229,195,0.3);
-  }
-  .gen-btn:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(0,229,195,0.4); }
-  .gen-btn:active { transform:translateY(0); }
-  .gen-btn.loading { opacity:0.7; pointer-events:none; }
-
-  /* Result */
-  .result-card {
-    background: linear-gradient(135deg, rgba(0,229,195,0.06), rgba(0,229,195,0.02));
-    border:1px solid rgba(0,229,195,0.25);
-    border-radius:14px; padding:24px;
-    display:none; animation:slideIn 0.3s ease;
-  }
-  .result-card.show { display:block; }
-  @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
-
-  .result-label {
-    font-size:0.68rem; font-weight:600; letter-spacing:0.1em;
-    text-transform:uppercase; color:var(--teal); margin-bottom:10px;
-    display:flex; align-items:center; gap:7px;
-  }
-  .result-label i { font-size:0.7rem; }
-
-  .result-link-wrap {
-    display:flex; align-items:center; gap:10px;
-    background:rgba(0,0,0,0.3); border:1px solid var(--border);
-    border-radius:8px; padding:12px 14px;
-    margin-bottom:16px;
-  }
-  .result-link {
-    flex:1; font-family:'DM Mono', monospace; font-size:0.82rem;
-    color:var(--teal); word-break:break-all; line-height:1.5;
-  }
-  .copy-btn {
-    background:var(--teal-dim); border:1px solid rgba(0,229,195,0.2);
-    color:var(--teal); padding:7px 14px; border-radius:6px;
-    font-size:0.75rem; font-weight:600; cursor:pointer;
-    transition:all 0.2s; white-space:nowrap; flex-shrink:0;
-  }
-  .copy-btn:hover { background:var(--teal); color:#000; }
-  .copy-btn.copied { background:var(--teal); color:#000; }
-
-  .result-meta {
-    display:flex; gap:12px; flex-wrap:wrap;
-  }
-  .meta-chip {
-    font-size:0.72rem; color:var(--gray2);
-    background:rgba(255,255,255,0.04); border:1px solid var(--border);
-    padding:4px 10px; border-radius:20px;
-    display:flex; align-items:center; gap:5px;
-  }
-  .meta-chip i { color:var(--teal); font-size:0.65rem; }
-
-  /* Divider */
-  .divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
-
-  /* Links table */
-  .table-head {
-    font-family:'Syne', sans-serif; font-size:1.1rem; font-weight:700;
-    margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;
-  }
-  .count-badge {
-    font-family:'DM Sans', sans-serif; font-size:0.72rem; font-weight:500;
-    background:var(--teal-dim); color:var(--teal);
-    border:1px solid rgba(0,229,195,0.2); padding:3px 10px; border-radius:20px;
-  }
-
-  .link-row {
-    display:flex; align-items:center; gap:12px;
-    padding:14px 16px; border-radius:10px;
-    border:1px solid var(--border); background:var(--s1);
-    margin-bottom:8px; transition:border-color 0.2s;
-  }
-  .link-row:hover { border-color:var(--border2); }
-
-  .link-row-title {
-    flex:1; min-width:0;
-  }
-  .lrt-name { font-size:0.85rem; font-weight:600; color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .lrt-code { font-family:'DM Mono', monospace; font-size:0.72rem; color:var(--teal); margin-top:2px; }
-
-  .row-copy {
-    background:transparent; border:1px solid var(--border);
-    color:var(--gray2); padding:5px 12px; border-radius:6px;
-    font-size:0.72rem; cursor:pointer; transition:all 0.2s;
-    white-space:nowrap;
-  }
-  .row-copy:hover { border-color:var(--teal); color:var(--teal); }
-
-  .row-del {
-    background:transparent; border:none;
-    color:var(--gray); font-size:0.8rem; cursor:pointer;
-    width:28px; height:28px; border-radius:6px;
-    display:flex; align-items:center; justify-content:center;
-    transition:all 0.2s; flex-shrink:0;
-  }
-  .row-del:hover { background:rgba(255,79,94,0.1); color:var(--red); }
-
-  .empty-state {
-    text-align:center; padding:32px; color:var(--gray);
-    font-size:0.85rem; display:none;
-  }
-  .empty-state i { font-size:1.8rem; margin-bottom:10px; display:block; opacity:0.3; }
-
-  /* Toast */
-  .toast {
-    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
-    background:var(--s2); border:1px solid var(--border2);
-    color:var(--white); padding:10px 20px; border-radius:30px;
-    font-size:0.82rem; font-weight:500; opacity:0;
-    transition:all 0.3s; z-index:999; white-space:nowrap;
-    display:flex; align-items:center; gap:8px;
-    box-shadow:0 8px 24px rgba(0,0,0,0.4);
-  }
-  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-  .toast i { color:var(--teal); }
-
-  /* Supabase config notice */
-  .config-notice {
-    background:rgba(255,201,71,0.06); border:1px solid rgba(255,201,71,0.2);
-    border-radius:10px; padding:14px 18px; margin-bottom:24px;
-    font-size:0.8rem; color:#e8c56a; display:flex; gap:10px;
-    align-items:flex-start; line-height:1.6;
-  }
-  .config-notice i { margin-top:2px; flex-shrink:0; }
-  .config-notice code {
-    background:rgba(255,255,255,0.08); padding:1px 6px; border-radius:4px;
-    font-family:'DM Mono', monospace; font-size:0.75rem;
-  }
-
-  @media(max-width:480px) {
-    h1 { font-size:1.8rem; }
-    .card { padding:20px; }
-    .title-row { flex-direction:column; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; background: #f4f4f4; }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
-
-<div class="page">
-
-  <div class="header">
-    <div class="badge"><div class="badge-dot"></div> Admin Panel</div>
-    <h1>Link <span>Masker</span></h1>
-    <p class="sub">Paste a YouTube URL. Get a private masked link. Your students never see the channel.</p>
-  </div>
-
-  <!-- Config notice -->
-  <div class="config-notice">
-    <i class="fas fa-triangle-exclamation"></i>
-    <div>
-      Replace <code>YOUR_SUPABASE_URL</code> and <code>YOUR_SUPABASE_ANON_KEY</code> at the top of this file's script block. Also set <code>YOUR_DOMAIN</code> to your actual domain (e.g. <code>openvector.com</code>).
-    </div>
-  </div>
-
-  <!-- Generator card -->
-  <div class="card">
-    <div class="field-label"><i class="fab fa-youtube"></i> YouTube URL</div>
-    <div class="input-wrap">
-      <span class="input-icon"><i class="fas fa-link"></i></span>
-      <input type="text" id="ytInput" placeholder="https://www.youtube.com/watch?v=...">
+    <div id="auth">
+        <h2>Admin Login</h2>
+        <input type="password" id="pass" placeholder="Enter Supabase Password">
+        <button onclick="login()">Login</button>
     </div>
 
-    <div class="title-row">
-      <div>
-        <div class="field-label" style="margin-top:0"><i class="fas fa-tag"></i> Video Title</div>
-        <div class="input-wrap">
-          <span class="input-icon"><i class="fas fa-heading"></i></span>
-          <input type="text" id="titleInput" placeholder="e.g. Physics Lecture 01">
-        </div>
-      </div>
+    <div id="editor" class="hidden">
+        <h2>Create Post</h2>
+        <input type="text" id="t" placeholder="Article Title">
+        <input type="text" id="s" placeholder="url-slug-here">
+        <input type="text" id="i" placeholder="Third-party Image URL">
+        <textarea id="c" rows="10" placeholder="Content text..."></textarea>
+        <button id="pub" onclick="publish()">Publish Now</button>
     </div>
 
-    <button class="gen-btn" id="genBtn" onclick="generateLink()">
-      <i class="fas fa-wand-magic-sparkles"></i> Generate Masked Link
-    </button>
-  </div>
+    <script>
+        const supabaseUrl = 'https://szzqaqwpvxwrefkojplh.supabase.co';
+        const supabaseKey = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  <!-- Result -->
-  <div class="result-card" id="resultCard">
-    <div class="result-label"><i class="fas fa-shield-halved"></i> Masked Link Ready</div>
-    <div class="result-link-wrap">
-      <span class="result-link" id="resultLink">—</span>
-      <button class="copy-btn" id="copyBtn" onclick="copyResult()">Copy</button>
-    </div>
-    <div class="result-meta">
-      <div class="meta-chip"><i class="fas fa-infinity"></i> Never expires</div>
-      <div class="meta-chip"><i class="fas fa-eye-slash"></i> Channel hidden</div>
-      <div class="meta-chip"><i class="fas fa-lock"></i> Anti-share locked</div>
-    </div>
-  </div>
+        async function login() {
+            const { error } = await _supabase.auth.signInWithPassword({ 
+                email: 'text.me.md.alamin@gmail.com', 
+                password: document.getElementById('pass').value 
+            });
+            if (error) alert("Access Denied");
+            else { 
+                document.getElementById('auth').classList.add('hidden');
+                document.getElementById('editor').classList.remove('hidden');
+            }
+        }
 
-  <hr class="divider">
+        async function publish() {
+            const btn = document.getElementById('pub');
+            btn.disabled = true; btn.innerText = "Processing...";
+            
+            const { error } = await _supabase.from('posts').insert([{
+                title: document.getElementById('t').value,
+                slug: document.getElementById('s').value,
+                image_url: document.getElementById('i').value,
+                content: document.getElementById('c').value
+            }]);
 
-  <!-- All links -->
-  <div class="table-head">
-    All Links <span class="count-badge" id="countBadge">0 links</span>
-  </div>
-  <div id="linksList"></div>
-  <div class="empty-state" id="emptyState">
-    <i class="fas fa-link-slash"></i> No masked links yet. Generate your first one above.
-  </div>
-
-</div>
-
-<div class="toast" id="toast"><i class="fas fa-check"></i><span id="toastMsg">Copied!</span></div>
-
-<script>
-/* ══════════════════════════════════════════
-   CONFIG — replace these 3 values
-══════════════════════════════════════════ */
-const SUPABASE_URL  = 'https://mtvsiblpujxdasvbihol.supabase.co';       // e.g. https://xxxx.supabase.co
-const SUPABASE_KEY  = 'sb_publishable_2jmfkbdD46rK05Tz_LlYqw_tS-fcrJx';  // your anon/public key
-const YOUR_DOMAIN   = 'alaminnotices.pages.dev';             // e.g. openvector.com (no https://)
-/* ══════════════════════════════════════════ */
-
-const DB_TABLE = 'masked_videos';
-
-/* ── SUPABASE HELPERS ── */
-async function dbInsert(row) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${DB_TABLE}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Prefer': 'return=representation'
-    },
-    body: JSON.stringify(row)
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-async function dbSelect() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${DB_TABLE}?order=created_at.desc`, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`
-    }
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-async function dbDelete(id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${DB_TABLE}?id=eq.${id}`, {
-    method: 'DELETE',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`
-    }
-  });
-  if (!res.ok) throw new Error(await res.text());
-}
-
-/* ── EXTRACT VIDEO ID ── */
-function extractVideoId(url) {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
-    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
-  ];
-  for (const p of patterns) {
-    const m = url.match(p);
-    if (m) return m[1];
-  }
-  return null;
-}
-
-/* ── GENERATE RANDOM CODE ── */
-function randomCode(len = 8) {
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  return Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-}
-
-/* ── GENERATE LINK ── */
-async function generateLink() {
-  const ytUrl = document.getElementById('ytInput').value.trim();
-  const title = document.getElementById('titleInput').value.trim() || 'Untitled Lecture';
-
-  if (!ytUrl) return showToast('Paste a YouTube URL first', 'fa-triangle-exclamation');
-
-  const videoId = extractVideoId(ytUrl);
-  if (!videoId) return showToast('Invalid YouTube URL', 'fa-circle-xmark');
-
-  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') return showToast('Set your Supabase config first!', 'fa-triangle-exclamation');
-
-  const btn = document.getElementById('genBtn');
-  btn.classList.add('loading');
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating…';
-
-  try {
-    const code = randomCode(8);
-    const row = { video_id: videoId, code, title, created_at: new Date().toISOString() };
-    await dbInsert(row);
-
-    const maskedUrl = `https://${YOUR_DOMAIN}/watch/${code}`;
-    document.getElementById('resultLink').textContent = maskedUrl;
-    document.getElementById('resultCard').classList.add('show');
-
-    document.getElementById('ytInput').value = '';
-    document.getElementById('titleInput').value = '';
-
-    showToast('Masked link created!');
-    loadLinks();
-  } catch(e) {
-    showToast('Error: ' + e.message, 'fa-circle-xmark');
-  }
-
-  btn.classList.remove('loading');
-  btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Generate Masked Link';
-}
-
-/* ── COPY RESULT ── */
-function copyResult() {
-  const link = document.getElementById('resultLink').textContent;
-  navigator.clipboard.writeText(link).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copied';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-/* ── LOAD & RENDER LINKS ── */
-async function loadLinks() {
-  if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-    document.getElementById('emptyState').style.display = 'block';
-    return;
-  }
-  try {
-    const rows = await dbSelect();
-    renderLinks(rows);
-  } catch(e) {
-    console.error(e);
-  }
-}
-
-function renderLinks(rows) {
-  const list = document.getElementById('linksList');
-  const empty = document.getElementById('emptyState');
-  const count = document.getElementById('countBadge');
-  count.textContent = `${rows.length} link${rows.length !== 1 ? 's' : ''}`;
-
-  if (rows.length === 0) {
-    list.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  list.innerHTML = rows.map(r => `
-    <div class="link-row" id="row-${r.id}">
-      <div class="link-row-title">
-        <div class="lrt-name">${escHtml(r.title)}</div>
-        <div class="lrt-code">${YOUR_DOMAIN}/watch/${r.code}</div>
-      </div>
-      <button class="row-copy" onclick="copyCode('https://${YOUR_DOMAIN}/watch/${r.code}', this)">Copy</button>
-      <button class="row-del" onclick="deleteLink('${r.id}')" title="Delete"><i class="fas fa-trash-can"></i></button>
-    </div>
-  `).join('');
-}
-
-function copyCode(url, btn) {
-  navigator.clipboard.writeText(url).then(() => {
-    btn.textContent = '✓'; setTimeout(() => btn.textContent = 'Copy', 1800);
-  });
-}
-
-async function deleteLink(id) {
-  if (!confirm('Delete this masked link? It will stop working immediately.')) return;
-  try {
-    await dbDelete(id);
-    document.getElementById(`row-${id}`)?.remove();
-    showToast('Link deleted');
-    loadLinks();
-  } catch(e) {
-    showToast('Delete failed', 'fa-circle-xmark');
-  }
-}
-
-/* ── TOAST ── */
-let toastTimer;
-function showToast(msg, icon = 'fa-check') {
-  const t = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  t.querySelector('i').className = `fas ${icon}`;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-/* ── ENTER KEY ── */
-document.getElementById('ytInput').addEventListener('keydown', e => { if (e.key === 'Enter') generateLink(); });
-document.getElementById('titleInput').addEventListener('keydown', e => { if (e.key === 'Enter') generateLink(); });
-
-/* ── INIT ── */
-loadLinks();
-</script>
+            if (error) alert("Error: " + error.message);
+            else { alert("Success!"); location.reload(); }
+        }
+    </script>
 </body>
 </html>
