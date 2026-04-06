@@ -55,7 +55,7 @@
       max-width: 100%;
     }
 
-    /* ---------- MASTHEAD: LOGO + NAME IN STRAIGHT LINE LEFT ---------- */
+    /* ---------- MASTHEAD: LOGO + NAME IN STRAIGHT HORIZONTAL LINE ---------- */
     .masthead {
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
@@ -78,7 +78,7 @@
       justify-content: space-between;
     }
 
-    /* LEFT: logo + name in straight horizontal line */
+    /* LEFT: logo + name in straight line */
     .masthead-brand {
       display: flex;
       align-items: center;
@@ -99,6 +99,7 @@
       letter-spacing: -0.01em;
       color: var(--ink);
       line-height: 1;
+      white-space: nowrap;
     }
 
     /* CENTER: NAVIGATION */
@@ -722,6 +723,7 @@
       }
       .brand-name {
         font-size: 1rem;
+        white-space: normal;
       }
       .hero-stack {
         flex-direction: column;
@@ -750,10 +752,13 @@
 
     @media (max-width: 480px) {
       .brand-name {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
       }
       .brand-logo-img {
         height: 24px;
+      }
+      .masthead-brand {
+        gap: 8px;
       }
     }
   </style>
