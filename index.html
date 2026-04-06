@@ -1,338 +1,830 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Alamin Gazette — World Intelligence</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --ink:#0d0d0d; --ink-muted:#4a4a4a; --ink-light:#7a7a7a;
-            --paper:#faf8f4; --paper-alt:#f2ede6; --rule:#d4c9b8;
-            --navy:#0a1628; --crimson:#b5122e; --gold:#c9962e;
-            --cat-world:#0a1628; --cat-economy:#1a5c3a; --cat-innovation:#0057a8; --cat-defense:#5a1a2a; --cat-society:#4a3a0a;
-            --serif:'Playfair Display',Georgia,serif; --body:'Source Serif 4',Georgia,serif; --sans:'DM Sans',sans-serif;
-        }
-        *{box-sizing:border-box;margin:0;padding:0;}
-        body{font-family:var(--body);background:var(--paper);color:var(--ink);font-size:17px;line-height:1.65;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Alamin Gazette — World Intelligence</title>
+  <meta name="description" content="Independent world intelligence. Breaking news, analysis and reporting across every continent.">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0f0f0f;
+      --ink-2: #3a3a3a;
+      --ink-3: #6e6e6e;
+      --paper: #f9f7f3;
+      --paper-2: #f1ece3;
+      --rule: #cfc8bb;
+      --navy: #0b1927;
+      --crimson: #b01428;
+      --gold: #c8922a;
+      --serif: 'Playfair Display', Georgia, serif;
+      --prose: 'Source Serif 4', Georgia, serif;
+      --ui: 'DM Sans', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--prose); background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    img { display: block; max-width: 100%; }
 
-        /* TICKER */
-        .ticker-bar{background:var(--navy);color:#c8d4e8;height:32px;display:none;align-items:center;overflow:hidden;}
-        .ticker-live{font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;background:var(--crimson);color:white;padding:0 14px;height:100%;display:flex;align-items:center;flex-shrink:0;}
-        .ticker-scroll{overflow:hidden;flex:1;height:100%;}
-        .ticker-inner{display:inline-block;white-space:nowrap;font-family:var(--sans);font-size:11.5px;font-weight:500;animation:scroll-t 50s linear infinite;line-height:32px;}
-        .ticker-inner:hover{animation-play-state:paused;}
-        @keyframes scroll-t{from{transform:translateX(100vw);}to{transform:translateX(-100%);}}
-        .ticker-inner a{color:#c8d4e8;text-decoration:none;margin-right:70px;}
-        .ticker-inner a::before{content:"◆ ";color:var(--gold);}
-        .ticker-inner a:hover{color:white;}
+    /* ── TICKER ──────────────────────────────── */
+    #ticker-bar {
+      background: var(--navy);
+      height: 34px;
+      display: none;
+      align-items: center;
+      overflow: hidden;
+    }
+    .ticker-live {
+      font-family: var(--ui);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: var(--crimson);
+      color: #fff;
+      padding: 0 16px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 6px;
+    }
+    .ticker-live::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .ticker-scroll { overflow: hidden; flex: 1; height: 100%; }
+    .ticker-track {
+      display: inline-block;
+      white-space: nowrap;
+      font-family: var(--ui);
+      font-size: 12px;
+      font-weight: 500;
+      color: #b8c8d8;
+      line-height: 34px;
+      animation: marquee 60s linear infinite;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    @keyframes marquee { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
+    .ticker-track a { color: #b8c8d8; text-decoration: none; margin-right: 80px; }
+    .ticker-track a::before { content: '◆ '; color: var(--gold); font-size: 8px; }
+    .ticker-track a:hover { color: #fff; }
+    .ticker-track a.is-breaking { color: #f0a0a8; }
+    .ticker-track a.is-breaking::before { content: '● '; color: var(--crimson); font-size: 10px; animation: blink 1s infinite; }
 
-        /* MASTHEAD */
-        .masthead{border-bottom:3px double var(--ink);padding:18px 0 0;background:var(--paper);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.06);}
-        .masthead-top{display:flex;align-items:center;justify-content:space-between;max-width:1280px;margin:0 auto;padding:0 30px 14px;border-bottom:1px solid var(--rule);}
-        .masthead-meta{font-family:var(--sans);font-size:11px;color:var(--ink-light);}
-        .logo-wrap{text-align:center;flex:1;}
-        .logo-img{height:54px;width:auto;}
-        .logo-text{font-family:var(--serif);font-size:2.6rem;font-weight:900;letter-spacing:-1px;color:var(--ink);line-height:1;text-decoration:none;display:block;}
-        .logo-tagline{font-family:var(--sans);font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-light);margin-top:3px;}
-        .masthead-actions{display:flex;align-items:center;gap:14px;}
-        .admin-link{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);text-decoration:none;padding:7px 14px;border:1px solid var(--rule);transition:all 0.2s;}
-        .admin-link:hover{background:var(--ink);color:var(--paper);}
-        .nav-bar{max-width:1280px;margin:0 auto;padding:0 30px;display:flex;overflow-x:auto;scrollbar-width:none;}
-        .nav-bar::-webkit-scrollbar{display:none;}
-        .nav-link{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;color:var(--ink-muted);padding:10px 18px;white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.2s;}
-        .nav-link:hover,.nav-link.active{color:var(--ink);border-bottom-color:var(--crimson);}
+    /* ── MASTHEAD ──────────────────────────────── */
+    .masthead {
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      box-shadow: 0 1px 12px rgba(0,0,0,.06);
+    }
+    .masthead-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+    .masthead-top {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 16px 0 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .masthead-date {
+      font-family: var(--ui);
+      font-size: 11px;
+      color: var(--ink-3);
+      letter-spacing: .3px;
+    }
+    .logo-area { text-align: center; }
+    .logo-img-el { height: 50px; width: auto; margin: 0 auto; }
+    .logo-wordmark {
+      font-family: var(--serif);
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: -.5px;
+      color: var(--ink);
+      line-height: 1;
+      text-decoration: none;
+      display: block;
+    }
+    .logo-tagline {
+      font-family: var(--ui);
+      font-size: 9.5px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-top: 4px;
+    }
+    .masthead-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+    }
+    .pill-btn {
+      font-family: var(--ui);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--ink-3);
+      padding: 7px 16px;
+      border: 1px solid var(--rule);
+      transition: all .2s;
+    }
+    .pill-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
-        /* LAYOUT */
-        .page-wrap{max-width:1280px;margin:0 auto;padding:0 30px;}
-        .section-header{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;}
-        .section-label{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--crimson);}
-        .section-line{flex:1;height:1px;background:var(--rule);}
-        .heavy-rule{border:none;border-top:2px solid var(--ink);margin:36px 0 30px;}
+    /* NAV */
+    .nav-strip {
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+      gap: 0;
+    }
+    .nav-strip::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      font-family: var(--ui);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink-2);
+      padding: 11px 18px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2.5px solid transparent;
+      transition: all .2s;
+    }
+    .nav-btn:hover, .nav-btn.active { color: var(--ink); border-bottom-color: var(--crimson); }
 
-        /* CHIPS & BADGES */
-        .cat-chip{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:8px;}
-        .cat-world{background:var(--cat-world);color:#aabcd4;}
-        .cat-economy{background:var(--cat-economy);color:#a8d4b8;}
-        .cat-innovation{background:var(--cat-innovation);color:#a0c8f0;}
-        .cat-defense{background:var(--cat-defense);color:#d4a0aa;}
-        .cat-society{background:var(--cat-society);color:#d4c080;}
-        .cat-default{background:var(--ink);color:#ccc;}
-        .breaking-badge{font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;background:var(--crimson);color:white;padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:8px;margin-right:5px;animation:pulse-b 2s ease-in-out infinite;}
-        @keyframes pulse-b{0%,100%{opacity:1;}50%{opacity:0.55;}}
+    /* ── PAGE LAYOUT ──────────────────────────────── */
+    .page { max-width: 1300px; margin: 0 auto; padding: 0 28px; }
 
-        /* HERO */
-        .hero-grid{display:grid;grid-template-columns:1fr 340px;gap:0;border:1px solid var(--rule);}
-        .hero-main{grid-row:1/3;position:relative;overflow:hidden;border-right:1px solid var(--rule);cursor:pointer;}
-        .hero-main img{width:100%;height:520px;object-fit:cover;display:block;transition:transform 0.5s;}
-        .hero-main:hover img{transform:scale(1.03);}
-        .hero-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(5,5,15,.93) 0%,rgba(5,5,15,.5) 60%,transparent 100%);padding:36px 28px 28px;}
-        .hero-overlay h2{font-family:var(--serif);font-size:2.1rem;font-weight:700;color:#f5f0e8;line-height:1.22;margin-bottom:8px;}
-        .hero-overlay .h-excerpt{font-family:var(--body);font-size:.95rem;color:#c8bfaa;line-height:1.5;margin-bottom:12px;}
-        .hero-meta{font-family:var(--sans);font-size:11px;color:#8a8070;display:flex;justify-content:space-between;align-items:center;}
-        .hero-side{padding:20px 22px;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .2s;}
-        .hero-side:last-child{border-bottom:none;}
-        .hero-side:hover{background:var(--paper-alt);}
-        .hero-side img{width:100%;height:148px;object-fit:cover;border-radius:2px;display:block;margin-bottom:10px;}
-        .hero-side h3{font-family:var(--serif);font-size:1.1rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:5px;}
-        .hero-side .s-excerpt{font-family:var(--body);font-size:.82rem;color:var(--ink-muted);line-height:1.5;margin-bottom:8px;}
-        .side-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-light);display:flex;justify-content:space-between;align-items:center;}
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 34px 0 22px;
+    }
+    .section-head-label {
+      font-family: var(--ui);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--crimson);
+      white-space: nowrap;
+    }
+    .section-head-rule { flex: 1; height: 1px; background: var(--rule); }
+    .divider { border: none; border-top: 2px solid var(--ink); margin: 0; }
 
-        /* FEED */
-        .feed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
-        .feed-card{padding:22px 24px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);cursor:pointer;transition:background .2s;}
-        .feed-card:nth-child(3n){border-right:none;}
-        .feed-card:hover{background:var(--paper-alt);}
-        .feed-card img{width:100%;height:130px;object-fit:cover;display:block;margin-bottom:10px;border-radius:2px;}
-        .feed-card h3{font-family:var(--serif);font-size:1.05rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:6px;}
-        .feed-card .f-excerpt{font-family:var(--body);font-size:.82rem;color:var(--ink-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px;}
-        .feed-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-light);display:flex;justify-content:space-between;align-items:center;}
+    /* ── CHIPS ──────────────────────────────── */
+    .chip {
+      font-family: var(--ui);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .chip-world     { background:#0b1927; color:#9ab0c8; }
+    .chip-economy   { background:#0e3d27; color:#8ec8a8; }
+    .chip-innovation{ background:#0a3d78; color:#90b8e8; }
+    .chip-defense   { background:#3d0e1a; color:#c89098; }
+    .chip-society   { background:#3d3000; color:#c8b870; }
+    .chip-default   { background:#1a1a1a; color:#aaa; }
+    .chip-breaking  {
+      background: var(--crimson);
+      color: #fff;
+      animation: pulse-chip 2s ease-in-out infinite;
+      margin-right: 5px;
+    }
+    @keyframes pulse-chip { 0%,100%{opacity:1} 50%{opacity:.65} }
 
-        /* SHARE */
-        .share-btn{background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:10px;font-weight:600;color:var(--ink-light);letter-spacing:.8px;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;padding:4px 0;transition:color .2s;}
-        .share-btn:hover{color:var(--crimson);}
+    /* ── HERO ──────────────────────────────── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      border: 1px solid var(--rule);
+      margin-bottom: 0;
+    }
+    .hero-lead {
+      position: relative;
+      overflow: hidden;
+      border-right: 1px solid var(--rule);
+      cursor: pointer;
+      min-height: 500px;
+    }
+    .hero-lead-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      transition: transform .6s ease;
+    }
+    .hero-lead:hover .hero-lead-img { transform: scale(1.04); }
+    .hero-lead-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8,12,20,.95) 0%, rgba(8,12,20,.45) 55%, transparent 100%);
+    }
+    .hero-lead-body {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 32px 28px 26px;
+    }
+    .hero-lead-body h2 {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 900;
+      color: #f4efe8;
+      line-height: 1.2;
+      margin: 8px 0 10px;
+    }
+    .hero-lead-body .hero-excerpt {
+      font-family: var(--prose);
+      font-size: .9rem;
+      color: #c0b8a8;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .hero-byline {
+      font-family: var(--ui);
+      font-size: 11px;
+      color: #7a7060;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        /* LOAD MORE */
-        .load-more-wrap{text-align:center;padding:40px 20px;border-top:1px solid var(--rule);}
-        .btn-load{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:transparent;color:var(--ink);border:1.5px solid var(--ink);padding:13px 36px;cursor:pointer;transition:all .25s;}
-        .btn-load:hover{background:var(--ink);color:var(--paper);}
-        .btn-load:disabled{opacity:.4;cursor:not-allowed;}
+    .hero-stack { display: flex; flex-direction: column; }
+    .hero-card {
+      flex: 1;
+      padding: 20px 20px;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .hero-card:last-child { border-bottom: none; }
+    .hero-card:hover { background: var(--paper-2); }
+    .hero-card-img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 2px;
+      margin-bottom: 12px;
+    }
+    .hero-card h3 {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 6px 0 6px;
+    }
+    .hero-card .card-excerpt {
+      font-family: var(--prose);
+      font-size: .8rem;
+      color: var(--ink-2);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .card-meta {
+      font-family: var(--ui);
+      font-size: 10.5px;
+      color: var(--ink-3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        /* FOOTER */
-        footer{background:var(--navy);color:#b0bcc8;margin-top:60px;padding:54px 30px 30px;}
-        .footer-inner{max-width:1280px;margin:0 auto;}
-        .footer-top{display:grid;grid-template-columns:280px 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.1);}
-        .footer-brand p{font-family:var(--body);font-size:.85rem;color:#8898aa;margin-top:12px;line-height:1.6;}
-        .f-logo{font-family:var(--serif);font-size:1.8rem;font-weight:900;color:#f5f0e8;}
-        .footer-col h4{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c8d4e0;margin-bottom:16px;}
-        .footer-col a{display:block;font-family:var(--sans);font-size:13px;color:#7a8a9a;text-decoration:none;margin-bottom:9px;transition:color .2s;}
-        .footer-col a:hover{color:#e0e8f0;}
-        .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-family:var(--sans);font-size:11px;color:#4a5a6a;}
+    /* ── FEED ──────────────────────────────── */
+    .feed {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-left: 1px solid var(--rule);
+      border-top: 1px solid var(--rule);
+    }
+    .feed-item {
+      padding: 22px 22px;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .feed-item:hover { background: var(--paper-2); }
+    .feed-item-img {
+      width: 100%;
+      height: 126px;
+      object-fit: cover;
+      border-radius: 2px;
+      margin-bottom: 10px;
+    }
+    .feed-item h3 {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 6px 0 6px;
+    }
+    .feed-item .item-excerpt {
+      font-family: var(--prose);
+      font-size: .8rem;
+      color: var(--ink-2);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
 
-        /* TOAST */
-        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#f5f0e8;font-family:var(--sans);font-size:13px;padding:12px 24px;border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:999;opacity:0;transition:all .35s;pointer-events:none;}
-        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    /* ── SHARE BTN ──────────────────────────────── */
+    .share-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--ui);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--ink-3);
+      letter-spacing: .8px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 0;
+      transition: color .2s;
+    }
+    .share-btn:hover { color: var(--crimson); }
 
-        @media(max-width:900px){
-            .hero-grid{grid-template-columns:1fr;}
-            .hero-main{grid-row:auto;border-right:none;border-bottom:1px solid var(--rule);}
-            .hero-main img{height:340px;}
-            .feed-grid{grid-template-columns:repeat(2,1fr);}
-            .feed-card:nth-child(3n){border-right:1px solid var(--rule);}
-            .feed-card:nth-child(2n){border-right:none;}
-            .footer-top{grid-template-columns:1fr 1fr;}
-        }
-        @media(max-width:600px){
-            .logo-text{font-size:1.9rem;} .masthead-meta,.masthead-actions{display:none;}
-            .feed-grid{grid-template-columns:1fr;} .feed-card:nth-child(2n){border-right:none;}
-            .footer-top{grid-template-columns:1fr;} .hero-overlay h2{font-size:1.5rem;}
-            .page-wrap{padding:0 16px;} .nav-link{padding:10px 12px;}
-        }
-    </style>
+    /* ── LOAD MORE ──────────────────────────────── */
+    .load-more-row {
+      text-align: center;
+      padding: 44px 0;
+      border-top: 1px solid var(--rule);
+    }
+    .load-more-btn {
+      font-family: var(--ui);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--ink);
+      padding: 14px 40px;
+      cursor: pointer;
+      transition: all .25s;
+    }
+    .load-more-btn:hover { background: var(--ink); color: var(--paper); }
+    .load-more-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+    /* ── FOOTER ──────────────────────────────── */
+    .site-footer {
+      background: var(--navy);
+      color: #8898a8;
+      margin-top: 70px;
+      padding: 60px 28px 32px;
+    }
+    .footer-inner { max-width: 1300px; margin: 0 auto; }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 44px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .footer-brand-logo {
+      font-family: var(--serif);
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: #e8e0d4;
+      display: block;
+      text-decoration: none;
+      margin-bottom: 14px;
+    }
+    .footer-brand p {
+      font-family: var(--prose);
+      font-size: .82rem;
+      color: #5a6878;
+      line-height: 1.65;
+    }
+    .footer-col h5 {
+      font-family: var(--ui);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #c0ccd8;
+      margin-bottom: 18px;
+    }
+    .footer-col a {
+      display: block;
+      font-family: var(--ui);
+      font-size: 13px;
+      color: #5a6878;
+      text-decoration: none;
+      margin-bottom: 10px;
+      transition: color .2s;
+    }
+    .footer-col a:hover { color: #d8e4f0; }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 26px;
+      font-family: var(--ui);
+      font-size: 11px;
+      color: #3a4858;
+    }
+
+    /* ── TOAST ──────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--ink);
+      color: #f4efe8;
+      font-family: var(--ui);
+      font-size: 13px;
+      padding: 12px 22px;
+      border-radius: 3px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.3);
+      z-index: 999;
+      opacity: 0;
+      transition: all .3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── EMPTY STATE ──────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--ink-3);
+      font-family: var(--ui);
+      font-size: 14px;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-lead { min-height: 360px; border-right: none; border-bottom: 1px solid var(--rule); }
+      .hero-stack { flex-direction: row; }
+      .hero-card { border-bottom: none; border-right: 1px solid var(--rule); }
+      .hero-card:last-child { border-right: none; }
+      .feed { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+      .masthead-date, .masthead-actions { display: none; }
+      .masthead-top { grid-template-columns: 1fr; justify-items: center; }
+      .logo-wordmark { font-size: 1.9rem; }
+      .hero-stack { flex-direction: column; }
+      .hero-card { border-right: none; border-bottom: 1px solid var(--rule); }
+      .feed { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .hero-lead-body h2 { font-size: 1.4rem; }
+      .page { padding: 0 16px; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="ticker-bar" id="ticker-bar">
-    <div class="ticker-live">Live</div>
-    <div class="ticker-scroll"><div class="ticker-inner" id="ticker"></div></div>
+<!-- TICKER -->
+<div id="ticker-bar">
+  <div class="ticker-live">Live</div>
+  <div class="ticker-scroll">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
 </div>
 
+<!-- MASTHEAD -->
 <header class="masthead">
+  <div class="masthead-inner">
     <div class="masthead-top">
-        <div class="masthead-meta" id="today-date"></div>
-        <div class="logo-wrap">
-            <a href="/" style="text-decoration:none;">
-                <img src="images/lol.png" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" alt="The Alamin Gazette">
-                <span class="logo-text" style="display:none;">The Alamin Gazette</span>
-            </a>
-            <div class="logo-tagline">Independent · Informed · Indispensable</div>
-        </div>
-        <div class="masthead-actions">
-            <a href="/admin.html" class="admin-link">Admin</a>
-        </div>
+      <div class="masthead-date" id="hdr-date"></div>
+      <div class="logo-area">
+        <a href="index.html" style="text-decoration:none;">
+          <img src="images/lol.png" class="logo-img-el"
+               onerror="this.style.display='none';document.getElementById('logo-wm').style.display='block';" alt="The Alamin Gazette">
+          <span class="logo-wordmark" id="logo-wm" style="display:none;">The Alamin Gazette</span>
+        </a>
+        <div class="logo-tagline">Independent · Informed · Indispensable</div>
+      </div>
+      <div class="masthead-actions">
+        <a href="admin.html" class="pill-btn">Admin</a>
+      </div>
     </div>
-    <nav class="nav-bar">
-        <a class="nav-link active" href="/" onclick="filterCat(event,'all')">All</a>
-        <a class="nav-link" href="#" onclick="filterCat(event,'World Affairs')">World Affairs</a>
-        <a class="nav-link" href="#" onclick="filterCat(event,'Economy & Markets')">Economy</a>
-        <a class="nav-link" href="#" onclick="filterCat(event,'Innovation')">Innovation</a>
-        <a class="nav-link" href="#" onclick="filterCat(event,'Defense & Security')">Defense</a>
-        <a class="nav-link" href="#" onclick="filterCat(event,'Society')">Society</a>
+    <nav class="nav-strip">
+      <button class="nav-btn active" onclick="setCategory(this,'')">All</button>
+      <button class="nav-btn" onclick="setCategory(this,'World Affairs')">World Affairs</button>
+      <button class="nav-btn" onclick="setCategory(this,'Economy & Markets')">Economy</button>
+      <button class="nav-btn" onclick="setCategory(this,'Innovation')">Innovation</button>
+      <button class="nav-btn" onclick="setCategory(this,'Defense & Security')">Defense</button>
+      <button class="nav-btn" onclick="setCategory(this,'Society')">Society</button>
     </nav>
+  </div>
 </header>
 
-<main class="page-wrap" style="padding-top:36px;">
-    <div class="section-header"><span class="section-label">Top Stories</span><span class="section-line"></span></div>
-    <div id="hero-section"></div>
-    <hr class="heavy-rule">
-    <div class="section-header"><span class="section-label">Intelligence Feed</span><span class="section-line"></span></div>
-    <div id="feed-grid" class="feed-grid"></div>
-    <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
-        <button class="btn-load" id="load-more-btn" onclick="loadMore()">Load More Stories</button>
-    </div>
+<!-- MAIN -->
+<main class="page">
+
+  <div class="section-head">
+    <span class="section-head-label">Top Stories</span>
+    <span class="section-head-rule"></span>
+  </div>
+  <div id="hero-zone"></div>
+
+  <hr class="divider" style="margin:36px 0 0;">
+
+  <div class="section-head">
+    <span class="section-head-label">Intelligence Feed</span>
+    <span class="section-head-rule"></span>
+  </div>
+  <div class="feed" id="feed-zone"></div>
+
+  <div class="load-more-row" id="load-more-row" style="display:none;">
+    <button class="load-more-btn" id="load-more-btn" onclick="loadMore()">Load More Stories</button>
+  </div>
+
 </main>
 
-<footer>
-    <div class="footer-inner">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <img src="images/lol.png" style="height:42px;filter:brightness(2);" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" alt="">
-                <div class="f-logo" style="display:none;">The Alamin Gazette</div>
-                <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Regions</h4>
-                <a href="#">Asia-Pacific</a><a href="#">EMEA</a><a href="#">Americas</a><a href="#">Middle East</a><a href="#">Africa</a>
-            </div>
-            <div class="footer-col">
-                <h4>Sections</h4>
-                <a href="#" onclick="filterCat(event,'World Affairs')">World Affairs</a>
-                <a href="#" onclick="filterCat(event,'Economy & Markets')">Economy & Markets</a>
-                <a href="#" onclick="filterCat(event,'Innovation')">Innovation</a>
-                <a href="#" onclick="filterCat(event,'Defense & Security')">Defense & Security</a>
-                <a href="#" onclick="filterCat(event,'Society')">Society</a>
-            </div>
-            <div class="footer-col">
-                <h4>The Gazette</h4>
-                <a href="#">About Us</a><a href="#">Editorial Standards</a><a href="#">Contact</a><a href="/admin.html">Admin Portal</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <span>© 2025 The Alamin Gazette. All rights reserved.</span>
-            <span>Built by Alamin · Powered by Supabase</span>
-        </div>
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="images/lol.png" style="height:40px;filter:brightness(10);opacity:.85;margin-bottom:12px;"
+             onerror="this.style.display='none';document.getElementById('fl').style.display='block';" alt="">
+        <span class="footer-brand-logo" id="fl" style="display:none;">The Alamin Gazette</span>
+        <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Regions</h5>
+        <a href="#">Asia-Pacific</a>
+        <a href="#">EMEA</a>
+        <a href="#">Americas</a>
+        <a href="#">Middle East</a>
+        <a href="#">Africa</a>
+      </div>
+      <div class="footer-col">
+        <h5>Sections</h5>
+        <a href="#" onclick="setCategory(null,'World Affairs')">World Affairs</a>
+        <a href="#" onclick="setCategory(null,'Economy & Markets')">Economy & Markets</a>
+        <a href="#" onclick="setCategory(null,'Innovation')">Innovation</a>
+        <a href="#" onclick="setCategory(null,'Defense & Security')">Defense & Security</a>
+        <a href="#" onclick="setCategory(null,'Society')">Society</a>
+      </div>
+      <div class="footer-col">
+        <h5>The Gazette</h5>
+        <a href="#">About Us</a>
+        <a href="#">Editorial Standards</a>
+        <a href="#">Contact</a>
+        <a href="admin.html">Admin Portal</a>
+      </div>
     </div>
+    <div class="footer-bottom">
+      <span>© 2025 The Alamin Gazette. All rights reserved.</span>
+      <span>Powered by Supabase · Built by Alamin</span>
+    </div>
+  </div>
 </footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
-    const SUPA_URL='https://szzqaqwpvxwrefkojplh.supabase.co';
-    const SUPA_KEY='sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-    const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
-    const PAGE_SIZE=12;
-    let allPosts=[],feedPosts=[],offset=0,activeCat='all';
+// ── CONFIG ─────────────────────────────────────────
+const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
+const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+const PAGE = 12;
 
-    document.getElementById('today-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+let allPosts = [], filtered = [], feedOffset = 0, activeCat = '';
 
-    const catCls=c=>({'World Affairs':'cat-world','Economy & Markets':'cat-economy','Innovation':'cat-innovation','Defense & Security':'cat-defense','Society':'cat-society'}[c]||'cat-default');
-    const teaser=(p,len)=>{const t=p.excerpt||p.content||'';return t.length>len?t.slice(0,len).trim()+'…':t;};
-    const fmtDate=d=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const storyURL=slug=>`/story/${slug}`;
-    const shareIco=()=>`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`;
-    const badge=p=>p.breaking?`<span class="breaking-badge">Breaking</span>`:'';
+// ── DATE ───────────────────────────────────────────
+document.getElementById('hdr-date').textContent =
+  new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-    function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+// ── HELPERS ────────────────────────────────────────
+function chipClass(c) {
+  return { 'World Affairs':'chip-world','Economy & Markets':'chip-economy',
+    'Innovation':'chip-innovation','Defense & Security':'chip-defense','Society':'chip-society' }[c] || 'chip-default';
+}
 
-    function sharePost(e,slug,title){
-        e.stopPropagation();
-        const url=`${location.origin}/story/${slug}`;
-        if(navigator.share)navigator.share({title,url});
-        else navigator.clipboard.writeText(url).then(()=>toast('Link copied'));
-    }
+function teaser(p, n) {
+  const t = (p.excerpt || p.content || '').replace(/<[^>]+>/g,'');
+  return t.length > n ? t.slice(0, n).trim() + '…' : t;
+}
 
-    function buildTicker(posts){
-        if(!posts.length)return;
-        const breaking=posts.filter(p=>p.breaking);
-        const rest=posts.filter(p=>!p.breaking).slice(0,10-breaking.length);
-        const items=[...breaking,...rest];
-        const inner=document.getElementById('ticker');
-        inner.innerHTML=items.map(p=>`<a href="${storyURL(p.slug)}">${p.breaking?'🔴 BREAKING: ':''}${p.title}</a>`).join('');
-        document.getElementById('ticker-bar').style.display='flex';
-        const dur=Math.max(35,Math.min(90,items.reduce((s,p)=>s+p.title.length,0)*0.2));
-        inner.style.animationDuration=dur+'s';
-    }
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'Just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7)  return `${d}d ago`;
+  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
 
-    function renderHero(posts){
-        const el=document.getElementById('hero-section');
-        if(!posts.length){el.innerHTML='';return;}
-        const m=posts[0],sides=posts.slice(1,3);
-        const sideHTML=sides.map(p=>`
-            <div class="hero-side" onclick="location.href='${storyURL(p.slug)}'">
-                <img src="${p.image_url||'https://placehold.co/600x300/1a1a2e/9aa8b8?text=Gazette'}" loading="lazy" onerror="this.src='https://placehold.co/600x300/1a1a2e/9aa8b8?text=Gazette'" alt="">
-                <div>${badge(p)}<span class="cat-chip ${catCls(p.category)}">${p.category||'World'}</span></div>
-                <h3>${p.title}</h3>
-                <p class="s-excerpt">${teaser(p,100)}</p>
-                <div class="side-meta">
-                    <span>${p.author||'Alamin Gazette'} &middot; ${fmtDate(p.created_at)}</span>
-                    <button class="share-btn" onclick="sharePost(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}'">${shareIco()} Share</button>
-                </div>
-            </div>`).join('');
-        el.innerHTML=`
-            <div class="hero-grid">
-                <div class="hero-main" onclick="location.href='${storyURL(m.slug)}'">
-                    <img src="${m.image_url||'https://placehold.co/900x520/0a1628/4a6a8a?text=Gazette'}" onerror="this.src='https://placehold.co/900x520/0a1628/4a6a8a?text=Gazette'" alt="">
-                    <div class="hero-overlay">
-                        <div>${badge(m)}<span class="cat-chip ${catCls(m.category)}">${m.category||'World'}</span></div>
-                        <h2>${m.title}</h2>
-                        <p class="h-excerpt">${teaser(m,180)}</p>
-                        <div class="hero-meta">
-                            <span>${m.author||'Alamin Gazette'} &middot; ${fmtDate(m.created_at)}</span>
-                            <button class="share-btn" style="color:#8a8070" onclick="sharePost(event,'${m.slug}','${m.title.replace(/'/g,"\\'")}'">${shareIco()} Share</button>
-                        </div>
-                    </div>
-                </div>
-                <div>${sideHTML}</div>
-            </div>`;
-    }
+function fullDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric',
+    hour:'2-digit', minute:'2-digit', timeZoneName:'short'
+  });
+}
 
-    function renderFeed(posts,append=false){
-        const grid=document.getElementById('feed-grid');
-        const html=posts.map(p=>`
-            <div class="feed-card" onclick="location.href='${storyURL(p.slug)}'">
-                <img src="${p.image_url||'https://placehold.co/400x130/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" onerror="this.src='https://placehold.co/400x130/e8e2d8/9a8a7a?text=Gazette'" alt="">
-                <div>${badge(p)}<span class="cat-chip ${catCls(p.category)}">${p.category||'World'}</span></div>
-                <h3>${p.title}</h3>
-                <p class="f-excerpt">${teaser(p,130)}</p>
-                <div class="feed-meta">
-                    <span>${p.author||'Alamin Gazette'} &middot; ${fmtDate(p.created_at)}</span>
-                    <button class="share-btn" onclick="sharePost(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}'">${shareIco()} Share</button>
-                </div>
-            </div>`).join('');
-        if(append)grid.innerHTML+=html;else grid.innerHTML=html;
-    }
+function articleURL(slug) { return `article.html?id=${slug}`; }
 
-    async function loadPosts(){
-        const{data,error}=await sb.from('posts').select('*').eq('is_published',true).order('created_at',{ascending:false});
-        if(error||!data){document.getElementById('hero-section').innerHTML='<p style="padding:30px">Unable to load posts.</p>';return;}
-        allPosts=data.sort((a,b)=>(b.breaking?1:0)-(a.breaking?1:0)||new Date(b.created_at)-new Date(a.created_at));
-        buildTicker(data);
-        applyFilter();
-    }
+function shareIco() {
+  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+  </svg>`;
+}
 
-    function applyFilter(){
-        const filtered=activeCat==='all'?allPosts:allPosts.filter(p=>p.category===activeCat);
-        renderHero(filtered.slice(0,3));
-        feedPosts=filtered.slice(3);
-        offset=PAGE_SIZE;
-        renderFeed(feedPosts.slice(0,PAGE_SIZE));
-        const wrap=document.getElementById('load-more-wrap');
-        const btn=document.getElementById('load-more-btn');
-        wrap.style.display=feedPosts.length>PAGE_SIZE?'block':'none';
-        if(btn)btn.disabled=false;
-    }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
 
-    function filterCat(e,cat){
-        e.preventDefault();
-        activeCat=cat;
-        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-        e.target.classList.add('active');
-        applyFilter();
-        window.scrollTo({top:0,behavior:'smooth'});
-    }
+function doShare(e, slug, title) {
+  e.stopPropagation();
+  const url = location.origin + '/' + articleURL(slug);
+  if (navigator.share) navigator.share({ title, url });
+  else navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
+}
 
-    function loadMore(){
-        const btn=document.getElementById('load-more-btn');
-        btn.textContent='Loading…';btn.disabled=true;
-        renderFeed(feedPosts.slice(offset,offset+PAGE_SIZE),true);
-        offset+=PAGE_SIZE;
-        if(offset>=feedPosts.length)document.getElementById('load-more-wrap').style.display='none';
-        else{btn.textContent='Load More Stories';btn.disabled=false;}
-    }
+// ── TICKER ─────────────────────────────────────────
+function buildTicker(posts) {
+  const breaking = posts.filter(p => p.breaking);
+  const rest     = posts.filter(p => !p.breaking).slice(0, 12);
+  const all      = [...breaking, ...rest];
+  if (!all.length) return;
+  document.getElementById('ticker-track').innerHTML =
+    all.map(p => `<a href="${articleURL(p.slug)}" class="${p.breaking ? 'is-breaking' : ''}">${p.breaking ? 'BREAKING: ' : ''}${p.title}</a>`).join('');
+  const dur = Math.max(40, Math.min(100, all.reduce((s,p) => s + p.title.length, 0) * 0.22));
+  document.getElementById('ticker-track').style.animationDuration = dur + 's';
+  document.getElementById('ticker-bar').style.display = 'flex';
+}
 
-    loadPosts();
+// ── HERO ───────────────────────────────────────────
+function renderHero(posts) {
+  const el = document.getElementById('hero-zone');
+  if (!posts.length) { el.innerHTML = '<div class="empty-state">No stories found.</div>'; return; }
+
+  const lead  = posts[0];
+  const cards = posts.slice(1, 3);
+
+  el.innerHTML = `
+    <div class="hero">
+      <div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'">
+        <img class="hero-lead-img"
+          src="${lead.image_url || 'https://placehold.co/900x560/0b1927/3a5878?text=The+Alamin+Gazette'}"
+          onerror="this.src='https://placehold.co/900x560/0b1927/3a5878?text=The+Alamin+Gazette'" alt="">
+        <div class="hero-lead-scrim"></div>
+        <div class="hero-lead-body">
+          <div>
+            ${lead.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}
+            <span class="chip ${chipClass(lead.category)}">${lead.category || 'World'}</span>
+          </div>
+          <h2>${lead.title}</h2>
+          <p class="hero-excerpt">${teaser(lead, 200)}</p>
+          <div class="hero-byline">
+            <span>${lead.author || 'Alamin Gazette'} &nbsp;·&nbsp; <span title="${fullDate(lead.created_at)}">${timeAgo(lead.created_at)}</span></span>
+            <button class="share-btn" style="color:#7a7060" onclick="doShare(event,'${lead.slug}','${lead.title.replace(/'/g,"\\'")}')">
+              ${shareIco()} Share
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-stack">
+        ${cards.map(p => `
+          <div class="hero-card" onclick="location.href='${articleURL(p.slug)}'">
+            <img class="hero-card-img"
+              src="${p.image_url || 'https://placehold.co/600x280/0b1927/3a5878?text=Gazette'}"
+              onerror="this.src='https://placehold.co/600x280/0b1927/3a5878?text=Gazette'" loading="lazy" alt="">
+            <div>
+              ${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}
+              <span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span>
+            </div>
+            <h3>${p.title}</h3>
+            <p class="card-excerpt">${teaser(p, 110)}</p>
+            <div class="card-meta">
+              <span title="${fullDate(p.created_at)}">${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span>
+              <button class="share-btn" onclick="doShare(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
+                ${shareIco()} Share
+              </button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── FEED ───────────────────────────────────────────
+function renderFeed(posts, append = false) {
+  const el = document.getElementById('feed-zone');
+  const html = posts.map(p => `
+    <div class="feed-item" onclick="location.href='${articleURL(p.slug)}'">
+      <img class="feed-item-img"
+        src="${p.image_url || 'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}"
+        onerror="this.src='https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
+      <div>
+        ${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}
+        <span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span>
+      </div>
+      <h3>${p.title}</h3>
+      <p class="item-excerpt">${teaser(p, 140)}</p>
+      <div class="card-meta">
+        <span title="${fullDate(p.created_at)}">${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span>
+        <button class="share-btn" onclick="doShare(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
+          ${shareIco()} Share
+        </button>
+      </div>
+    </div>`).join('');
+  if (append) el.innerHTML += html; else el.innerHTML = html;
+}
+
+// ── LOAD & FILTER ─────────────────────────────────
+async function loadPosts() {
+  const { data, error } = await sb
+    .from('posts')
+    .select('*')
+    .eq('is_published', true)
+    .order('created_at', { ascending: false });
+
+  if (error || !data) {
+    document.getElementById('hero-zone').innerHTML =
+      '<div class="empty-state">Unable to load stories. Please try again.</div>';
+    console.error(error);
+    return;
+  }
+
+  // Breaking always floats up
+  allPosts = data.sort((a, b) =>
+    (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) ||
+    new Date(b.created_at) - new Date(a.created_at)
+  );
+
+  buildTicker(data);
+  applyFilter();
+}
+
+function applyFilter() {
+  filtered = activeCat ? allPosts.filter(p => p.category === activeCat) : allPosts;
+  renderHero(filtered.slice(0, 3));
+  feedOffset = PAGE;
+  renderFeed(filtered.slice(3, 3 + PAGE));
+  const hasMore = filtered.length > 3 + PAGE;
+  document.getElementById('load-more-row').style.display = hasMore ? 'block' : 'none';
+}
+
+function setCategory(btn, cat) {
+  activeCat = cat;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applyFilter();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function loadMore() {
+  const btn = document.getElementById('load-more-btn');
+  btn.textContent = 'Loading…'; btn.disabled = true;
+  const slice = filtered.slice(3 + feedOffset, 3 + feedOffset + PAGE);
+  renderFeed(slice, true);
+  feedOffset += PAGE;
+  if (3 + feedOffset >= filtered.length) {
+    document.getElementById('load-more-row').style.display = 'none';
+  } else {
+    btn.textContent = 'Load More Stories'; btn.disabled = false;
+  }
+}
+
+loadPosts();
 </script>
 </body>
 </html>
