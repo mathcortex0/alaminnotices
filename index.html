@@ -28,12 +28,12 @@
       --prose: 'Source Serif 4', Georgia, serif;
       --ui: 'DM Sans', system-ui, sans-serif;
       
-      --header-height: 64px;
+      --header-height: 80px;
     }
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 70px;
+      scroll-padding-top: 90px;
     }
 
     body {
@@ -55,7 +55,7 @@
       max-width: 100%;
     }
 
-    /* ---------- MASTHEAD: LOGO + NAME IN STRAIGHT HORIZONTAL LINE ---------- */
+    /* ---------- MASTHEAD: BIG LOGO + NAME ---------- */
     .masthead {
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
@@ -78,23 +78,23 @@
       justify-content: space-between;
     }
 
-    /* LEFT: logo + name in straight line */
+    /* LEFT: BIG logo + name in straight line */
     .masthead-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       flex-shrink: 0;
     }
 
     .brand-logo-img {
-      height: 34px;
+      height: 52px;
       width: auto;
       display: block;
     }
 
     .brand-name {
       font-family: var(--serif);
-      font-size: 1.35rem;
+      font-size: 1.8rem;
       font-weight: 900;
       letter-spacing: -0.01em;
       color: var(--ink);
@@ -719,11 +719,14 @@
         display: flex;
       }
       .brand-logo-img {
-        height: 28px;
+        height: 40px;
       }
       .brand-name {
-        font-size: 1rem;
+        font-size: 1.2rem;
         white-space: normal;
+      }
+      .masthead-brand {
+        gap: 10px;
       }
       .hero-stack {
         flex-direction: column;
@@ -752,10 +755,10 @@
 
     @media (max-width: 480px) {
       .brand-name {
-        font-size: 0.85rem;
+        font-size: 1rem;
       }
       .brand-logo-img {
-        height: 24px;
+        height: 34px;
       }
       .masthead-brand {
         gap: 8px;
@@ -767,7 +770,7 @@
 
 <header class="masthead">
   <div class="masthead-inner">
-    <!-- LEFT: logo + name in straight horizontal line -->
+    <!-- LEFT: BIG logo + name in straight line -->
     <div class="masthead-brand">
       <img src="images/lol.png" class="brand-logo-img" alt="The Alamin Gazette" 
            onerror="this.style.display='none';document.getElementById('fallbackBrandName').style.display='inline-block';">
