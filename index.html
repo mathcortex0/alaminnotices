@@ -9,6 +9,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* ---------- RESET & VARIABLES ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     :root {
       --ink: #0f0f0f;
       --ink-2: #3a3a3a;
@@ -18,89 +25,112 @@
       --rule: #cfc8bb;
       --navy: #0b1927;
       --crimson: #b01428;
-      --gold: #c8922a;
       --serif: 'Playfair Display', Georgia, serif;
       --prose: 'Source Serif 4', Georgia, serif;
       --ui: 'DM Sans', system-ui, sans-serif;
+      
+      --header-height-expanded: 88px;
+      --header-height-compact: 56px;
+      --transition-duration: 0.2s;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
-    body { font-family: var(--prose); background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 
-    /* ── MASTHEAD ── */
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px;
+    }
+
+    body {
+      font-family: var(--prose);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ---------- MASTHEAD (ECONOMIST + REUTERS HYBRID) ---------- */
     .masthead {
       background: var(--paper);
-      border-bottom: 1px solid var(--rule);
       position: sticky;
       top: 0;
       z-index: 100;
       width: 100%;
+      border-bottom: 1px solid var(--rule);
+      transition: box-shadow var(--transition-duration) ease;
+    }
+
+    .masthead.scrolled {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     }
 
     .masthead-inner {
       max-width: 1300px;
       margin: 0 auto;
-      padding: 0 28px;
+      padding: 0 24px;
     }
 
-    /* TOP ROW - shrinks on scroll */
-    .masthead-top {
+    /* ----- TOP BAR: logo + utilities (collapses on scroll) ----- */
+    .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 12px 0 8px;
       border-bottom: 1px solid var(--rule);
-      transition: all 0.25s ease-out;
-      overflow: hidden;
+      transition: padding var(--transition-duration) ease, border-color var(--transition-duration) ease;
     }
 
-    /* Compact state - triggered by JS */
-    .masthead.compact .masthead-top {
-      padding: 0 0 0;
+    /* Compact state: shrink top bar */
+    .masthead.compact .top-bar {
+      padding: 0;
       border-bottom-color: transparent;
-      max-height: 0;
     }
 
-    .masthead-date {
-      font-family: var(--ui);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: .3px;
-      white-space: nowrap;
-      transition: opacity 0.2s ease;
-    }
-    .masthead.compact .masthead-date {
-      opacity: 0;
-      visibility: hidden;
+    /* Logo area */
+    .logo-area {
+      text-align: center;
+      transition: transform var(--transition-duration) ease;
     }
 
-    .logo-area { 
-      text-align: center; 
-      transition: transform 0.25s ease;
-    }
     .masthead.compact .logo-area {
       transform: scale(0.85);
     }
-    .logo-img-el { height: 42px; width: auto; margin: 0 auto; transition: height 0.25s ease; }
-    .masthead.compact .logo-img-el { height: 32px; }
+
+    .logo-img {
+      height: 44px;
+      width: auto;
+      margin: 0 auto;
+      transition: height var(--transition-duration) ease;
+    }
+
+    .masthead.compact .logo-img {
+      height: 32px;
+    }
+
     .logo-wordmark {
       font-family: var(--serif);
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: 900;
-      letter-spacing: -.5px;
+      letter-spacing: -0.02em;
       color: var(--ink);
-      line-height: 1;
+      line-height: 1.1;
       display: block;
     }
+
     .logo-tagline {
       font-family: var(--ui);
-      font-size: 9px;
+      font-size: 8.5px;
       letter-spacing: 2.8px;
       text-transform: uppercase;
       color: var(--ink-3);
-      margin-top: 3px;
-      transition: opacity 0.2s ease;
+      margin-top: 4px;
+      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
     }
+
     .masthead.compact .logo-tagline {
       opacity: 0;
       visibility: hidden;
@@ -108,156 +138,447 @@
       margin: 0;
     }
 
-    .masthead-actions {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 12px;
-      transition: opacity 0.2s ease;
+    /* Date (desktop only) */
+    .date-badge {
+      font-family: var(--ui);
+      font-size: 11px;
+      color: var(--ink-3);
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
     }
-    .masthead.compact .masthead-actions {
+
+    .masthead.compact .date-badge {
       opacity: 0;
       visibility: hidden;
     }
 
-    .pill-btn {
+    /* Utilities: Admin + Search (desktop) */
+    .util-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
+    }
+
+    .masthead.compact .util-actions {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .util-link {
       font-family: var(--ui);
       font-size: 10.5px;
       font-weight: 600;
-      letter-spacing: .8px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      text-decoration: none;
       color: var(--ink-3);
-      padding: 6px 14px;
-      border: 1px solid var(--rule);
-      transition: all .2s;
+      transition: color 0.2s;
     }
-    .pill-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
-    /* NAV ROW - always visible */
-    .masthead-nav-row {
+    .util-link:hover {
+      color: var(--crimson);
+    }
+
+    .search-icon {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      cursor: pointer;
+    }
+
+    /* ----- NAVIGATION ROW (always visible, compacts slightly) ----- */
+    .nav-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 8px 0;
-      transition: padding 0.25s ease;
+      transition: padding var(--transition-duration) ease;
     }
-    .masthead.compact .masthead-nav-row {
+
+    .masthead.compact .nav-row {
       padding: 4px 0;
     }
 
     /* Compact logo that appears on scroll */
     .compact-logo {
       font-family: var(--serif);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 900;
       color: var(--ink);
-      text-decoration: none;
       white-space: nowrap;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
+      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
       margin-right: 0;
+      letter-spacing: -0.01em;
     }
+
     .masthead.compact .compact-logo {
       opacity: 1;
       visibility: visible;
-      margin-right: 20px;
+      margin-right: 24px;
     }
 
+    /* Desktop navigation strip */
     .nav-strip {
       display: flex;
       overflow-x: auto;
       scrollbar-width: none;
       flex: 1;
-      gap: 4px;
+      gap: 2px;
     }
-    .nav-strip::-webkit-scrollbar { display: none; }
+
+    .nav-strip::-webkit-scrollbar {
+      display: none;
+    }
+
     .nav-btn {
       font-family: var(--ui);
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .9px;
+      font-weight: 500;
+      letter-spacing: 0.7px;
       text-transform: uppercase;
       color: var(--ink-2);
-      padding: 10px 16px;
+      padding: 8px 14px;
       border: none;
       background: none;
       cursor: pointer;
       white-space: nowrap;
       border-bottom: 2px solid transparent;
-      transition: all .2s;
+      transition: all 0.2s;
     }
-    .nav-btn:hover, .nav-btn.active { color: var(--ink); border-bottom-color: var(--crimson); }
 
+    .nav-btn:hover {
+      color: var(--ink);
+    }
+
+    .nav-btn.active {
+      color: var(--crimson);
+      font-weight: 600;
+      border-bottom-color: var(--crimson);
+    }
+
+    /* Compact admin link (visible on scroll, desktop/tablet) */
     .compact-admin {
       font-family: var(--ui);
       font-size: 10.5px;
       font-weight: 600;
-      letter-spacing: .6px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
       color: var(--ink-3);
-      text-decoration: none;
-      padding-left: 16px;
-      border-left: 1px solid var(--rule);
       white-space: nowrap;
       flex-shrink: 0;
-      transition: opacity 0.2s ease;
+      padding-left: 16px;
+      border-left: 1px solid var(--rule);
+      transition: opacity var(--transition-duration) ease;
     }
-    .masthead.compact .compact-admin {
-      opacity: 0.7;
+
+    .compact-admin:hover {
+      color: var(--crimson);
     }
-    .compact-admin:hover { color: var(--crimson); }
 
-    /* ── REST OF PAGE (unchanged, stable) ── */
-    .page { max-width: 1300px; margin: 0 auto; padding: 0 28px; }
-    .section-head { display: flex; align-items: center; gap: 14px; margin: 34px 0 22px; }
-    .section-head-label { font-family: var(--ui); font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--crimson); white-space: nowrap; }
-    .section-head-rule { flex: 1; height: 1px; background: var(--rule); }
-    .divider { border: none; border-top: 2px solid var(--ink); margin: 0; }
+    /* ----- MOBILE ELEMENTS (hidden on desktop) ----- */
+    .mobile-controls {
+      display: none;
+      align-items: center;
+      gap: 16px;
+    }
 
-    .chip {
+    .hamburger {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      padding: 0;
+    }
+
+    .hamburger span {
+      width: 100%;
+      height: 2px;
+      background: var(--ink);
+      transition: all 0.2s;
+    }
+
+    .mobile-search-icon {
+      width: 20px;
+      height: 20px;
+      stroke: var(--ink-2);
+      stroke-width: 2;
+      fill: none;
+      cursor: pointer;
+    }
+
+    /* ----- MOBILE SLIDE MENU ----- */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 85%;
+      max-width: 320px;
+      height: 100vh;
+      background: var(--paper);
+      z-index: 200;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      box-shadow: 2px 0 24px rgba(0, 0, 0, 0.1);
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 199;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .menu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .menu-header .logo-wordmark {
+      font-size: 1.3rem;
+    }
+
+    .close-menu {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--ink-2);
+      line-height: 1;
+    }
+
+    .menu-nav {
+      flex: 1;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-nav a {
       font-family: var(--ui);
-      font-size: 9.5px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 3px 9px;
-      border-radius: 2px;
-      display: inline-block;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--ink-2);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--rule);
+      transition: color 0.2s;
     }
-    .chip-world { background:#0b1927; color:#9ab0c8; }
-    .chip-economy { background:#0e3d27; color:#8ec8a8; }
-    .chip-innovation { background:#0a3d78; color:#90b8e8; }
-    .chip-defense { background:#3d0e1a; color:#c89098; }
-    .chip-society { background:#3d3000; color:#c8b870; }
-    .chip-default { background:#1a1a1a; color:#aaa; }
-    .chip-breaking { background: var(--crimson); color: #fff; margin-right: 5px; }
 
+    .menu-nav a:hover,
+    .menu-nav a.active-mobile {
+      color: var(--crimson);
+      font-weight: 600;
+    }
+
+    .menu-footer {
+      padding: 20px;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      gap: 24px;
+    }
+
+    .menu-footer a {
+      font-family: var(--ui);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-3);
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    /* ---------- REST OF PAGE (stable, no shake) ---------- */
+    .page {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 34px 0 22px;
+    }
+
+    .section-head-label {
+      font-family: var(--ui);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--crimson);
+      white-space: nowrap;
+    }
+
+    .section-head-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .divider {
+      border: none;
+      border-top: 2px solid var(--ink);
+      margin: 0;
+    }
+
+    /* Hero and feed styles (minimal, functional) */
     .hero {
       display: grid;
       grid-template-columns: 1fr 320px;
       border: 1px solid var(--rule);
       background: var(--paper);
-      min-height: 500px;
+      min-height: 480px;
     }
-    .hero-lead { position: relative; overflow: hidden; border-right: 1px solid var(--rule); cursor: pointer; min-height: 500px; background: var(--navy); }
-    .hero-lead-img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; transition: transform .4s ease; }
-    .hero-lead:hover .hero-lead-img { transform: scale(1.02); }
-    .hero-lead-scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,12,20,.92) 0%, rgba(8,12,20,.4) 60%, transparent 100%); }
-    .hero-lead-body { position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 24px 24px; }
-    .hero-lead-body h2 { font-family: var(--serif); font-size: 1.8rem; font-weight: 900; color: #f4efe8; line-height: 1.25; margin: 8px 0 10px; }
-    .hero-lead-body .hero-excerpt { font-family: var(--prose); font-size: .85rem; color: #c0b8a8; line-height: 1.5; margin-bottom: 12px; }
-    .hero-byline { font-family: var(--ui); font-size: 11px; color: #7a7060; display: flex; justify-content: space-between; align-items: center; }
 
-    .hero-stack { display: flex; flex-direction: column; background: var(--paper); }
-    .hero-card { flex: 1; padding: 18px 18px; border-bottom: 1px solid var(--rule); cursor: pointer; transition: background .2s; background: var(--paper); }
-    .hero-card:last-child { border-bottom: none; }
-    .hero-card:hover { background: var(--paper-2); }
-    .hero-card-img { width: 100%; height: 130px; object-fit: cover; border-radius: 2px; margin-bottom: 10px; background: #e8e2d8; }
-    .hero-card h3 { font-family: var(--serif); font-size: 1rem; font-weight: 700; line-height: 1.3; color: var(--ink); margin: 6px 0 6px; }
-    .hero-card .card-excerpt { font-family: var(--prose); font-size: .78rem; color: var(--ink-2); line-height: 1.45; margin-bottom: 8px; }
-    .card-meta { font-family: var(--ui); font-size: 10px; color: var(--ink-3); display: flex; justify-content: space-between; align-items: center; }
+    .hero-lead {
+      position: relative;
+      overflow: hidden;
+      border-right: 1px solid var(--rule);
+      cursor: pointer;
+      min-height: 480px;
+      background: var(--navy);
+    }
+
+    .hero-lead-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      transition: transform 0.4s ease;
+    }
+
+    .hero-lead:hover .hero-lead-img {
+      transform: scale(1.02);
+    }
+
+    .hero-lead-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8, 12, 20, 0.92) 0%, rgba(8, 12, 20, 0.4) 60%, transparent 100%);
+    }
+
+    .hero-lead-body {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 28px 24px 24px;
+    }
+
+    .hero-lead-body h2 {
+      font-family: var(--serif);
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #f4efe8;
+      line-height: 1.25;
+      margin: 8px 0 10px;
+    }
+
+    .hero-excerpt {
+      font-family: var(--prose);
+      font-size: 0.85rem;
+      color: #c0b8a8;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .hero-byline {
+      font-family: var(--ui);
+      font-size: 11px;
+      color: #7a7060;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-stack {
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+    }
+
+    .hero-card {
+      flex: 1;
+      padding: 18px;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      transition: background 0.2s;
+      background: var(--paper);
+    }
+
+    .hero-card:last-child {
+      border-bottom: none;
+    }
+
+    .hero-card:hover {
+      background: var(--paper-2);
+    }
+
+    .hero-card-img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      background: #e8e2d8;
+    }
+
+    .hero-card h3 {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 6px 0;
+    }
+
+    .card-excerpt {
+      font-family: var(--prose);
+      font-size: 0.78rem;
+      color: var(--ink-2);
+      line-height: 1.45;
+      margin-bottom: 8px;
+    }
+
+    .card-meta {
+      font-family: var(--ui);
+      font-size: 10px;
+      color: var(--ink-3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
     .feed {
       display: grid;
@@ -266,11 +587,46 @@
       border-top: 1px solid var(--rule);
       background: var(--paper);
     }
-    .feed-item { padding: 20px 20px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); cursor: pointer; transition: background .2s; background: var(--paper); }
-    .feed-item:hover { background: var(--paper-2); }
-    .feed-item-img { width: 100%; height: 120px; object-fit: cover; border-radius: 2px; margin-bottom: 10px; background: #e8e2d8; }
-    .feed-item h3 { font-family: var(--serif); font-size: 0.95rem; font-weight: 700; line-height: 1.3; color: var(--ink); margin: 6px 0 6px; }
-    .feed-item .item-excerpt { font-family: var(--prose); font-size: .78rem; color: var(--ink-2); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px; }
+
+    .feed-item {
+      padding: 20px;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .feed-item:hover {
+      background: var(--paper-2);
+    }
+
+    .feed-item-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      background: #e8e2d8;
+    }
+
+    .feed-item h3 {
+      font-family: var(--serif);
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 6px 0;
+    }
+
+    .item-excerpt {
+      font-size: 0.78rem;
+      color: var(--ink-2);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
 
     .share-btn {
       background: none;
@@ -280,17 +636,24 @@
       font-size: 9.5px;
       font-weight: 600;
       color: var(--ink-3);
-      letter-spacing: .6px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
       gap: 4px;
       padding: 3px 0;
-      transition: color .2s;
     }
-    .share-btn:hover { color: var(--crimson); }
 
-    .load-more-row { text-align: center; padding: 44px 0; border-top: 1px solid var(--rule); }
+    .share-btn:hover {
+      color: var(--crimson);
+    }
+
+    .load-more-row {
+      text-align: center;
+      padding: 44px 0;
+      border-top: 1px solid var(--rule);
+    }
+
     .load-more-btn {
       font-family: var(--ui);
       font-size: 11px;
@@ -302,10 +665,8 @@
       border: 1.5px solid var(--ink);
       padding: 14px 40px;
       cursor: pointer;
-      transition: all .25s;
+      transition: all 0.25s;
     }
-    .load-more-btn:hover { background: var(--ink); color: var(--paper); }
-    .load-more-btn:disabled { opacity: .35; cursor: not-allowed; }
 
     .site-footer {
       background: var(--navy);
@@ -313,14 +674,52 @@
       margin-top: 70px;
       padding: 60px 28px 32px;
     }
-    .footer-inner { max-width: 1300px; margin: 0 auto; }
-    .footer-grid { display: grid; grid-template-columns: 260px 1fr 1fr 1fr; gap: 48px; padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,.08); }
-    .footer-brand-logo { font-family: var(--serif); font-size: 1.7rem; font-weight: 900; color: #e8e0d4; display: block; margin-bottom: 14px; }
-    .footer-brand p { font-family: var(--prose); font-size: .82rem; color: #5a6878; line-height: 1.65; }
-    .footer-col h5 { font-family: var(--ui); font-size: 9.5px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #c0ccd8; margin-bottom: 18px; }
-    .footer-col a { display: block; font-family: var(--ui); font-size: 13px; color: #5a6878; margin-bottom: 10px; transition: color .2s; }
-    .footer-col a:hover { color: #d8e4f0; }
-    .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 26px; font-family: var(--ui); font-size: 11px; color: #3a4858; }
+
+    .footer-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 44px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .footer-brand p {
+      font-family: var(--prose);
+      font-size: 0.82rem;
+      color: #5a6878;
+    }
+
+    .footer-col h5 {
+      font-family: var(--ui);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #c0ccd8;
+      margin-bottom: 18px;
+    }
+
+    .footer-col a {
+      display: block;
+      font-family: var(--ui);
+      font-size: 13px;
+      color: #5a6878;
+      margin-bottom: 10px;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 26px;
+      font-family: var(--ui);
+      font-size: 11px;
+      color: #3a4858;
+    }
 
     .toast {
       position: fixed;
@@ -333,45 +732,106 @@
       font-size: 13px;
       padding: 12px 22px;
       border-radius: 3px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.3);
       z-index: 999;
       opacity: 0;
-      transition: all .3s ease;
+      transition: all 0.3s ease;
       pointer-events: none;
-      white-space: nowrap;
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .empty-state { text-align: center; padding: 80px 20px; color: var(--ink-3); font-family: var(--ui); font-size: 14px; }
 
-    @media (max-width: 1024px) { .feed { grid-template-columns: repeat(2,1fr); } }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--ink-3);
+    }
+
+    /* RESPONSIVE */
     @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-lead { min-height: 380px; border-right: none; border-bottom: 1px solid var(--rule); }
-      .hero-stack { flex-direction: row; }
-      .hero-card { border-bottom: none; border-right: 1px solid var(--rule); }
-      .hero-card:last-child { border-right: none; }
-      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .hero-lead {
+        min-height: 380px;
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+      .hero-stack {
+        flex-direction: row;
+      }
+      .hero-card {
+        border-bottom: none;
+        border-right: 1px solid var(--rule);
+      }
+      .hero-card:last-child {
+        border-right: none;
+      }
+      .feed {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
     }
+
     @media (max-width: 768px) {
-      .masthead-top { justify-content: center; }
-      .masthead-date, .masthead-actions { display: none; }
-      .logo-wordmark { font-size: 1.6rem; }
-      .logo-img-el { height: 36px; }
-      .nav-btn { padding: 8px 12px; font-size: 10px; }
-      .compact-admin { display: none; }
+      .top-bar {
+        justify-content: space-between;
+        padding: 8px 0;
+      }
+      .date-badge,
+      .util-actions {
+        display: none;
+      }
+      .mobile-controls {
+        display: flex;
+      }
+      .nav-strip,
+      .compact-admin {
+        display: none;
+      }
+      .compact-logo {
+        display: none;
+      }
+      .nav-row {
+        justify-content: flex-end;
+      }
+      .hero-stack {
+        flex-direction: column;
+      }
+      .hero-card {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+      .feed {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      .page {
+        padding: 0 16px;
+      }
+      .hero-lead-body h2 {
+        font-size: 1.3rem;
+      }
+      .hero-lead-body .hero-excerpt {
+        display: none;
+      }
     }
-    @media (max-width: 640px) {
-      .hero-stack { flex-direction: column; }
-      .hero-card { border-right: none; border-bottom: 1px solid var(--rule); }
-      .hero-lead { min-height: 300px; }
-      .hero-lead-body h2 { font-size: 1.2rem; }
-      .hero-lead-body .hero-excerpt { display: none; }
-      .feed { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
-      .page { padding: 0 16px; }
-      .section-head { margin: 24px 0 16px; }
-      .compact-logo { font-size: 0.9rem; }
-      .masthead.compact .compact-logo { margin-right: 12px; }
+
+    @media (max-width: 480px) {
+      .logo-wordmark {
+        font-size: 1.3rem;
+      }
+      .logo-img {
+        height: 32px;
+      }
     }
   </style>
 </head>
@@ -379,221 +839,132 @@
 
 <header class="masthead" id="masthead">
   <div class="masthead-inner">
-    <!-- Top row - shrinks/compacts on scroll -->
-    <div class="masthead-top">
-      <div class="masthead-date" id="hdr-date"></div>
+    <!-- Top bar: logo, date, admin/search (desktop) -->
+    <div class="top-bar">
+      <div class="date-badge" id="headerDate"></div>
       <div class="logo-area">
-        <a href="index.html" style="text-decoration:none;">
-          <img src="images/lol.png" class="logo-img-el"
-               onerror="this.style.display='none';document.getElementById('logo-wm').style.display='block';" alt="The Alamin Gazette">
-          <span class="logo-wordmark" id="logo-wm" style="display:none;">The Alamin Gazette</span>
+        <a href="index.html">
+          <img src="images/lol.png" class="logo-img" alt="The Alamin Gazette" onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='block';">
+          <span class="logo-wordmark" id="fallbackLogo" style="display:none;">The Alamin Gazette</span>
         </a>
-        <div class="logo-tagline">Independent · Informed · Indispensable</div>
+        <div class="logo-tagline">INDEPENDENT · INFORMED · INDISPENSABLE</div>
       </div>
-      <div class="masthead-actions">
-        <a href="admin.html" class="pill-btn">Admin</a>
+      <div class="util-actions">
+        <a href="admin.html" class="util-link">Admin</a>
+        <svg class="search-icon" viewBox="0 0 24 24" id="searchIcon">
+          <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
+          <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <!-- Mobile controls (hamburger + search) -->
+      <div class="mobile-controls">
+        <svg class="mobile-search-icon" viewBox="0 0 24 24" id="mobileSearchIcon">
+          <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
+          <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-linecap="round"/>
+        </svg>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </div>
-    <!-- Nav row - compact logo appears here when scrolled -->
-    <div class="masthead-nav-row">
+
+    <!-- Navigation row -->
+    <div class="nav-row">
       <a href="index.html" class="compact-logo" id="compactLogo">The Alamin Gazette</a>
-      <nav class="nav-strip">
+      <div class="nav-strip" id="navStrip">
         <button class="nav-btn active" data-cat="">All</button>
         <button class="nav-btn" data-cat="World Affairs">World Affairs</button>
         <button class="nav-btn" data-cat="Economy & Markets">Economy</button>
         <button class="nav-btn" data-cat="Innovation">Innovation</button>
         <button class="nav-btn" data-cat="Defense & Security">Defense</button>
         <button class="nav-btn" data-cat="Society">Society</button>
-      </nav>
+      </div>
       <a href="admin.html" class="compact-admin">Admin</a>
     </div>
   </div>
 </header>
+
+<!-- Mobile menu overlay + panel -->
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <div class="menu-header">
+    <span class="logo-wordmark">The Alamin Gazette</span>
+    <button class="close-menu" id="closeMenuBtn">×</button>
+  </div>
+  <div class="menu-nav" id="mobileNavList">
+    <a href="#" data-cat="">All Stories</a>
+    <a href="#" data-cat="World Affairs">World Affairs</a>
+    <a href="#" data-cat="Economy & Markets">Economy & Markets</a>
+    <a href="#" data-cat="Innovation">Innovation</a>
+    <a href="#" data-cat="Defense & Security">Defense & Security</a>
+    <a href="#" data-cat="Society">Society</a>
+  </div>
+  <div class="menu-footer">
+    <a href="admin.html">Admin Portal</a>
+    <a href="#" id="mobileSearchTrigger">Search</a>
+  </div>
+</div>
 
 <main class="page">
   <div class="section-head">
     <span class="section-head-label">Top Stories</span>
     <span class="section-head-rule"></span>
   </div>
-  <div id="hero-zone"><div class="empty-state">Loading stories...</div></div>
-
+  <div id="heroZone"><div class="empty-state">Loading intelligence...</div></div>
   <hr class="divider" style="margin:36px 0 0;">
-
   <div class="section-head">
     <span class="section-head-label">Intelligence Feed</span>
     <span class="section-head-rule"></span>
   </div>
-  <div class="feed" id="feed-zone"></div>
-
-  <div class="load-more-row" id="load-more-row" style="display:none;">
-    <button class="load-more-btn" id="load-more-btn">Load More Stories</button>
+  <div class="feed" id="feedZone"></div>
+  <div class="load-more-row" id="loadMoreRow" style="display:none;">
+    <button class="load-more-btn" id="loadMoreBtn">Load More Stories</button>
   </div>
 </main>
 
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-grid">
-      <div class="footer-brand">
-        <img src="images/lol.png" style="height:40px;filter:brightness(10);opacity:.85;margin-bottom:12px;"
-             onerror="this.style.display='none';document.getElementById('fl').style.display='block';" alt="">
-        <span class="footer-brand-logo" id="fl" style="display:none;">The Alamin Gazette</span>
-        <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
-      </div>
-      <div class="footer-col">
-        <h5>Regions</h5>
-        <a href="#">Asia-Pacific</a>
-        <a href="#">EMEA</a>
-        <a href="#">Americas</a>
-        <a href="#">Middle East</a>
-        <a href="#">Africa</a>
-      </div>
-      <div class="footer-col">
-        <h5>Sections</h5>
-        <a href="#" data-cat="World Affairs">World Affairs</a>
-        <a href="#" data-cat="Economy & Markets">Economy & Markets</a>
-        <a href="#" data-cat="Innovation">Innovation</a>
-        <a href="#" data-cat="Defense & Security">Defense & Security</a>
-        <a href="#" data-cat="Society">Society</a>
-      </div>
-      <div class="footer-col">
-        <h5>The Gazette</h5>
-        <a href="#">About Us</a>
-        <a href="#">Editorial Standards</a>
-        <a href="#">Contact</a>
-        <a href="admin.html">Admin Portal</a>
-      </div>
+      <div class="footer-brand"><p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p></div>
+      <div class="footer-col"><h5>Sections</h5><a href="#" data-cat="World Affairs">World Affairs</a><a href="#" data-cat="Economy & Markets">Economy</a><a href="#" data-cat="Innovation">Innovation</a><a href="#" data-cat="Defense & Security">Defense</a><a href="#" data-cat="Society">Society</a></div>
+      <div class="footer-col"><h5>The Gazette</h5><a href="#">About</a><a href="#">Standards</a><a href="admin.html">Admin</a></div>
     </div>
-    <div class="footer-bottom">
-      <span>© 2025 The Alamin Gazette. All rights reserved.</span>
-      <span>Powered by Supabase · Built by Alamin</span>
-    </div>
+    <div class="footer-bottom"><span>© 2025 The Alamin Gazette. All rights reserved.</span><span>Supabase · Intelligence</span></div>
   </div>
 </footer>
-
-<div class="toast" id="toast"></div>
+<div class="toast" id="toastMsg"></div>
 
 <script>
-const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
-const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
-const PAGE = 12;
+  const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  document.getElementById('headerDate').innerText = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-let allPosts = [], filtered = [], feedOffset = 0, activeCat = '';
-let isLoading = false;
-
-document.getElementById('hdr-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-
-function chipClass(c) {
-  const map = { 'World Affairs': 'chip-world', 'Economy & Markets': 'chip-economy', 'Innovation': 'chip-innovation', 'Defense & Security': 'chip-defense', 'Society': 'chip-society' };
-  return map[c] || 'chip-default';
-}
-
-function teaser(p, n) {
-  const t = (p.excerpt || p.content || '').replace(/<[^>]+>/g, '');
-  return t.length > n ? t.slice(0, n).trim() + '…' : t;
-}
-
-function timeAgo(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return 'Just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d}d ago`;
-  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-}
-
-function fullDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', timeZoneName:'short' });
-}
-
-function articleURL(slug) { return `article.html?id=${slug}`; }
-function shareIco() { return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`; }
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
-function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-
-window.doShare = function(e, slug, title) {
-  e.stopPropagation();
-  const url = window.location.origin + '/' + articleURL(slug);
-  if (navigator.share) navigator.share({ title, url });
-  else navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
-};
-
-function renderHero(posts) {
-  const el = document.getElementById('hero-zone');
-  if (!posts.length) { el.innerHTML = '<div class="empty-state">No stories found.</div>'; return; }
-  const lead = posts[0];
-  const cards = posts.slice(1, 3);
-  el.innerHTML = `<div class="hero"><div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'"><img class="hero-lead-img" src="${lead.image_url || 'https://placehold.co/900x560/0b1927/3a5878?text=The+Alamin+Gazette'}" alt=""><div class="hero-lead-scrim"></div><div class="hero-lead-body"><div>${lead.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(lead.category)}">${lead.category || 'World'}</span></div><h2>${escapeHtml(lead.title)}</h2><p class="hero-excerpt">${escapeHtml(teaser(lead, 200))}</p><div class="hero-byline"><span>${lead.author || 'Alamin Gazette'} · ${timeAgo(lead.created_at)}</span><button class="share-btn" onclick="doShare(event,'${lead.slug}','${escapeHtml(lead.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div></div><div class="hero-stack">${cards.map(p => `<div class="hero-card" onclick="location.href='${articleURL(p.slug)}'"><img class="hero-card-img" src="${p.image_url || 'https://placehold.co/600x280/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="card-excerpt">${escapeHtml(teaser(p, 110))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('')}</div></div>`;
-}
-
-function renderFeed(posts, append = false) {
-  const el = document.getElementById('feed-zone');
-  const html = posts.map(p => `<div class="feed-item" onclick="location.href='${articleURL(p.slug)}'"><img class="feed-item-img" src="${p.image_url || 'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="item-excerpt">${escapeHtml(teaser(p, 140))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('');
-  if (append) el.insertAdjacentHTML('beforeend', html);
-  else el.innerHTML = html;
-}
-
-async function loadPosts() {
-  const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
-  if (error || !data) { document.getElementById('hero-zone').innerHTML = '<div class="empty-state">Unable to load stories. Please refresh.</div>'; console.error(error); return; }
-  allPosts = data.sort((a, b) => { if (a.breaking && !b.breaking) return -1; if (!a.breaking && b.breaking) return 1; return new Date(b.created_at) - new Date(a.created_at); });
-  applyFilter();
-}
-
-function applyFilter() {
-  filtered = activeCat ? allPosts.filter(p => p.category === activeCat) : [...allPosts];
-  renderHero(filtered.slice(0, 3));
-  feedOffset = PAGE;
-  renderFeed(filtered.slice(3, 3 + PAGE));
-  document.getElementById('load-more-row').style.display = filtered.length > 3 + PAGE ? 'block' : 'none';
-}
-
-function setCategory(cat, btnElement) {
-  activeCat = cat;
-  document.querySelectorAll('.nav-btn').forEach(btn => { if (btn.dataset.cat === cat) btn.classList.add('active'); else btn.classList.remove('active'); });
-  applyFilter();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-async function loadMore() {
-  if (isLoading) return;
-  isLoading = true;
-  const btn = document.getElementById('load-more-btn');
-  btn.textContent = 'Loading…'; btn.disabled = true;
-  await new Promise(r => setTimeout(r, 100));
-  const slice = filtered.slice(3 + feedOffset, 3 + feedOffset + PAGE);
-  renderFeed(slice, true);
-  feedOffset += PAGE;
-  if (3 + feedOffset >= filtered.length) document.getElementById('load-more-row').style.display = 'none';
-  else { btn.textContent = 'Load More Stories'; btn.disabled = false; }
-  isLoading = false;
-}
-
-// ── SMOOTH SCROLL COMPACT HEADER (NO SHAKE) ──
-let scrollTimer = null;
-function handleScroll() {
-  if (scrollTimer) cancelAnimationFrame(scrollTimer);
-  scrollTimer = requestAnimationFrame(() => {
-    const scrolled = window.scrollY > 50;
-    const masthead = document.getElementById('masthead');
-    if (scrolled && !masthead.classList.contains('compact')) {
-      masthead.classList.add('compact');
-    } else if (!scrolled && masthead.classList.contains('compact')) {
-      masthead.classList.remove('compact');
-    }
-  });
-}
-
-window.addEventListener('scroll', handleScroll, { passive: true });
-
-document.querySelectorAll('.nav-btn').forEach(btn => { btn.addEventListener('click', () => setCategory(btn.dataset.cat, btn)); });
-document.querySelectorAll('.footer-col a[data-cat]').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat, null); }); });
-document.getElementById('load-more-btn').addEventListener('click', loadMore);
-
-loadPosts();
+  let allPosts = [], filtered = [], feedOffset = 0, activeCat = '', isLoading = false;
+  function chipClass(c) { const m={'World Affairs':'chip-world','Economy & Markets':'chip-economy','Innovation':'chip-innovation','Defense & Security':'chip-defense','Society':'chip-society'}; return m[c]||'chip-default'; }
+  function teaser(p,n) { const t=(p.excerpt||p.content||'').replace(/<[^>]+>/g,''); return t.length>n?t.slice(0,n).trim()+'…':t; }
+  function timeAgo(iso) { const d=Date.now()-new Date(iso).getTime(), m=Math.floor(d/60000); if(m<1)return'Just now'; if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; const d2=Math.floor(h/24); return d2<7?d2+'d ago':new Date(iso).toLocaleDateString(); }
+  function articleURL(slug){return'article.html?id='+slug;}
+  function escapeHtml(s){if(!s)return'';return s.replace(/[&<>]/g,function(m){if(m==='&')return'&amp;';if(m==='<')return'&lt;';if(m==='>')return'&gt;';return m;});}
+  function showToast(m){const t=document.getElementById('toastMsg');t.innerText=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+  function renderHero(posts){const el=document.getElementById('heroZone');if(!posts.length){el.innerHTML='<div class="empty-state">No stories found.</div>';return;} const lead=posts[0],cards=posts.slice(1,3); el.innerHTML=`<div class="hero"><div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'"><img class="hero-lead-img" src="${lead.image_url||'https://placehold.co/900x560/0b1927/3a5878?text=Gazette'}" alt=""><div class="hero-lead-scrim"></div><div class="hero-lead-body"><div><span class="chip chip-${lead.breaking?'breaking':chipClass(lead.category)}">${lead.breaking?'BREAKING':(lead.category||'World')}</span></div><h2>${escapeHtml(lead.title)}</h2><p class="hero-excerpt">${escapeHtml(teaser(lead,200))}</p><div class="hero-byline"><span>${lead.author||'Alamin Gazette'} · ${timeAgo(lead.created_at)}</span><button class="share-btn" onclick="event.stopPropagation();navigator.clipboard?.writeText(location.origin+'/'+articleURL('${lead.slug}')).then(()=>showToast('Link copied'))"> Share</button></div></div></div><div class="hero-stack">${cards.map(p=>`<div class="hero-card" onclick="location.href='${articleURL(p.slug)}'"><img class="hero-card-img" src="${p.image_url||'https://placehold.co/600x280/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy"><div><span class="chip chip-${p.breaking?'breaking':chipClass(p.category)}">${p.breaking?'BREAKING':(p.category||'World')}</span></div><h3>${escapeHtml(p.title)}</h3><p class="card-excerpt">${escapeHtml(teaser(p,110))}</p><div class="card-meta"><span>${p.author||'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="event.stopPropagation();navigator.clipboard?.writeText(location.origin+'/'+articleURL('${p.slug}')).then(()=>showToast('Link copied'))"> Share</button></div></div>`).join('')}</div></div>`; }
+  function renderFeed(posts,append=false){const el=document.getElementById('feedZone');const html=posts.map(p=>`<div class="feed-item" onclick="location.href='${articleURL(p.slug)}'"><img class="feed-item-img" src="${p.image_url||'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy"><div><span class="chip chip-${p.breaking?'breaking':chipClass(p.category)}">${p.breaking?'BREAKING':(p.category||'World')}</span></div><h3>${escapeHtml(p.title)}</h3><p class="item-excerpt">${escapeHtml(teaser(p,140))}</p><div class="card-meta"><span>${p.author||'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="event.stopPropagation();navigator.clipboard?.writeText(location.origin+'/'+articleURL('${p.slug}')).then(()=>showToast('Link copied'))"> Share</button></div></div>`).join(''); if(append)el.insertAdjacentHTML('beforeend',html); else el.innerHTML=html; }
+  async function loadPosts(){const{data,error}=await sb.from('posts').select('*').eq('is_published',true).order('created_at',{ascending:false}); if(error||!data){document.getElementById('heroZone').innerHTML='<div class="empty-state">Unable to load stories.</div>';return;} allPosts=data.sort((a,b)=>(b.breaking?1:0)-(a.breaking?1:0)||new Date(b.created_at)-new Date(a.created_at)); applyFilter();}
+  function applyFilter(){filtered=activeCat?allPosts.filter(p=>p.category===activeCat):[...allPosts]; renderHero(filtered.slice(0,3)); feedOffset=12; renderFeed(filtered.slice(3,3+12)); document.getElementById('loadMoreRow').style.display=filtered.length>3+12?'block':'none';}
+  function setCategory(cat,btn){activeCat=cat; document.querySelectorAll('.nav-btn').forEach(b=>{if(b.dataset.cat===cat)b.classList.add('active');else b.classList.remove('active');}); applyFilter(); window.scrollTo({top:0,behavior:'smooth'});}
+  async function loadMore(){if(isLoading)return; isLoading=true; const btn=document.getElementById('loadMoreBtn'); btn.innerText='Loading…'; btn.disabled=true; const slice=filtered.slice(3+feedOffset,3+feedOffset+12); renderFeed(slice,true); feedOffset+=12; if(3+feedOffset>=filtered.length)document.getElementById('loadMoreRow').style.display='none'; else{btn.innerText='Load More Stories'; btn.disabled=false;} isLoading=false;}
+  document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>setCategory(b.dataset.cat,b)));
+  document.querySelectorAll('[data-cat]').forEach(el=>{if(el.tagName==='A')el.addEventListener('click',(e)=>{e.preventDefault(); setCategory(el.dataset.cat,null);});});
+  document.getElementById('loadMoreBtn')?.addEventListener('click',loadMore);
+  let ticking=false; window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(()=>{const scrolled=window.scrollY>50; document.getElementById('masthead').classList.toggle('compacted',scrolled); ticking=false;}); ticking=true;}},{passive:true});
+  const hamburger=document.getElementById('hamburgerBtn'), mobileMenu=document.getElementById('mobileMenu'), overlay=document.getElementById('menuOverlay'), closeBtn=document.getElementById('closeMenuBtn');
+  function openMenu(){mobileMenu.classList.add('open');overlay.classList.add('active');document.body.classList.add('menu-open');}
+  function closeMenu(){mobileMenu.classList.remove('open');overlay.classList.remove('active');document.body.classList.remove('menu-open');}
+  hamburger?.addEventListener('click',openMenu); closeBtn?.addEventListener('click',closeMenu); overlay?.addEventListener('click',closeMenu);
+  document.querySelectorAll('#mobileNavList a').forEach(link=>{link.addEventListener('click',(e)=>{e.preventDefault(); const cat=link.dataset.cat; setCategory(cat,null); closeMenu();});});
+  document.getElementById('mobileSearchTrigger')?.addEventListener('click',(e)=>{e.preventDefault(); showToast('Search coming soon'); closeMenu();});
+  document.querySelectorAll('.search-icon, .mobile-search-icon').forEach(icon=>{icon.addEventListener('click',()=>showToast('Search interface coming soon'));});
+  loadPosts();
 </script>
 </body>
 </html>
