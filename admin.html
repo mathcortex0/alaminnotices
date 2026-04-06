@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin - Manage Articles</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; background: #f4f4f4; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f4f4f4; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .pub-btn { background: #1a1a1a; color: white; }
+        .edit-btn { background: #ffcc00; color: black; margin-bottom: 5px; }
+        .del-btn { background: #ff4444; color: white; }
+        .post-item { background: white; padding: 10px; margin-top: 10px; border-radius: 8px; border-left: 5px solid #1a1a1a; }
         .hidden { display: none; }
     </style>
 </head>
@@ -16,16 +20,21 @@
     <div id="auth">
         <h2>Admin Login</h2>
         <input type="password" id="pass" placeholder="Enter Supabase Password">
-        <button onclick="login()">Login</button>
+        <button class="pub-btn" onclick="login()">Login</button>
     </div>
 
     <div id="editor" class="hidden">
-        <h2>Create Post</h2>
-        <input type="text" id="t" placeholder="Article Title">
+        <h2 id="form-title">Create New Post</h2>
+        <input type="hidden" id="post-id"> <input type="text" id="t" placeholder="Article Title">
         <input type="text" id="s" placeholder="url-slug-here">
         <input type="text" id="i" placeholder="Third-party Image URL">
-        <textarea id="c" rows="10" placeholder="Content text..."></textarea>
-        <button id="pub" onclick="publish()">Publish Now</button>
+        <textarea id="c" rows="8" placeholder="Content..."></textarea>
+        <button class="pub-btn" id="save-btn" onclick="savePost()">Publish Post</button>
+        <button onclick="resetForm()" style="background:#ccc;">Cancel / New Post</button>
+        
+        <hr>
+        <h3>All Posts</h3>
+        <div id="post-list">Loading...</div>
     </div>
 
     <script>
@@ -42,22 +51,70 @@
             else { 
                 document.getElementById('auth').classList.add('hidden');
                 document.getElementById('editor').classList.remove('hidden');
+                loadPostList();
             }
         }
 
-        async function publish() {
-            const btn = document.getElementById('pub');
-            btn.disabled = true; btn.innerText = "Processing...";
-            
-            const { error } = await _supabase.from('posts').insert([{
+        async function loadPostList() {
+            const { data } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
+            document.getElementById('post-list').innerHTML = data.map(p => `
+                <div class="post-item">
+                    <strong>${p.title}</strong><br>
+                    <button class="edit-btn" onclick='prepareEdit(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Edit</button>
+                    <button class="del-btn" onclick="deletePost('${p.id}')">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function prepareEdit(post) {
+            document.getElementById('form-title').innerText = "Edit Post";
+            document.getElementById('save-btn').innerText = "Update Post";
+            document.getElementById('post-id').value = post.id;
+            document.getElementById('t').value = post.title;
+            document.getElementById('s').value = post.slug;
+            document.getElementById('i').value = post.image_url;
+            document.getElementById('c').value = post.content;
+            window.scrollTo(0,0);
+        }
+
+        async function savePost() {
+            const id = document.getElementById('post-id').value;
+            const payload = {
                 title: document.getElementById('t').value,
                 slug: document.getElementById('s').value,
                 image_url: document.getElementById('i').value,
                 content: document.getElementById('c').value
-            }]);
+            };
 
-            if (error) alert("Error: " + error.message);
-            else { alert("Success!"); location.reload(); }
+            let result;
+            if (id) {
+                // UPDATE existing
+                result = await _supabase.from('posts').update(payload).eq('id', id);
+            } else {
+                // INSERT new
+                result = await _supabase.from('posts').insert([payload]);
+            }
+
+            if (result.error) alert(result.error.message);
+            else { alert("Success!"); resetForm(); loadPostList(); }
+        }
+
+        async function deletePost(id) {
+            if (confirm("Are you sure you want to delete this?")) {
+                const { error } = await _supabase.from('posts').delete().eq('id', id);
+                if (error) alert(error.message);
+                else loadPostList();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('form-title').innerText = "Create New Post";
+            document.getElementById('save-btn').innerText = "Publish Post";
+            document.getElementById('post-id').value = "";
+            document.getElementById('t').value = "";
+            document.getElementById('s').value = "";
+            document.getElementById('i').value = "";
+            document.getElementById('c').value = "";
         }
     </script>
 </body>
