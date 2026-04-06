@@ -8,303 +8,109 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ink: #0d0d0d;
-            --ink-muted: #4a4a4a;
-            --ink-light: #7a7a7a;
-            --paper: #faf8f4;
-            --paper-alt: #f2ede6;
-            --rule: #d4c9b8;
-            --navy: #0a1628;
-            --crimson: #b5122e;
-            --gold: #c9962e;
-            --green: #1a5c3a;
-            --surface: #ffffff;
-            --serif: 'Playfair Display', Georgia, serif;
-            --sans: 'DM Sans', sans-serif;
+        :root{
+            --ink:#0d0d0d;--ink-muted:#4a4a4a;--ink-light:#7a7a7a;
+            --paper:#faf8f4;--paper-alt:#f2ede6;--rule:#d4c9b8;
+            --navy:#0a1628;--crimson:#b5122e;--gold:#c9962e;--green:#1a5c3a;
+            --surface:#ffffff;--serif:'Playfair Display',Georgia,serif;--sans:'DM Sans',sans-serif;
         }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:var(--sans);background:#f0ebe2;color:var(--ink);min-height:100vh;}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* HEADER */
+        .admin-header{background:var(--navy);padding:18px 30px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);}
+        .admin-logo{font-family:var(--serif);font-size:1.4rem;font-weight:900;color:#f5f0e8;text-decoration:none;}
+        .admin-badge{background:rgba(201,150,46,.15);border:1px solid rgba(201,150,46,.3);color:var(--gold);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:2px;}
+        .header-right{display:flex;gap:14px;align-items:center;}
+        .header-link{color:#8898aa;font-size:12px;font-weight:600;text-decoration:none;transition:color .2s;}
+        .header-link:hover{color:#f5f0e8;}
+        .logout-btn{background:transparent;border:1px solid rgba(255,255,255,.1);color:#8898aa;font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 14px;cursor:pointer;border-radius:2px;transition:all .2s;display:none;}
+        .logout-btn:hover{color:#f5f0e8;border-color:rgba(255,255,255,.3);}
 
-        body {
-            font-family: var(--sans);
-            background: #f0ebe2;
-            color: var(--ink);
-            min-height: 100vh;
-        }
+        /* AUTH */
+        #auth-panel{min-height:calc(100vh - 74px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+        .auth-card{background:var(--surface);padding:48px 44px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.1);}
+        .auth-card h2{font-family:var(--serif);font-size:1.9rem;margin-bottom:8px;}
+        .auth-card p{font-size:13.5px;color:var(--ink-light);margin-bottom:32px;}
 
-        /* ── HEADER ── */
-        .admin-header {
-            background: var(--navy);
-            padding: 18px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 3px solid var(--gold);
-        }
-        .admin-logo { font-family: var(--serif); font-size: 1.4rem; font-weight: 900; color: #f5f0e8; }
-        .admin-badge {
-            background: rgba(201,150,46,0.15);
-            border: 1px solid rgba(201,150,46,0.3);
-            color: var(--gold);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            padding: 4px 10px;
-            border-radius: 2px;
-        }
-        .header-nav { display: flex; gap: 12px; align-items: center; }
-        .header-nav a {
-            color: #8898aa;
-            font-size: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-            transition: color 0.2s;
-        }
-        .header-nav a:hover { color: #f5f0e8; }
+        /* LAYOUT */
+        .admin-layout{display:grid;grid-template-columns:440px 1fr;min-height:calc(100vh - 74px);display:none;}
 
-        /* ── LAYOUT ── */
-        .admin-layout {
-            display: grid;
-            grid-template-columns: 420px 1fr;
-            gap: 0;
-            min-height: calc(100vh - 74px);
-        }
+        /* FIELDS */
+        .field{margin-bottom:16px;}
+        .field label{display:block;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-muted);margin-bottom:7px;}
+        .field input,.field textarea,.field select{width:100%;padding:12px 14px;border:1.5px solid var(--rule);background:var(--paper);font-family:var(--sans);font-size:14.5px;color:var(--ink);border-radius:3px;transition:border-color .2s,box-shadow .2s;outline:none;}
+        .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(10,22,40,.08);}
+        .field textarea{resize:vertical;min-height:180px;line-height:1.6;}
+        .field input[readonly]{background:#ede8e0;color:var(--ink-light);cursor:not-allowed;}
 
-        /* ── AUTH PANEL ── */
-        #auth-panel {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f0ebe2;
-            padding: 40px 20px;
-        }
-        .auth-card {
-            background: var(--surface);
-            padding: 48px 44px;
-            width: 100%;
-            max-width: 440px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.1);
-        }
-        .auth-card h2 {
-            font-family: var(--serif);
-            font-size: 1.9rem;
-            margin-bottom: 8px;
-        }
-        .auth-card p {
-            font-size: 13.5px;
-            color: var(--ink-light);
-            margin-bottom: 32px;
-        }
+        /* TOGGLE — Breaking News */
+        .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1.5px solid var(--rule);border-radius:3px;background:var(--paper);margin-bottom:16px;}
+        .toggle-label{font-size:13.5px;font-weight:600;color:var(--ink-muted);}
+        .toggle-sub{font-size:11px;color:var(--ink-light);margin-top:2px;}
+        .toggle-switch{position:relative;width:46px;height:26px;flex-shrink:0;}
+        .toggle-switch input{opacity:0;width:0;height:0;}
+        .toggle-slider{position:absolute;inset:0;background:#d4c9b8;border-radius:26px;cursor:pointer;transition:.3s;}
+        .toggle-slider:before{content:'';position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;}
+        input:checked + .toggle-slider{background:var(--crimson);}
+        input:checked + .toggle-slider:before{transform:translateX(20px);}
+        .toggle-row.breaking-on{border-color:var(--crimson);background:#fdf5f5;}
 
-        /* ── FORM ELEMENTS ── */
-        .field { margin-bottom: 18px; }
-        .field label {
-            display: block;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            color: var(--ink-muted);
-            margin-bottom: 7px;
-        }
-        .field input, .field textarea, .field select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid var(--rule);
-            background: var(--paper);
-            font-family: var(--sans);
-            font-size: 14.5px;
-            color: var(--ink);
-            border-radius: 3px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
-        }
-        .field input:focus, .field textarea:focus, .field select:focus {
-            border-color: var(--navy);
-            box-shadow: 0 0 0 3px rgba(10,22,40,0.08);
-        }
-        .field textarea { resize: vertical; min-height: 200px; line-height: 1.6; }
-        .field input[readonly] { background: #ede8e0; color: var(--ink-light); cursor: not-allowed; }
+        /* BUTTONS */
+        .btn{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:13px 26px;border:none;cursor:pointer;border-radius:3px;transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+        .btn-primary{background:var(--navy);color:#c8d4e8;width:100%;justify-content:center;}
+        .btn-primary:hover{background:#0f2040;}
+        .btn-publish{background:var(--green);color:#a8d4b8;width:100%;justify-content:center;}
+        .btn-publish:hover{background:#0d3d27;}
+        .btn-outline{background:transparent;border:1.5px solid var(--rule);color:var(--ink-muted);}
+        .btn-outline:hover{border-color:var(--ink);color:var(--ink);}
+        .btn-danger{background:transparent;border:1.5px solid #e0c0c4;color:var(--crimson);}
+        .btn-danger:hover{background:var(--crimson);color:white;border-color:var(--crimson);}
+        .btn:disabled{opacity:.45;cursor:not-allowed;}
+        .btn-sm{padding:7px 14px;font-size:10.5px;}
 
-        /* ── BUTTONS ── */
-        .btn {
-            font-family: var(--sans);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            padding: 13px 26px;
-            border: none;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-primary { background: var(--navy); color: #c8d4e8; width: 100%; justify-content: center; }
-        .btn-primary:hover { background: #0f2040; }
-        .btn-publish { background: var(--green); color: #a8d4b8; width: 100%; justify-content: center; }
-        .btn-publish:hover { background: #0d3d27; }
-        .btn-outline { background: transparent; border: 1.5px solid var(--rule); color: var(--ink-muted); }
-        .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
-        .btn-danger { background: transparent; border: 1.5px solid #e0c0c4; color: var(--crimson); }
-        .btn-danger:hover { background: var(--crimson); color: white; border-color: var(--crimson); }
-        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-        .btn-sm { padding: 7px 14px; font-size: 10.5px; }
+        /* PANELS */
+        .editor-panel{background:var(--surface);padding:32px 36px;overflow-y:auto;max-height:calc(100vh - 74px);border-right:1px solid var(--rule);}
+        .editor-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--ink);}
+        .editor-header h2{font-family:var(--serif);font-size:1.5rem;font-weight:700;}
+        .list-panel{background:var(--paper);padding:32px 36px;overflow-y:auto;max-height:calc(100vh - 74px);}
+        .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--rule);}
+        .list-header h3{font-family:var(--serif);font-size:1.2rem;font-weight:700;}
+        .post-count{font-size:11px;font-weight:600;color:var(--ink-light);background:var(--paper-alt);padding:4px 10px;border-radius:20px;}
 
-        /* ── EDITOR PANEL ── */
-        .editor-panel {
-            background: var(--surface);
-            padding: 32px 36px;
-            overflow-y: auto;
-            max-height: calc(100vh - 74px);
-            border-right: 1px solid var(--rule);
-        }
-        .editor-header {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            margin-bottom: 28px;
-            padding-bottom: 18px;
-            border-bottom: 2px solid var(--ink);
-        }
-        .editor-header h2 {
-            font-family: var(--serif);
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
+        /* POST LIST ITEM */
+        .post-item{display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:start;padding:14px 0;border-bottom:1px solid var(--rule);}
+        .post-item:hover{background:var(--paper-alt);margin:0 -8px;padding:14px 8px;}
+        .post-thumb{width:56px;height:42px;object-fit:cover;border-radius:2px;background:var(--rule);}
+        .post-info h4{font-size:13.5px;font-weight:600;line-height:1.3;margin-bottom:4px;}
+        .post-info .post-meta{font-size:11px;color:var(--ink-light);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+        .post-actions{display:flex;gap:6px;align-items:center;}
+        .breaking-dot{width:7px;height:7px;border-radius:50%;background:var(--crimson);display:inline-block;margin-right:3px;animation:pulse-b 2s ease-in-out infinite;}
+        @keyframes pulse-b{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-        /* ── LIST PANEL ── */
-        .list-panel {
-            background: var(--paper);
-            padding: 32px 36px;
-            overflow-y: auto;
-            max-height: calc(100vh - 74px);
-        }
-        .list-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--rule);
-        }
-        .list-header h3 {
-            font-family: var(--serif);
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-        .post-count {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            color: var(--ink-light);
-            background: var(--paper-alt);
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
+        /* CAT MINI */
+        .cat-mini{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:2px 6px;border-radius:2px;display:inline-block;}
+        .cat-world{background:#0a1628;color:#aabcd4;} .cat-economy{background:#1a5c3a;color:#a8d4b8;}
+        .cat-innovation{background:#0057a8;color:#a0c8f0;} .cat-defense{background:#5a1a2a;color:#d4a0aa;}
+        .cat-society{background:#4a3a0a;color:#d4c080;} .cat-default{background:#0d0d0d;color:#ccc;}
 
-        .post-item {
-            display: grid;
-            grid-template-columns: 56px 1fr auto;
-            gap: 14px;
-            align-items: start;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--rule);
-            transition: background 0.15s;
-        }
-        .post-item:hover { background: var(--paper-alt); margin: 0 -16px; padding: 16px 16px; }
-        .post-thumb {
-            width: 56px;
-            height: 42px;
-            object-fit: cover;
-            border-radius: 2px;
-            background: var(--rule);
-        }
-        .post-info h4 {
-            font-size: 13.5px;
-            font-weight: 600;
-            line-height: 1.3;
-            margin-bottom: 4px;
-            color: var(--ink);
-        }
-        .post-info .post-meta {
-            font-size: 11px;
-            color: var(--ink-light);
-        }
-        .post-actions { display: flex; gap: 6px; align-items: center; }
+        /* UPLOAD STATUS */
+        .upload-status{font-size:12px;font-weight:600;padding:4px 0;display:inline-flex;align-items:center;gap:5px;}
+        .upload-status.uploading{color:#0057a8;} .upload-status.success{color:var(--green);} .upload-status.error{color:var(--crimson);}
 
-        /* ── STATUS BADGE ── */
-        .upload-status {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .upload-status.uploading { color: #0057a8; }
-        .upload-status.success { color: var(--green); }
-        .upload-status.error { color: var(--crimson); }
+        .slug-preview{font-size:11px;color:var(--ink-light);margin-top:5px;font-family:monospace;}
+        .login-error{font-size:12.5px;color:var(--crimson);margin-bottom:14px;display:none;}
 
-        /* ── SLUG PREVIEW ── */
-        .slug-preview {
-            font-size: 11px;
-            color: var(--ink-light);
-            margin-top: 5px;
-            font-family: monospace;
-        }
+        /* TOAST */
+        .toast{position:fixed;bottom:30px;right:30px;background:var(--navy);color:#c8d4e8;font-size:13px;padding:14px 22px;border-radius:3px;box-shadow:0 6px 20px rgba(0,0,0,.25);z-index:999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;border-left:3px solid var(--gold);max-width:300px;}
+        .toast.show{opacity:1;transform:translateY(0);}
+        .toast.success{border-left-color:#4caf80;}
+        .toast.error{border-left-color:var(--crimson);}
 
-        /* ── CAT CHIP in list ── */
-        .cat-mini {
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 2px;
-            display: inline-block;
-        }
-        .cat-world     { background: #0a1628; color: #aabcd4; }
-        .cat-economy   { background: #1a5c3a; color: #a8d4b8; }
-        .cat-innovation{ background: #0057a8; color: #a0c8f0; }
-        .cat-defense   { background: #5a1a2a; color: #d4a0aa; }
-        .cat-society   { background: #4a3a0a; color: #d4c080; }
-        .cat-default   { background: #0d0d0d; color: #ccc; }
-
-        /* ── TOAST ── */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--navy);
-            color: #c8d4e8;
-            font-size: 13px;
-            padding: 14px 22px;
-            border-radius: 3px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-            z-index: 999;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s;
-            pointer-events: none;
-            border-left: 3px solid var(--gold);
-            max-width: 300px;
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        .toast.success { border-left-color: #4caf80; }
-        .toast.error { border-left-color: var(--crimson); }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 900px) {
-            .admin-layout { grid-template-columns: 1fr; }
-            .editor-panel { max-height: none; border-right: none; border-bottom: 1px solid var(--rule); }
-            .list-panel { max-height: none; }
+        @media(max-width:900px){
+            .admin-layout{grid-template-columns:1fr;}
+            .editor-panel,.list-panel{max-height:none;}
+            .editor-panel{border-right:none;border-bottom:1px solid var(--rule);}
         }
     </style>
 </head>
@@ -312,12 +118,12 @@
 
 <header class="admin-header">
     <div style="display:flex;align-items:center;gap:14px;">
-        <a href="index.html" style="text-decoration:none;"><span class="admin-logo">The Alamin Gazette</span></a>
+        <a href="/" class="admin-logo">The Alamin Gazette</a>
         <span class="admin-badge">Editorial Desk</span>
     </div>
-    <div class="header-nav">
-        <a href="index.html">← View Site</a>
-        <button onclick="handleLogout()" id="logout-btn" style="display:none;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#8898aa;font-family:var(--sans);font-size:12px;font-weight:600;padding:7px 14px;cursor:pointer;border-radius:2px;transition:all 0.2s;" onmouseover="this.style.color='#f5f0e8'" onmouseout="this.style.color='#8898aa'">Sign Out</button>
+    <div class="header-right">
+        <a href="/" class="header-link">← View Site</a>
+        <button class="logout-btn" id="logout-btn" onclick="handleLogout()">Sign Out</button>
     </div>
 </header>
 
@@ -328,17 +134,17 @@
         <p>Sign in to manage The Alamin Gazette's content.</p>
         <div class="field">
             <label>Password</label>
-            <input type="password" id="admin-pass" placeholder="Enter your Supabase password" onkeydown="if(event.key==='Enter') handleLogin()">
+            <input type="password" id="admin-pass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')handleLogin()">
         </div>
-        <div id="login-error" style="font-size:12.5px;color:var(--crimson);margin-bottom:14px;display:none;"></div>
+        <div class="login-error" id="login-error"></div>
         <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">Access Dashboard</button>
     </div>
 </div>
 
-<!-- MAIN EDITOR (hidden until login) -->
-<div class="admin-layout" id="main-layout" style="display:none;">
+<!-- MAIN -->
+<div class="admin-layout" id="main-layout">
 
-    <!-- LEFT: EDITOR -->
+    <!-- EDITOR -->
     <div class="editor-panel">
         <div class="editor-header">
             <h2 id="editor-title">New Article</h2>
@@ -346,6 +152,18 @@
         </div>
 
         <input type="hidden" id="post-id">
+
+        <!-- BREAKING TOGGLE -->
+        <div class="toggle-row" id="breaking-row">
+            <div>
+                <div class="toggle-label">🔴 Breaking News</div>
+                <div class="toggle-sub">Pins to top of feed and ticker</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="post-breaking" onchange="onBreakingChange()">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
 
         <div class="field">
             <label>Cover Image</label>
@@ -367,22 +185,32 @@
         </div>
 
         <div class="field">
+            <label>Author</label>
+            <input type="text" id="post-author" placeholder="Alamin Gazette Staff">
+        </div>
+
+        <div class="field">
             <label>Headline</label>
             <input type="text" id="post-title" placeholder="Write a compelling headline…" oninput="autoSlug()">
         </div>
 
         <div class="field">
             <label>URL Slug</label>
-            <input type="text" id="post-slug" placeholder="url-friendly-slug">
-            <div class="slug-preview" id="slug-preview">article.html?id=</div>
+            <input type="text" id="post-slug" placeholder="url-friendly-slug" oninput="updateSlugPreview()">
+            <div class="slug-preview" id="slug-preview">alamingazette.com/story/</div>
         </div>
 
         <div class="field">
-            <label>Article Body</label>
-            <textarea id="post-content" rows="12" placeholder="Write your full article here. Separate paragraphs with a blank line."></textarea>
+            <label>Excerpt <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--ink-light);">(1–2 sentence teaser shown on cards)</span></label>
+            <textarea id="post-excerpt" rows="3" placeholder="Short teaser that appears on the homepage cards and social shares…" style="min-height:80px;"></textarea>
         </div>
 
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+        <div class="field">
+            <label>Full Article Body</label>
+            <textarea id="post-content" rows="12" placeholder="Write the full article here. Separate paragraphs with a blank line."></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:8px;">
             <button class="btn btn-publish" id="save-btn" onclick="saveToSupabase()" style="flex:1;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 <span id="save-label">Publish Article</span>
@@ -393,20 +221,17 @@
         </div>
     </div>
 
-    <!-- RIGHT: POST LIST -->
+    <!-- LIST -->
     <div class="list-panel">
         <div class="list-header">
             <h3>All Articles</h3>
             <span class="post-count" id="post-count">Loading…</span>
         </div>
-
-        <!-- SEARCH -->
         <div class="field" style="margin-bottom:20px;">
             <input type="text" id="search-input" placeholder="Search articles…" oninput="filterList()" style="background:white;">
         </div>
-
         <div id="post-list">
-            <div style="text-align:center;padding:40px;color:var(--ink-light);font-size:13px;">Loading articles…</div>
+            <div style="text-align:center;padding:40px;color:var(--ink-light);font-size:13px;">Loading…</div>
         </div>
     </div>
 </div>
@@ -414,225 +239,167 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
-    const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-    const IBB_KEY = '5eedf24deee3528bc34e811052972c74';
-    const _supabase = supabase.createClient(SUPA_URL, SUPA_KEY);
+    const SUPA_URL='https://szzqaqwpvxwrefkojplh.supabase.co';
+    const SUPA_KEY='sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+    const IBB_KEY='5eedf24deee3528bc34e811052972c74';
+    const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+    let allPosts=[];
 
-    let allPosts = [];
-
-    // ── TOAST ──
-    function showToast(msg, type = 'default') {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = `toast show ${type}`;
-        setTimeout(() => t.className = 'toast', 3200);
+    function showToast(msg,type='default'){
+        const t=document.getElementById('toast');
+        t.textContent=msg;t.className=`toast show ${type}`;
+        setTimeout(()=>t.className='toast',3200);
     }
 
-    // ── AUTH ──
-    async function handleLogin() {
-        const pass = document.getElementById('admin-pass').value.trim();
-        const btn = document.getElementById('login-btn');
-        const err = document.getElementById('login-error');
-        if (!pass) { err.textContent = 'Password is required.'; err.style.display = 'block'; return; }
+    function onBreakingChange(){
+        const row=document.getElementById('breaking-row');
+        const checked=document.getElementById('post-breaking').checked;
+        row.classList.toggle('breaking-on',checked);
+    }
 
-        btn.disabled = true;
-        btn.textContent = 'Signing in…';
-        err.style.display = 'none';
-
-        const { error } = await _supabase.auth.signInWithPassword({
-            email: 'text.me.md.alamin@gmail.com', password: pass
-        });
-
-        if (error) {
-            err.textContent = 'Incorrect password. Please try again.';
-            err.style.display = 'block';
-            btn.disabled = false;
-            btn.textContent = 'Access Dashboard';
-            return;
+    async function handleLogin(){
+        const pass=document.getElementById('admin-pass').value.trim();
+        const btn=document.getElementById('login-btn');
+        const err=document.getElementById('login-error');
+        if(!pass){err.textContent='Password is required.';err.style.display='block';return;}
+        btn.disabled=true;btn.textContent='Signing in…';err.style.display='none';
+        const{error}=await sb.auth.signInWithPassword({email:'text.me.md.alamin@gmail.com',password:pass});
+        if(error){
+            err.textContent='Incorrect password. Please try again.';err.style.display='block';
+            btn.disabled=false;btn.textContent='Access Dashboard';return;
         }
-
-        document.getElementById('auth-panel').style.display = 'none';
-        document.getElementById('main-layout').style.display = 'grid';
-        document.getElementById('logout-btn').style.display = 'block';
+        document.getElementById('auth-panel').style.display='none';
+        document.getElementById('main-layout').style.display='grid';
+        document.getElementById('logout-btn').style.display='block';
         refreshList();
-        showToast('Welcome to the Editorial Desk', 'success');
+        showToast('Welcome to the Editorial Desk','success');
     }
 
-    async function handleLogout() {
-        await _supabase.auth.signOut();
-        location.reload();
+    async function handleLogout(){await sb.auth.signOut();location.reload();}
+
+    async function uploadToImgBB(){
+        const file=document.getElementById('img-file').files[0];
+        const status=document.getElementById('upload-status');
+        if(!file)return;
+        status.innerHTML='<span class="upload-status uploading">⟳ Uploading…</span>';
+        const fd=new FormData();fd.append('image',file);
+        try{
+            const res=await fetch(`https://api.imgbb.com/1/upload?key=${IBB_KEY}`,{method:'POST',body:fd});
+            const json=await res.json();
+            if(json.success){
+                document.getElementById('img-url').value=json.data.url;
+                status.innerHTML='<span class="upload-status success">✓ Uploaded successfully</span>';
+                showToast('Image uploaded','success');
+            }else throw new Error();
+        }catch{status.innerHTML='<span class="upload-status error">✗ Upload failed. Paste URL manually.</span>';}
     }
 
-    // ── IMAGE UPLOAD ──
-    async function uploadToImgBB() {
-        const file = document.getElementById('img-file').files[0];
-        const status = document.getElementById('upload-status');
-        if (!file) return;
-
-        status.innerHTML = '<span class="upload-status uploading">⟳ Uploading to ImgBB…</span>';
-
-        const formData = new FormData();
-        formData.append('image', file);
-
-        try {
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IBB_KEY}`, { method: 'POST', body: formData });
-            const json = await res.json();
-            if (json.success) {
-                document.getElementById('img-url').value = json.data.url;
-                status.innerHTML = '<span class="upload-status success">✓ Image uploaded successfully</span>';
-                showToast('Image uploaded', 'success');
-            } else {
-                throw new Error('Upload failed');
-            }
-        } catch {
-            status.innerHTML = '<span class="upload-status error">✗ Upload failed. Paste URL manually.</span>';
-        }
+    function autoSlug(){
+        if(document.getElementById('post-id').value)return;
+        const slug=document.getElementById('post-title').value.toLowerCase().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,60);
+        document.getElementById('post-slug').value=slug;
+        updateSlugPreview();
     }
 
-    // ── AUTO-SLUG ──
-    function autoSlug() {
-        const id = document.getElementById('post-id').value;
-        if (id) return; // don't override slug when editing
-        const title = document.getElementById('post-title').value;
-        const slug = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 60);
-        document.getElementById('post-slug').value = slug;
-        document.getElementById('slug-preview').textContent = 'article.html?id=' + slug;
+    function updateSlugPreview(){
+        document.getElementById('slug-preview').textContent='alamingazette.com/story/'+document.getElementById('post-slug').value;
     }
 
-    document.getElementById && document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('post-slug').addEventListener('input', () => {
-            document.getElementById('slug-preview').textContent = 'article.html?id=' + document.getElementById('post-slug').value;
-        });
-    });
-
-    // ── SAVE ──
-    async function saveToSupabase() {
-        const id = document.getElementById('post-id').value;
-        const title = document.getElementById('post-title').value.trim();
-        const slug = document.getElementById('post-slug').value.trim();
-        const content = document.getElementById('post-content').value.trim();
-        const category = document.getElementById('post-category').value;
-
-        if (!title || !slug || !content) {
-            showToast('Title, slug, and content are required.', 'error');
-            return;
-        }
-
-        const data = {
-            title,
-            slug,
-            image_url: document.getElementById('img-url').value.trim() || null,
-            content,
-            category: category || null
+    async function saveToSupabase(){
+        const id=document.getElementById('post-id').value;
+        const title=document.getElementById('post-title').value.trim();
+        const slug=document.getElementById('post-slug').value.trim();
+        const content=document.getElementById('post-content').value.trim();
+        if(!title||!slug||!content){showToast('Title, slug and content are required.','error');return;}
+        const data={
+            title,slug,content,
+            image_url:document.getElementById('img-url').value.trim()||null,
+            category:document.getElementById('post-category').value||null,
+            author:document.getElementById('post-author').value.trim()||'Alamin Gazette Staff',
+            excerpt:document.getElementById('post-excerpt').value.trim()||null,
+            breaking:document.getElementById('post-breaking').checked
         };
-
-        const btn = document.getElementById('save-btn');
-        const label = document.getElementById('save-label');
-        btn.disabled = true;
-        label.textContent = 'Saving…';
-
-        const res = id
-            ? await _supabase.from('posts').update(data).eq('id', id)
-            : await _supabase.from('posts').insert([data]);
-
-        btn.disabled = false;
-        label.textContent = id ? 'Update Article' : 'Publish Article';
-
-        if (res.error) {
-            showToast(res.error.message, 'error');
-        } else {
-            showToast(id ? 'Article updated successfully' : 'Article published!', 'success');
-            resetForm();
-            refreshList();
-        }
+        const btn=document.getElementById('save-btn');
+        const label=document.getElementById('save-label');
+        btn.disabled=true;label.textContent='Saving…';
+        const res=id?await sb.from('posts').update(data).eq('id',id):await sb.from('posts').insert([data]);
+        btn.disabled=false;
+        label.textContent=id?'Update Article':'Publish Article';
+        if(res.error)showToast(res.error.message,'error');
+        else{showToast(id?'Article updated!':'Article published!','success');resetForm();refreshList();}
     }
 
-    // ── DELETE ──
-    async function deletePost(id, title) {
-        if (!confirm(`Delete "${title}"?\n\nThis cannot be undone.`)) return;
-        const { error } = await _supabase.from('posts').delete().eq('id', id);
-        if (error) showToast('Delete failed: ' + error.message, 'error');
-        else { showToast('Article deleted', 'default'); refreshList(); }
+    async function deletePost(id,title){
+        if(!confirm(`Delete "${title}"?\n\nThis cannot be undone.`))return;
+        const{error}=await sb.from('posts').delete().eq('id',id);
+        if(error)showToast('Delete failed: '+error.message,'error');
+        else{showToast('Article deleted');refreshList();}
     }
 
-    // ── EDIT ──
-    function startEdit(p) {
-        document.getElementById('editor-title').textContent = 'Edit Article';
-        document.getElementById('save-label').textContent = 'Update Article';
-        document.getElementById('post-id').value = p.id;
-        document.getElementById('post-title').value = p.title;
-        document.getElementById('post-slug').value = p.slug;
-        document.getElementById('img-url').value = p.image_url || '';
-        document.getElementById('post-content').value = p.content;
-        document.getElementById('post-category').value = p.category || '';
-        document.getElementById('slug-preview').textContent = 'article.html?id=' + p.slug;
-        document.getElementById('upload-status').innerHTML = '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    function startEdit(p){
+        document.getElementById('editor-title').textContent='Edit Article';
+        document.getElementById('save-label').textContent='Update Article';
+        document.getElementById('post-id').value=p.id;
+        document.getElementById('post-title').value=p.title;
+        document.getElementById('post-slug').value=p.slug;
+        document.getElementById('img-url').value=p.image_url||'';
+        document.getElementById('post-content').value=p.content;
+        document.getElementById('post-category').value=p.category||'';
+        document.getElementById('post-author').value=p.author||'';
+        document.getElementById('post-excerpt').value=p.excerpt||'';
+        document.getElementById('post-breaking').checked=!!p.breaking;
+        onBreakingChange();
+        updateSlugPreview();
+        document.getElementById('upload-status').innerHTML='';
+        window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    // ── RESET ──
-    function resetForm() {
-        document.getElementById('editor-title').textContent = 'New Article';
-        document.getElementById('save-label').textContent = 'Publish Article';
-        ['post-id','post-title','post-slug','img-url','post-content'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('post-category').value = '';
-        document.getElementById('upload-status').innerHTML = '';
-        document.getElementById('img-file').value = '';
-        document.getElementById('slug-preview').textContent = 'article.html?id=';
+    function resetForm(){
+        document.getElementById('editor-title').textContent='New Article';
+        document.getElementById('save-label').textContent='Publish Article';
+        ['post-id','post-title','post-slug','img-url','post-content','post-author','post-excerpt'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('post-category').value='';
+        document.getElementById('post-breaking').checked=false;
+        onBreakingChange();
+        document.getElementById('upload-status').innerHTML='';
+        document.getElementById('img-file').value='';
+        document.getElementById('slug-preview').textContent='alamingazette.com/story/';
     }
 
-    // ── REFRESH LIST ──
-    async function refreshList() {
-        const { data } = await _supabase.from('posts').select('*').order('created_at', { ascending: false });
-        allPosts = data || [];
-        document.getElementById('post-count').textContent = `${allPosts.length} article${allPosts.length !== 1 ? 's' : ''}`;
-        renderList(allPosts);
-    }
+    const catCls=c=>({'World Affairs':'cat-world','Economy & Markets':'cat-economy','Innovation':'cat-innovation','Defense & Security':'cat-defense','Society':'cat-society'}[c]||'cat-default');
+    const fmtDate=d=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
-    function getCatClass(cat) {
-        const map = { 'World Affairs': 'cat-world', 'Economy & Markets': 'cat-economy', 'Innovation': 'cat-innovation', 'Defense & Security': 'cat-defense', 'Society': 'cat-society' };
-        return map[cat] || 'cat-default';
-    }
-
-    function renderList(posts) {
-        if (!posts.length) {
-            document.getElementById('post-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink-light);font-size:13px;">No articles found.</div>';
-            return;
-        }
-        document.getElementById('post-list').innerHTML = posts.map(p => `
+    function renderList(posts){
+        if(!posts.length){document.getElementById('post-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--ink-light);font-size:13px;">No articles found.</div>';return;}
+        document.getElementById('post-list').innerHTML=posts.map(p=>`
             <div class="post-item">
-                <img class="post-thumb" src="${p.image_url || 'https://placehold.co/56x42/d4c9b8/7a6a5a?text=+'}" alt="" onerror="this.src='https://placehold.co/56x42/d4c9b8/7a6a5a?text=+'">
+                <img class="post-thumb" src="${p.image_url||'https://placehold.co/56x42/d4c9b8/7a6a5a?text=+'}" onerror="this.src='https://placehold.co/56x42/d4c9b8/7a6a5a?text=+'" alt="">
                 <div class="post-info">
-                    <h4>${p.title}</h4>
-                    <div class="post-meta" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                        ${p.category ? `<span class="cat-mini ${getCatClass(p.category)}">${p.category}</span>` : ''}
-                        <span>${new Date(p.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}</span>
+                    <h4>${p.breaking?'<span class="breaking-dot"></span>':''}${p.title}</h4>
+                    <div class="post-meta">
+                        ${p.category?`<span class="cat-mini ${catCls(p.category)}">${p.category}</span>`:''}
+                        <span>${p.author||'Alamin Gazette'}</span>
+                        <span>${fmtDate(p.created_at)}</span>
                     </div>
                 </div>
                 <div class="post-actions">
                     <button class="btn btn-outline btn-sm" onclick='startEdit(${JSON.stringify(p).replace(/'/g,"&apos;")})'>Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}', '${p.title.replace(/'/g,"\\'")}')">Del</button>
+                    <button class="btn btn-danger btn-sm" onclick="deletePost('${p.id}','${p.title.replace(/'/g,"\\'")}')">Del</button>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
 
-    function filterList() {
-        const q = document.getElementById('search-input').value.toLowerCase();
-        const filtered = allPosts.filter(p => p.title.toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q));
-        renderList(filtered);
+    async function refreshList(){
+        const{data}=await sb.from('posts').select('*').order('created_at',{ascending:false});
+        allPosts=data||[];
+        document.getElementById('post-count').textContent=`${allPosts.length} article${allPosts.length!==1?'s':''}`;
+        renderList(allPosts);
     }
 
-    // Slug preview on load
-    document.addEventListener('DOMContentLoaded', () => {
-        const slugEl = document.getElementById('post-slug');
-        if (slugEl) {
-            slugEl.addEventListener('input', () => {
-                document.getElementById('slug-preview').textContent = 'article.html?id=' + slugEl.value;
-            });
-        }
-    });
+    function filterList(){
+        const q=document.getElementById('search-input').value.toLowerCase();
+        renderList(allPosts.filter(p=>p.title.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q)||(p.author||'').toLowerCase().includes(q)));
+    }
 </script>
 </body>
 </html>
