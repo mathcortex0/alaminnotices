@@ -9,615 +9,194 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ink: #0d0d0d;
-            --ink-muted: #4a4a4a;
-            --ink-light: #7a7a7a;
-            --paper: #faf8f4;
-            --paper-alt: #f2ede6;
-            --rule: #d4c9b8;
-            --accent-navy: #0a1628;
-            --accent-crimson: #b5122e;
-            --accent-gold: #c9962e;
-            --cat-world: #0a1628;
-            --cat-economy: #1a5c3a;
-            --cat-innovation: #0057a8;
-            --cat-defense: #5a1a2a;
-            --cat-society: #4a3a0a;
-            --serif: 'Playfair Display', Georgia, serif;
-            --serif-body: 'Source Serif 4', Georgia, serif;
-            --sans: 'DM Sans', sans-serif;
+            --ink:#0d0d0d; --ink-muted:#4a4a4a; --ink-light:#7a7a7a;
+            --paper:#faf8f4; --paper-alt:#f2ede6; --rule:#d4c9b8;
+            --navy:#0a1628; --crimson:#b5122e; --gold:#c9962e;
+            --cat-world:#0a1628; --cat-economy:#1a5c3a; --cat-innovation:#0057a8; --cat-defense:#5a1a2a; --cat-society:#4a3a0a;
+            --serif:'Playfair Display',Georgia,serif; --body:'Source Serif 4',Georgia,serif; --sans:'DM Sans',sans-serif;
         }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:var(--body);background:var(--paper);color:var(--ink);font-size:17px;line-height:1.65;}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* TICKER */
+        .ticker-bar{background:var(--navy);color:#c8d4e8;height:32px;display:none;align-items:center;overflow:hidden;}
+        .ticker-live{font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;background:var(--crimson);color:white;padding:0 14px;height:100%;display:flex;align-items:center;flex-shrink:0;}
+        .ticker-scroll{overflow:hidden;flex:1;height:100%;}
+        .ticker-inner{display:inline-block;white-space:nowrap;font-family:var(--sans);font-size:11.5px;font-weight:500;animation:scroll-t 50s linear infinite;line-height:32px;}
+        .ticker-inner:hover{animation-play-state:paused;}
+        @keyframes scroll-t{from{transform:translateX(100vw);}to{transform:translateX(-100%);}}
+        .ticker-inner a{color:#c8d4e8;text-decoration:none;margin-right:70px;}
+        .ticker-inner a::before{content:"◆ ";color:var(--gold);}
+        .ticker-inner a:hover{color:white;}
 
-        body {
-            font-family: var(--serif-body);
-            background: var(--paper);
-            color: var(--ink);
-            font-size: 17px;
-            line-height: 1.65;
-        }
+        /* MASTHEAD */
+        .masthead{border-bottom:3px double var(--ink);padding:18px 0 0;background:var(--paper);position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.06);}
+        .masthead-top{display:flex;align-items:center;justify-content:space-between;max-width:1280px;margin:0 auto;padding:0 30px 14px;border-bottom:1px solid var(--rule);}
+        .masthead-meta{font-family:var(--sans);font-size:11px;color:var(--ink-light);}
+        .logo-wrap{text-align:center;flex:1;}
+        .logo-img{height:54px;width:auto;}
+        .logo-text{font-family:var(--serif);font-size:2.6rem;font-weight:900;letter-spacing:-1px;color:var(--ink);line-height:1;text-decoration:none;display:block;}
+        .logo-tagline{font-family:var(--sans);font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-light);margin-top:3px;}
+        .masthead-actions{display:flex;align-items:center;gap:14px;}
+        .admin-link{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);text-decoration:none;padding:7px 14px;border:1px solid var(--rule);transition:all 0.2s;}
+        .admin-link:hover{background:var(--ink);color:var(--paper);}
+        .nav-bar{max-width:1280px;margin:0 auto;padding:0 30px;display:flex;overflow-x:auto;scrollbar-width:none;}
+        .nav-bar::-webkit-scrollbar{display:none;}
+        .nav-link{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;color:var(--ink-muted);padding:10px 18px;white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.2s;}
+        .nav-link:hover,.nav-link.active{color:var(--ink);border-bottom-color:var(--crimson);}
 
-        /* ── TOP HEADER ── */
-        .top-ticker {
-            background: var(--accent-navy);
-            color: #c8d4e8;
-            font-family: var(--sans);
-            font-size: 11.5px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            height: 32px;
-            overflow: hidden;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-        }
-        .ticker-inner {
-            display: inline-block;
-            white-space: nowrap;
-            animation: ticker 40s linear infinite;
-        }
-        .ticker-inner:hover { animation-play-state: paused; }
-        @keyframes ticker {
-            from { transform: translateX(100vw); }
-            to   { transform: translateX(-100%); }
-        }
-        .ticker-inner span { margin-right: 70px; cursor: pointer; }
-        .ticker-inner span::before { content: "◆ "; color: var(--accent-gold); }
-        .ticker-inner span:hover { color: white; }
+        /* LAYOUT */
+        .page-wrap{max-width:1280px;margin:0 auto;padding:0 30px;}
+        .section-header{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;}
+        .section-label{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--crimson);}
+        .section-line{flex:1;height:1px;background:var(--rule);}
+        .heavy-rule{border:none;border-top:2px solid var(--ink);margin:36px 0 30px;}
 
-        .masthead {
-            border-bottom: 3px double var(--ink);
-            padding: 18px 0 0;
-            background: var(--paper);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.06);
-        }
+        /* CHIPS & BADGES */
+        .cat-chip{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:8px;}
+        .cat-world{background:var(--cat-world);color:#aabcd4;}
+        .cat-economy{background:var(--cat-economy);color:#a8d4b8;}
+        .cat-innovation{background:var(--cat-innovation);color:#a0c8f0;}
+        .cat-defense{background:var(--cat-defense);color:#d4a0aa;}
+        .cat-society{background:var(--cat-society);color:#d4c080;}
+        .cat-default{background:var(--ink);color:#ccc;}
+        .breaking-badge{font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;background:var(--crimson);color:white;padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:8px;margin-right:5px;animation:pulse-b 2s ease-in-out infinite;}
+        @keyframes pulse-b{0%,100%{opacity:1;}50%{opacity:0.55;}}
 
-        .masthead-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 30px 14px;
-            border-bottom: 1px solid var(--rule);
-        }
+        /* HERO */
+        .hero-grid{display:grid;grid-template-columns:1fr 340px;gap:0;border:1px solid var(--rule);}
+        .hero-main{grid-row:1/3;position:relative;overflow:hidden;border-right:1px solid var(--rule);cursor:pointer;}
+        .hero-main img{width:100%;height:520px;object-fit:cover;display:block;transition:transform 0.5s;}
+        .hero-main:hover img{transform:scale(1.03);}
+        .hero-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(5,5,15,.93) 0%,rgba(5,5,15,.5) 60%,transparent 100%);padding:36px 28px 28px;}
+        .hero-overlay h2{font-family:var(--serif);font-size:2.1rem;font-weight:700;color:#f5f0e8;line-height:1.22;margin-bottom:8px;}
+        .hero-overlay .h-excerpt{font-family:var(--body);font-size:.95rem;color:#c8bfaa;line-height:1.5;margin-bottom:12px;}
+        .hero-meta{font-family:var(--sans);font-size:11px;color:#8a8070;display:flex;justify-content:space-between;align-items:center;}
+        .hero-side{padding:20px 22px;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .2s;}
+        .hero-side:last-child{border-bottom:none;}
+        .hero-side:hover{background:var(--paper-alt);}
+        .hero-side img{width:100%;height:148px;object-fit:cover;border-radius:2px;display:block;margin-bottom:10px;}
+        .hero-side h3{font-family:var(--serif);font-size:1.1rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:5px;}
+        .hero-side .s-excerpt{font-family:var(--body);font-size:.82rem;color:var(--ink-muted);line-height:1.5;margin-bottom:8px;}
+        .side-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-light);display:flex;justify-content:space-between;align-items:center;}
 
-        .masthead-meta {
-            font-family: var(--sans);
-            font-size: 11px;
-            color: var(--ink-light);
-            letter-spacing: 0.3px;
-        }
-        .masthead-meta strong { color: var(--ink-muted); }
+        /* FEED */
+        .feed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+        .feed-card{padding:22px 24px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);cursor:pointer;transition:background .2s;}
+        .feed-card:nth-child(3n){border-right:none;}
+        .feed-card:hover{background:var(--paper-alt);}
+        .feed-card img{width:100%;height:130px;object-fit:cover;display:block;margin-bottom:10px;border-radius:2px;}
+        .feed-card h3{font-family:var(--serif);font-size:1.05rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:6px;}
+        .feed-card .f-excerpt{font-family:var(--body);font-size:.82rem;color:var(--ink-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px;}
+        .feed-meta{font-family:var(--sans);font-size:10.5px;color:var(--ink-light);display:flex;justify-content:space-between;align-items:center;}
 
-        .logo-wrap { text-align: center; flex: 1; }
-        .logo-img { height: 54px; width: auto; }
-        .logo-text {
-            font-family: var(--serif);
-            font-size: 2.6rem;
-            font-weight: 900;
-            letter-spacing: -1px;
-            color: var(--ink);
-            line-height: 1;
-        }
-        .logo-tagline {
-            font-family: var(--sans);
-            font-size: 10.5px;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: var(--ink-light);
-            margin-top: 3px;
-        }
+        /* SHARE */
+        .share-btn{background:none;border:none;cursor:pointer;font-family:var(--sans);font-size:10px;font-weight:600;color:var(--ink-light);letter-spacing:.8px;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;padding:4px 0;transition:color .2s;}
+        .share-btn:hover{color:var(--crimson);}
 
-        .masthead-actions {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
+        /* LOAD MORE */
+        .load-more-wrap{text-align:center;padding:40px 20px;border-top:1px solid var(--rule);}
+        .btn-load{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:transparent;color:var(--ink);border:1.5px solid var(--ink);padding:13px 36px;cursor:pointer;transition:all .25s;}
+        .btn-load:hover{background:var(--ink);color:var(--paper);}
+        .btn-load:disabled{opacity:.4;cursor:not-allowed;}
 
-        .nav-bar {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 30px;
-            display: flex;
-            gap: 0;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .nav-bar::-webkit-scrollbar { display: none; }
-        .nav-link {
-            font-family: var(--sans);
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: var(--ink-muted);
-            padding: 10px 18px;
-            white-space: nowrap;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: var(--ink);
-            border-bottom-color: var(--accent-crimson);
-        }
+        /* FOOTER */
+        footer{background:var(--navy);color:#b0bcc8;margin-top:60px;padding:54px 30px 30px;}
+        .footer-inner{max-width:1280px;margin:0 auto;}
+        .footer-top{display:grid;grid-template-columns:280px 1fr 1fr 1fr;gap:40px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.1);}
+        .footer-brand p{font-family:var(--body);font-size:.85rem;color:#8898aa;margin-top:12px;line-height:1.6;}
+        .f-logo{font-family:var(--serif);font-size:1.8rem;font-weight:900;color:#f5f0e8;}
+        .footer-col h4{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c8d4e0;margin-bottom:16px;}
+        .footer-col a{display:block;font-family:var(--sans);font-size:13px;color:#7a8a9a;text-decoration:none;margin-bottom:9px;transition:color .2s;}
+        .footer-col a:hover{color:#e0e8f0;}
+        .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-family:var(--sans);font-size:11px;color:#4a5a6a;}
 
-        /* ── MAIN LAYOUT ── */
-        .page-wrap {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 30px;
-        }
+        /* TOAST */
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#f5f0e8;font-family:var(--sans);font-size:13px;padding:12px 24px;border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:999;opacity:0;transition:all .35s;pointer-events:none;}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-        .section-rule {
-            border: none;
-            border-top: 1px solid var(--rule);
-            margin: 30px 0;
+        @media(max-width:900px){
+            .hero-grid{grid-template-columns:1fr;}
+            .hero-main{grid-row:auto;border-right:none;border-bottom:1px solid var(--rule);}
+            .hero-main img{height:340px;}
+            .feed-grid{grid-template-columns:repeat(2,1fr);}
+            .feed-card:nth-child(3n){border-right:1px solid var(--rule);}
+            .feed-card:nth-child(2n){border-right:none;}
+            .footer-top{grid-template-columns:1fr 1fr;}
         }
-        .section-rule.heavy {
-            border-top: 2px solid var(--ink);
-            margin-top: 36px;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: baseline;
-            gap: 14px;
-            margin-bottom: 22px;
-        }
-        .section-label {
-            font-family: var(--sans);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--accent-crimson);
-        }
-        .section-line {
-            flex: 1;
-            height: 1px;
-            background: var(--rule);
-        }
-
-        /* ── CATEGORY CHIPS ── */
-        .cat-chip {
-            font-family: var(--sans);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            padding: 3px 8px;
-            border-radius: 2px;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-        .cat-world     { background: var(--cat-world);    color: #aabcd4; }
-        .cat-economy   { background: var(--cat-economy);  color: #a8d4b8; }
-        .cat-innovation{ background: var(--cat-innovation);color: #a0c8f0; }
-        .cat-defense   { background: var(--cat-defense);  color: #d4a0aa; }
-        .cat-society   { background: var(--cat-society);  color: #d4c080; }
-        .cat-default   { background: var(--ink);          color: #ccc; }
-
-        /* ── HERO SECTION ── */
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            grid-template-rows: auto auto;
-            gap: 0;
-            border: 1px solid var(--rule);
-            margin-bottom: 0;
-        }
-
-        .hero-main {
-            grid-row: 1 / 3;
-            position: relative;
-            overflow: hidden;
-            border-right: 1px solid var(--rule);
-            cursor: pointer;
-        }
-        .hero-main img {
-            width: 100%;
-            height: 520px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-        .hero-main:hover img { transform: scale(1.03); }
-        .hero-main-overlay {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            background: linear-gradient(to top, rgba(5,5,15,0.92) 0%, rgba(5,5,15,0.5) 60%, transparent 100%);
-            padding: 36px 28px 28px;
-        }
-        .hero-main-overlay h2 {
-            font-family: var(--serif);
-            font-size: 2.1rem;
-            font-weight: 700;
-            color: #f5f0e8;
-            line-height: 1.22;
-            margin-bottom: 10px;
-        }
-        .hero-main-overlay p {
-            font-family: var(--serif-body);
-            font-size: 0.95rem;
-            color: #c8bfaa;
-            line-height: 1.5;
-            margin-bottom: 14px;
-        }
-        .hero-meta {
-            font-family: var(--sans);
-            font-size: 11px;
-            color: #8a8070;
-            letter-spacing: 0.3px;
-        }
-
-        .hero-side-item {
-            padding: 22px 22px;
-            border-bottom: 1px solid var(--rule);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .hero-side-item:last-child { border-bottom: none; }
-        .hero-side-item:hover { background: var(--paper-alt); }
-        .hero-side-item img {
-            width: 100%;
-            height: 155px;
-            object-fit: cover;
-            border-radius: 3px;
-            display: block;
-            margin-bottom: 12px;
-        }
-        .hero-side-item h3 {
-            font-family: var(--serif);
-            font-size: 1.15rem;
-            font-weight: 700;
-            line-height: 1.3;
-            color: var(--ink);
-            margin-bottom: 6px;
-        }
-        .hero-side-item p {
-            font-family: var(--serif-body);
-            font-size: 0.82rem;
-            color: var(--ink-muted);
-            line-height: 1.5;
-        }
-
-        /* ── INTELLIGENCE FEED ── */
-        .feed-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-        }
-
-        .feed-card {
-            padding: 22px 24px;
-            border-right: 1px solid var(--rule);
-            border-bottom: 1px solid var(--rule);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .feed-card:nth-child(3n) { border-right: none; }
-        .feed-card:hover { background: var(--paper-alt); }
-
-        .feed-card img {
-            width: 100%;
-            height: 130px;
-            object-fit: cover;
-            display: block;
-            margin-bottom: 12px;
-            border-radius: 2px;
-        }
-        .feed-card h3 {
-            font-family: var(--serif);
-            font-size: 1.05rem;
-            font-weight: 700;
-            line-height: 1.3;
-            color: var(--ink);
-            margin-bottom: 7px;
-        }
-        .feed-card p {
-            font-family: var(--serif-body);
-            font-size: 0.82rem;
-            color: var(--ink-muted);
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .feed-meta {
-            font-family: var(--sans);
-            font-size: 10.5px;
-            color: var(--ink-light);
-            margin-top: 10px;
-            letter-spacing: 0.2px;
-        }
-
-        /* ── LOAD MORE ── */
-        .load-more-wrap {
-            text-align: center;
-            padding: 40px 20px;
-            border-top: 1px solid var(--rule);
-        }
-        .btn-load {
-            font-family: var(--sans);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            background: transparent;
-            color: var(--ink);
-            border: 1.5px solid var(--ink);
-            padding: 13px 36px;
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-        .btn-load:hover { background: var(--ink); color: var(--paper); }
-        .btn-load:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        /* ── SHARE BUTTON ── */
-        .share-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-family: var(--sans);
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--ink-light);
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 0;
-            transition: color 0.2s;
-        }
-        .share-btn:hover { color: var(--accent-crimson); }
-        .share-icon { width: 14px; height: 14px; }
-
-        /* ── FOOTER ── */
-        footer {
-            background: var(--accent-navy);
-            color: #b0bcc8;
-            margin-top: 60px;
-            padding: 54px 30px 30px;
-        }
-        .footer-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-        .footer-top {
-            display: grid;
-            grid-template-columns: 280px 1fr 1fr 1fr;
-            gap: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .footer-brand .logo-text { color: #f5f0e8; font-size: 1.8rem; }
-        .footer-brand p {
-            font-family: var(--serif-body);
-            font-size: 0.85rem;
-            color: #8898aa;
-            margin-top: 12px;
-            line-height: 1.6;
-        }
-        .footer-col h4 {
-            font-family: var(--sans);
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #c8d4e0;
-            margin-bottom: 16px;
-        }
-        .footer-col a {
-            display: block;
-            font-family: var(--sans);
-            font-size: 13px;
-            color: #7a8a9a;
-            text-decoration: none;
-            margin-bottom: 9px;
-            transition: color 0.2s;
-        }
-        .footer-col a:hover { color: #e0e8f0; }
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 24px;
-            font-family: var(--sans);
-            font-size: 11px;
-            color: #4a5a6a;
-        }
-
-        /* ── TOAST SHARE NOTIFICATION ── */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: var(--ink);
-            color: #f5f0e8;
-            font-family: var(--sans);
-            font-size: 13px;
-            padding: 12px 24px;
-            border-radius: 4px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            z-index: 999;
-            opacity: 0;
-            transition: all 0.35s ease;
-            pointer-events: none;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* ── SKELETON LOADER ── */
-        @keyframes shimmer {
-            0% { background-position: -600px 0; }
-            100% { background-position: 600px 0; }
-        }
-        .skeleton {
-            background: linear-gradient(90deg, #e8e2d8 25%, #f2ede6 50%, #e8e2d8 75%);
-            background-size: 600px 100%;
-            animation: shimmer 1.4s infinite;
-            border-radius: 3px;
-        }
-        .skel-img { height: 520px; margin-bottom: 12px; }
-        .skel-text { height: 18px; margin-bottom: 8px; }
-        .skel-text.w70 { width: 70%; }
-        .skel-text.w50 { width: 50%; }
-
-        /* ── FILTER BAR ── */
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-        .filter-chip {
-            font-family: var(--sans);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            padding: 6px 14px;
-            border: 1px solid var(--rule);
-            background: transparent;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: all 0.2s;
-            color: var(--ink-muted);
-        }
-        .filter-chip:hover, .filter-chip.active {
-            background: var(--ink);
-            color: var(--paper);
-            border-color: var(--ink);
-        }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 900px) {
-            .hero-grid { grid-template-columns: 1fr; }
-            .hero-main { grid-row: auto; border-right: none; border-bottom: 1px solid var(--rule); }
-            .hero-main img { height: 340px; }
-            .feed-grid { grid-template-columns: repeat(2, 1fr); }
-            .feed-card:nth-child(3n) { border-right: 1px solid var(--rule); }
-            .feed-card:nth-child(2n) { border-right: none; }
-            .footer-top { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 600px) {
-            .logo-text { font-size: 1.9rem; }
-            .masthead-meta, .masthead-actions { display: none; }
-            .feed-grid { grid-template-columns: 1fr; }
-            .feed-card:nth-child(2n) { border-right: none; }
-            .footer-top { grid-template-columns: 1fr; }
-            .hero-main-overlay h2 { font-size: 1.5rem; }
-            .page-wrap { padding: 0 16px; }
-            .nav-link { padding: 10px 12px; }
+        @media(max-width:600px){
+            .logo-text{font-size:1.9rem;} .masthead-meta,.masthead-actions{display:none;}
+            .feed-grid{grid-template-columns:1fr;} .feed-card:nth-child(2n){border-right:none;}
+            .footer-top{grid-template-columns:1fr;} .hero-overlay h2{font-size:1.5rem;}
+            .page-wrap{padding:0 16px;} .nav-link{padding:10px 12px;}
         }
     </style>
 </head>
 <body>
 
-<div class="top-ticker" id="ticker-bar" style="display:none;">
-    <span style="font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:var(--accent-crimson);color:white;padding:0 14px;margin-right:14px;line-height:28px;display:inline-block;flex-shrink:0;">LIVE</span>
-    <div style="overflow:hidden;flex:1;position:relative;">
-        <div class="ticker-inner" id="ticker"></div>
-    </div>
+<div class="ticker-bar" id="ticker-bar">
+    <div class="ticker-live">Live</div>
+    <div class="ticker-scroll"><div class="ticker-inner" id="ticker"></div></div>
 </div>
 
 <header class="masthead">
     <div class="masthead-top">
-        <div class="masthead-meta">
-            <strong id="today-date"></strong> &nbsp;·&nbsp; World Intelligence
-        </div>
+        <div class="masthead-meta" id="today-date"></div>
         <div class="logo-wrap">
-            <a href="index.html" style="text-decoration:none;">
-                <img src="images/lol.png" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="The Alamin Gazette">
-                <div class="logo-text" style="display:none;">The Alamin Gazette</div>
+            <a href="/" style="text-decoration:none;">
+                <img src="images/lol.png" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" alt="The Alamin Gazette">
+                <span class="logo-text" style="display:none;">The Alamin Gazette</span>
             </a>
             <div class="logo-tagline">Independent · Informed · Indispensable</div>
         </div>
         <div class="masthead-actions">
-            <a href="admin.html" style="font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);text-decoration:none;padding:7px 14px;border:1px solid var(--rule);transition:all 0.2s;" onmouseover="this.style.background='var(--ink)';this.style.color='var(--paper)'" onmouseout="this.style.background='';this.style.color='var(--ink-light)'">Admin</a>
+            <a href="/admin.html" class="admin-link">Admin</a>
         </div>
     </div>
     <nav class="nav-bar">
-        <a class="nav-link active" href="#" onclick="filterCategory('all')">All</a>
-        <a class="nav-link" href="#" onclick="filterCategory('World Affairs')">World Affairs</a>
-        <a class="nav-link" href="#" onclick="filterCategory('Economy & Markets')">Economy</a>
-        <a class="nav-link" href="#" onclick="filterCategory('Innovation')">Innovation</a>
-        <a class="nav-link" href="#" onclick="filterCategory('Defense & Security')">Defense</a>
-        <a class="nav-link" href="#" onclick="filterCategory('Society')">Society</a>
+        <a class="nav-link active" href="/" onclick="filterCat(event,'all')">All</a>
+        <a class="nav-link" href="#" onclick="filterCat(event,'World Affairs')">World Affairs</a>
+        <a class="nav-link" href="#" onclick="filterCat(event,'Economy & Markets')">Economy</a>
+        <a class="nav-link" href="#" onclick="filterCat(event,'Innovation')">Innovation</a>
+        <a class="nav-link" href="#" onclick="filterCat(event,'Defense & Security')">Defense</a>
+        <a class="nav-link" href="#" onclick="filterCat(event,'Society')">Society</a>
     </nav>
 </header>
 
 <main class="page-wrap" style="padding-top:36px;">
-
-    <!-- HERO -->
-    <div class="section-header">
-        <span class="section-label">Top Stories</span>
-        <span class="section-line"></span>
-    </div>
-    <div id="hero-section">
-        <div class="hero-grid">
-            <div class="skeleton skel-img hero-main"></div>
-            <div>
-                <div class="hero-side-item"><div class="skeleton skel-img" style="height:155px;"></div></div>
-                <div class="hero-side-item"><div class="skeleton skel-img" style="height:155px;"></div></div>
-            </div>
-        </div>
-    </div>
-
-    <hr class="section-rule heavy">
-
-    <!-- INTELLIGENCE FEED -->
-    <div class="section-header">
-        <span class="section-label">Intelligence Feed</span>
-        <span class="section-line"></span>
-    </div>
-
+    <div class="section-header"><span class="section-label">Top Stories</span><span class="section-line"></span></div>
+    <div id="hero-section"></div>
+    <hr class="heavy-rule">
+    <div class="section-header"><span class="section-label">Intelligence Feed</span><span class="section-line"></span></div>
     <div id="feed-grid" class="feed-grid"></div>
-
     <div class="load-more-wrap" id="load-more-wrap" style="display:none;">
         <button class="btn-load" id="load-more-btn" onclick="loadMore()">Load More Stories</button>
     </div>
 </main>
 
-<!-- FOOTER -->
 <footer>
     <div class="footer-inner">
         <div class="footer-top">
             <div class="footer-brand">
-                <img src="images/lol.png" style="height:42px;width:auto;filter:brightness(2);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="">
-                <div class="logo-text" style="display:none;">The Alamin Gazette</div>
-                <p>Independent world intelligence since today. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
+                <img src="images/lol.png" style="height:42px;filter:brightness(2);" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" alt="">
+                <div class="f-logo" style="display:none;">The Alamin Gazette</div>
+                <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
             </div>
             <div class="footer-col">
                 <h4>Regions</h4>
-                <a href="#">Asia-Pacific</a>
-                <a href="#">EMEA</a>
-                <a href="#">Americas</a>
-                <a href="#">Middle East</a>
-                <a href="#">Africa</a>
+                <a href="#">Asia-Pacific</a><a href="#">EMEA</a><a href="#">Americas</a><a href="#">Middle East</a><a href="#">Africa</a>
             </div>
             <div class="footer-col">
                 <h4>Sections</h4>
-                <a href="#" onclick="filterCategory('World Affairs')">World Affairs</a>
-                <a href="#" onclick="filterCategory('Economy & Markets')">Economy & Markets</a>
-                <a href="#" onclick="filterCategory('Innovation')">Innovation</a>
-                <a href="#" onclick="filterCategory('Defense & Security')">Defense & Security</a>
-                <a href="#" onclick="filterCategory('Society')">Society</a>
+                <a href="#" onclick="filterCat(event,'World Affairs')">World Affairs</a>
+                <a href="#" onclick="filterCat(event,'Economy & Markets')">Economy & Markets</a>
+                <a href="#" onclick="filterCat(event,'Innovation')">Innovation</a>
+                <a href="#" onclick="filterCat(event,'Defense & Security')">Defense & Security</a>
+                <a href="#" onclick="filterCat(event,'Society')">Society</a>
             </div>
             <div class="footer-col">
                 <h4>The Gazette</h4>
-                <a href="#">About Us</a>
-                <a href="#">Editorial Standards</a>
-                <a href="#">Contact</a>
-                <a href="admin.html">Admin Portal</a>
+                <a href="#">About Us</a><a href="#">Editorial Standards</a><a href="#">Contact</a><a href="/admin.html">Admin Portal</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -630,178 +209,127 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
-    const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-    const _supabase = supabase.createClient(SUPA_URL, SUPA_KEY);
+    const SUPA_URL='https://szzqaqwpvxwrefkojplh.supabase.co';
+    const SUPA_KEY='sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+    const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const PAGE_SIZE=12;
+    let allPosts=[],feedPosts=[],offset=0,activeCat='all';
 
-    const PAGE_SIZE = 12;
-    let offset = 3; // hero shows first 3
-    let activeCategory = 'all';
-    let allPosts = [];
-    let feedPosts = [];
+    document.getElementById('today-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-    // Date in masthead
-    document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const catCls=c=>({'World Affairs':'cat-world','Economy & Markets':'cat-economy','Innovation':'cat-innovation','Defense & Security':'cat-defense','Society':'cat-society'}[c]||'cat-default');
+    const teaser=(p,len)=>{const t=p.excerpt||p.content||'';return t.length>len?t.slice(0,len).trim()+'…':t;};
+    const fmtDate=d=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const storyURL=slug=>`/story/${slug}`;
+    const shareIco=()=>`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`;
+    const badge=p=>p.breaking?`<span class="breaking-badge">Breaking</span>`:'';
 
-    function getCatClass(cat) {
-        if (!cat) return 'cat-default';
-        const map = { 'World Affairs': 'cat-world', 'Economy & Markets': 'cat-economy', 'Innovation': 'cat-innovation', 'Defense & Security': 'cat-defense', 'Society': 'cat-society' };
-        return map[cat] || 'cat-default';
-    }
+    function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
-    function excerpt(text, len = 120) {
-        if (!text) return '';
-        return text.length > len ? text.slice(0, len).trim() + '…' : text;
-    }
-
-    function fmtDate(d) {
-        return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
-    function sharePost(e, slug, title) {
+    function sharePost(e,slug,title){
         e.stopPropagation();
-        const url = `${window.location.origin}${window.location.pathname.replace('index.html','')}article.html?id=${slug}`;
-        if (navigator.share) {
-            navigator.share({ title, url });
-        } else {
-            navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
-        }
+        const url=`${location.origin}/story/${slug}`;
+        if(navigator.share)navigator.share({title,url});
+        else navigator.clipboard.writeText(url).then(()=>toast('Link copied'));
     }
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
+    function buildTicker(posts){
+        if(!posts.length)return;
+        const breaking=posts.filter(p=>p.breaking);
+        const rest=posts.filter(p=>!p.breaking).slice(0,10-breaking.length);
+        const items=[...breaking,...rest];
+        const inner=document.getElementById('ticker');
+        inner.innerHTML=items.map(p=>`<a href="${storyURL(p.slug)}">${p.breaking?'🔴 BREAKING: ':''}${p.title}</a>`).join('');
+        document.getElementById('ticker-bar').style.display='flex';
+        const dur=Math.max(35,Math.min(90,items.reduce((s,p)=>s+p.title.length,0)*0.2));
+        inner.style.animationDuration=dur+'s';
     }
 
-    function renderHero(posts) {
-        if (!posts.length) { document.getElementById('hero-section').innerHTML = ''; return; }
-        const main = posts[0];
-        const sides = posts.slice(1, 3);
-
-        const sideHTML = sides.map(p => `
-            <div class="hero-side-item" onclick="location.href='article.html?id=${p.slug}'">
-                <img src="${p.image_url || 'https://placehold.co/600x300/1a1a2e/9aa8b8?text=Gazette'}" alt="" loading="lazy" onerror="this.src='https://placehold.co/600x300/1a1a2e/9aa8b8?text=Gazette'">
-                <span class="cat-chip ${getCatClass(p.category)}">${p.category || 'World'}</span>
+    function renderHero(posts){
+        const el=document.getElementById('hero-section');
+        if(!posts.length){el.innerHTML='';return;}
+        const m=posts[0],sides=posts.slice(1,3);
+        const sideHTML=sides.map(p=>`
+            <div class="hero-side" onclick="location.href='${storyURL(p.slug)}'">
+                <img src="${p.image_url||'https://placehold.co/600x300/1a1a2e/9aa8b8?text=Gazette'}" loading="lazy" onerror="this.src='https://placehold.co/600x300/1a1a2e/9aa8b8?text=Gazette'" alt="">
+                <div>${badge(p)}<span class="cat-chip ${catCls(p.category)}">${p.category||'World'}</span></div>
                 <h3>${p.title}</h3>
-                <p>${excerpt(p.content, 90)}</p>
-                <div class="feed-meta" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-                    <span>${fmtDate(p.created_at)}</span>
-                    <button class="share-btn" onclick="sharePost(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
-                        <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                        Share
-                    </button>
+                <p class="s-excerpt">${teaser(p,100)}</p>
+                <div class="side-meta">
+                    <span>${p.author||'Alamin Gazette'} &middot; ${fmtDate(p.created_at)}</span>
+                    <button class="share-btn" onclick="sharePost(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}'">${shareIco()} Share</button>
                 </div>
-            </div>
-        `).join('');
-
-        document.getElementById('hero-section').innerHTML = `
+            </div>`).join('');
+        el.innerHTML=`
             <div class="hero-grid">
-                <div class="hero-main" onclick="location.href='article.html?id=${main.slug}'">
-                    <img src="${main.image_url || 'https://placehold.co/900x520/0a1628/4a6a8a?text=Gazette'}" alt="" onerror="this.src='https://placehold.co/900x520/0a1628/4a6a8a?text=Gazette'">
-                    <div class="hero-main-overlay">
-                        <span class="cat-chip ${getCatClass(main.category)}">${main.category || 'World'}</span>
-                        <h2>${main.title}</h2>
-                        <p>${excerpt(main.content, 160)}</p>
-                        <div class="hero-meta" style="display:flex;justify-content:space-between;align-items:center;">
-                            <span>${fmtDate(main.created_at)}</span>
-                            <button class="share-btn" style="color:#8a8070;" onclick="sharePost(event,'${main.slug}','${main.title.replace(/'/g,"\\'")}')">
-                                <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                                Share
-                            </button>
+                <div class="hero-main" onclick="location.href='${storyURL(m.slug)}'">
+                    <img src="${m.image_url||'https://placehold.co/900x520/0a1628/4a6a8a?text=Gazette'}" onerror="this.src='https://placehold.co/900x520/0a1628/4a6a8a?text=Gazette'" alt="">
+                    <div class="hero-overlay">
+                        <div>${badge(m)}<span class="cat-chip ${catCls(m.category)}">${m.category||'World'}</span></div>
+                        <h2>${m.title}</h2>
+                        <p class="h-excerpt">${teaser(m,180)}</p>
+                        <div class="hero-meta">
+                            <span>${m.author||'Alamin Gazette'} &middot; ${fmtDate(m.created_at)}</span>
+                            <button class="share-btn" style="color:#8a8070" onclick="sharePost(event,'${m.slug}','${m.title.replace(/'/g,"\\'")}'">${shareIco()} Share</button>
                         </div>
                     </div>
                 </div>
                 <div>${sideHTML}</div>
-            </div>
-        `;
+            </div>`;
     }
 
-    function renderFeed(posts, append = false) {
-        const grid = document.getElementById('feed-grid');
-        const html = posts.map((p, i) => `
-            <div class="feed-card" onclick="location.href='article.html?id=${p.slug}'">
-                <img src="${p.image_url || 'https://placehold.co/400x130/e8e2d8/9a8a7a?text=Gazette'}" alt="" loading="lazy" onerror="this.src='https://placehold.co/400x130/e8e2d8/9a8a7a?text=Gazette'">
-                <span class="cat-chip ${getCatClass(p.category)}">${p.category || 'World'}</span>
+    function renderFeed(posts,append=false){
+        const grid=document.getElementById('feed-grid');
+        const html=posts.map(p=>`
+            <div class="feed-card" onclick="location.href='${storyURL(p.slug)}'">
+                <img src="${p.image_url||'https://placehold.co/400x130/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" onerror="this.src='https://placehold.co/400x130/e8e2d8/9a8a7a?text=Gazette'" alt="">
+                <div>${badge(p)}<span class="cat-chip ${catCls(p.category)}">${p.category||'World'}</span></div>
                 <h3>${p.title}</h3>
-                <p>${excerpt(p.content)}</p>
-                <div class="feed-meta" style="display:flex;justify-content:space-between;align-items:center;">
-                    <span>${fmtDate(p.created_at)}</span>
-                    <button class="share-btn" onclick="sharePost(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
-                        <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                        Share
-                    </button>
+                <p class="f-excerpt">${teaser(p,130)}</p>
+                <div class="feed-meta">
+                    <span>${p.author||'Alamin Gazette'} &middot; ${fmtDate(p.created_at)}</span>
+                    <button class="share-btn" onclick="sharePost(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}'">${shareIco()} Share</button>
                 </div>
-            </div>
-        `).join('');
-        if (append) grid.innerHTML += html;
-        else grid.innerHTML = html;
+            </div>`).join('');
+        if(append)grid.innerHTML+=html;else grid.innerHTML=html;
     }
 
-    async function loadPosts() {
-        const { data, error } = await _supabase
-            .from('posts')
-            .select('*')
-            .eq('is_published', true)
-            .order('created_at', { ascending: false });
-
-        if (error || !data) {
-            document.getElementById('hero-section').innerHTML = '<p style="padding:30px;color:var(--ink-muted);">Unable to load posts.</p>';
-            return;
-        }
-
-        allPosts = data;
+    async function loadPosts(){
+        const{data,error}=await sb.from('posts').select('*').eq('is_published',true).order('created_at',{ascending:false});
+        if(error||!data){document.getElementById('hero-section').innerHTML='<p style="padding:30px">Unable to load posts.</p>';return;}
+        allPosts=data.sort((a,b)=>(b.breaking?1:0)-(a.breaking?1:0)||new Date(b.created_at)-new Date(a.created_at));
+        buildTicker(data);
         applyFilter();
     }
 
-    function applyFilter(cat) {
-        if (cat !== undefined) activeCategory = cat;
-
-        // Update nav links
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        event && event.target && event.target.classList.add('active');
-
-        const filtered = activeCategory === 'all' ? allPosts : allPosts.filter(p => p.category === activeCategory);
-
-        renderHero(filtered.slice(0, 3));
-        feedPosts = filtered.slice(3);
-        renderFeed(feedPosts.slice(0, PAGE_SIZE));
-
-        const btn = document.getElementById('load-more-btn');
-        const wrap = document.getElementById('load-more-wrap');
-        offset = PAGE_SIZE;
-
-        if (feedPosts.length > PAGE_SIZE) { wrap.style.display = 'block'; btn.disabled = false; }
-        else wrap.style.display = 'none';
+    function applyFilter(){
+        const filtered=activeCat==='all'?allPosts:allPosts.filter(p=>p.category===activeCat);
+        renderHero(filtered.slice(0,3));
+        feedPosts=filtered.slice(3);
+        offset=PAGE_SIZE;
+        renderFeed(feedPosts.slice(0,PAGE_SIZE));
+        const wrap=document.getElementById('load-more-wrap');
+        const btn=document.getElementById('load-more-btn');
+        wrap.style.display=feedPosts.length>PAGE_SIZE?'block':'none';
+        if(btn)btn.disabled=false;
     }
 
-    function filterCategory(cat) {
-        activeCategory = cat;
-        const filtered = activeCategory === 'all' ? allPosts : allPosts.filter(p => p.category === activeCategory);
-        renderHero(filtered.slice(0, 3));
-        feedPosts = filtered.slice(3);
-        renderFeed(feedPosts.slice(0, PAGE_SIZE));
-        offset = PAGE_SIZE;
-        const wrap = document.getElementById('load-more-wrap');
-        const btn = document.getElementById('load-more-btn');
-        if (feedPosts.length > PAGE_SIZE) { wrap.style.display = 'block'; btn.disabled = false; }
-        else wrap.style.display = 'none';
+    function filterCat(e,cat){
+        e.preventDefault();
+        activeCat=cat;
+        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+        e.target.classList.add('active');
+        applyFilter();
+        window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    function loadMore() {
-        const btn = document.getElementById('load-more-btn');
-        btn.textContent = 'Loading…';
-        btn.disabled = true;
-        const next = feedPosts.slice(offset, offset + PAGE_SIZE);
-        renderFeed(next, true);
-        offset += PAGE_SIZE;
-        if (offset >= feedPosts.length) {
-            document.getElementById('load-more-wrap').style.display = 'none';
-        } else {
-            btn.textContent = 'Load More Stories';
-            btn.disabled = false;
-        }
+    function loadMore(){
+        const btn=document.getElementById('load-more-btn');
+        btn.textContent='Loading…';btn.disabled=true;
+        renderFeed(feedPosts.slice(offset,offset+PAGE_SIZE),true);
+        offset+=PAGE_SIZE;
+        if(offset>=feedPosts.length)document.getElementById('load-more-wrap').style.display='none';
+        else{btn.textContent='Load More Stories';btn.disabled=false;}
     }
 
     loadPosts();
