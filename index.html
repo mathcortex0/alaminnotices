@@ -29,9 +29,8 @@
       --prose: 'Source Serif 4', Georgia, serif;
       --ui: 'DM Sans', system-ui, sans-serif;
       
-      --header-height-expanded: 88px;
-      --header-height-compact: 56px;
-      --transition-duration: 0.2s;
+      --header-height: 64px;
+      --transition: 0.2s ease;
     }
 
     html {
@@ -53,7 +52,7 @@
       text-decoration: none;
     }
 
-    /* ---------- MASTHEAD (ECONOMIST + REUTERS HYBRID) ---------- */
+    /* ---------- MASTHEAD: ULTRA COMPACT, LEFT LOGO ---------- */
     .masthead {
       background: var(--paper);
       position: sticky;
@@ -61,174 +60,64 @@
       z-index: 100;
       width: 100%;
       border-bottom: 1px solid var(--rule);
-      transition: box-shadow var(--transition-duration) ease;
+      transition: box-shadow var(--transition);
     }
 
     .masthead.scrolled {
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
     }
 
     .masthead-inner {
-      max-width: 1300px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 28px;
     }
 
-    /* ----- TOP BAR: logo + utilities (collapses on scroll) ----- */
-    .top-bar {
+    /* SINGLE ROW HEADER: logo left, nav center, utils right */
+    .header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 0 8px;
-      border-bottom: 1px solid var(--rule);
-      transition: padding var(--transition-duration) ease, border-color var(--transition-duration) ease;
+      height: var(--header-height);
+      gap: 24px;
     }
 
-    /* Compact state: shrink top bar */
-    .masthead.compact .top-bar {
-      padding: 0;
-      border-bottom-color: transparent;
-    }
-
-    /* Logo area */
+    /* LEFT: BIG LOGO (no tagline, no extra words) */
     .logo-area {
-      text-align: center;
-      transition: transform var(--transition-duration) ease;
-    }
-
-    .masthead.compact .logo-area {
-      transform: scale(0.85);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
     }
 
     .logo-img {
-      height: 44px;
+      height: 38px;
       width: auto;
-      margin: 0 auto;
-      transition: height var(--transition-duration) ease;
-    }
-
-    .masthead.compact .logo-img {
-      height: 32px;
+      transition: height var(--transition);
+      display: block;
     }
 
     .logo-wordmark {
       font-family: var(--serif);
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       font-weight: 900;
       letter-spacing: -0.02em;
       color: var(--ink);
-      line-height: 1.1;
-      display: block;
-    }
-
-    .logo-tagline {
-      font-family: var(--ui);
-      font-size: 8.5px;
-      letter-spacing: 2.8px;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      margin-top: 4px;
-      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
-    }
-
-    .masthead.compact .logo-tagline {
-      opacity: 0;
-      visibility: hidden;
-      height: 0;
-      margin: 0;
-    }
-
-    /* Date (desktop only) */
-    .date-badge {
-      font-family: var(--ui);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: 0.3px;
+      line-height: 1;
       white-space: nowrap;
-      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
     }
 
-    .masthead.compact .date-badge {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    /* Utilities: Admin + Search (desktop) */
-    .util-actions {
+    /* CENTER: NAVIGATION (compact, horizontal) */
+    .nav-center {
+      flex: 1;
       display: flex;
-      align-items: center;
-      gap: 16px;
-      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
+      justify-content: center;
     }
 
-    .masthead.compact .util-actions {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    .util-link {
-      font-family: var(--ui);
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      transition: color 0.2s;
-    }
-
-    .util-link:hover {
-      color: var(--crimson);
-    }
-
-    .search-icon {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-      cursor: pointer;
-    }
-
-    /* ----- NAVIGATION ROW (always visible, compacts slightly) ----- */
-    .nav-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      transition: padding var(--transition-duration) ease;
-    }
-
-    .masthead.compact .nav-row {
-      padding: 4px 0;
-    }
-
-    /* Compact logo that appears on scroll */
-    .compact-logo {
-      font-family: var(--serif);
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: var(--ink);
-      white-space: nowrap;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
-      margin-right: 0;
-      letter-spacing: -0.01em;
-    }
-
-    .masthead.compact .compact-logo {
-      opacity: 1;
-      visibility: visible;
-      margin-right: 24px;
-    }
-
-    /* Desktop navigation strip */
     .nav-strip {
       display: flex;
+      gap: 2px;
       overflow-x: auto;
       scrollbar-width: none;
-      flex: 1;
-      gap: 2px;
     }
 
     .nav-strip::-webkit-scrollbar {
@@ -239,7 +128,7 @@
       font-family: var(--ui);
       font-size: 11px;
       font-weight: 500;
-      letter-spacing: 0.7px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--ink-2);
       padding: 8px 14px;
@@ -247,7 +136,7 @@
       background: none;
       cursor: pointer;
       white-space: nowrap;
-      border-bottom: 2px solid transparent;
+      border-bottom: 1.5px solid transparent;
       transition: all 0.2s;
     }
 
@@ -261,38 +150,51 @@
       border-bottom-color: var(--crimson);
     }
 
-    /* Compact admin link (visible on scroll, desktop/tablet) */
-    .compact-admin {
+    /* RIGHT: UTILITIES (admin + search) */
+    .util-group {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-shrink: 0;
+    }
+
+    .util-link {
       font-family: var(--ui);
       font-size: 10.5px;
       font-weight: 600;
       letter-spacing: 0.6px;
       text-transform: uppercase;
       color: var(--ink-3);
-      white-space: nowrap;
-      flex-shrink: 0;
-      padding-left: 16px;
-      border-left: 1px solid var(--rule);
-      transition: opacity var(--transition-duration) ease;
+      transition: color 0.2s;
     }
 
-    .compact-admin:hover {
+    .util-link:hover {
       color: var(--crimson);
     }
 
-    /* ----- MOBILE ELEMENTS (hidden on desktop) ----- */
+    .search-icon {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      cursor: pointer;
+      color: var(--ink-2);
+    }
+
+    /* ----- MOBILE CONTROLS (hidden on desktop) ----- */
     .mobile-controls {
       display: none;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     .hamburger {
       background: none;
       border: none;
       cursor: pointer;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       display: flex;
       flex-direction: column;
       justify-content: space-around;
@@ -307,8 +209,8 @@
     }
 
     .mobile-search-icon {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       stroke: var(--ink-2);
       stroke-width: 2;
       fill: none;
@@ -320,14 +222,14 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 85%;
-      max-width: 320px;
+      width: 80%;
+      max-width: 300px;
       height: 100vh;
       background: var(--paper);
       z-index: 200;
       transform: translateX(-100%);
       transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      box-shadow: 2px 0 24px rgba(0, 0, 0, 0.1);
+      box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
       border-right: 1px solid var(--rule);
       display: flex;
       flex-direction: column;
@@ -340,7 +242,7 @@
     .menu-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.3);
       z-index: 199;
       opacity: 0;
       visibility: hidden;
@@ -356,21 +258,20 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 20px;
+      padding: 20px;
       border-bottom: 1px solid var(--rule);
     }
 
     .menu-header .logo-wordmark {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
     }
 
     .close-menu {
       background: none;
       border: none;
-      font-size: 28px;
+      font-size: 26px;
       cursor: pointer;
       color: var(--ink-2);
-      line-height: 1;
     }
 
     .menu-nav {
@@ -378,17 +279,16 @@
       padding: 24px 20px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .menu-nav a {
       font-family: var(--ui);
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 500;
       color: var(--ink-2);
       padding: 12px 0;
       border-bottom: 1px solid var(--rule);
-      transition: color 0.2s;
     }
 
     .menu-nav a:hover,
@@ -415,11 +315,11 @@
       overflow: hidden;
     }
 
-    /* ---------- REST OF PAGE (stable, no shake) ---------- */
+    /* ---------- PAGE CONTENT (stable, professional) ---------- */
     .page {
       max-width: 1300px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 28px;
     }
 
     .section-head {
@@ -451,13 +351,12 @@
       margin: 0;
     }
 
-    /* Hero and feed styles (minimal, functional) */
     .hero {
       display: grid;
       grid-template-columns: 1fr 320px;
       border: 1px solid var(--rule);
       background: var(--paper);
-      min-height: 480px;
+      min-height: 460px;
     }
 
     .hero-lead {
@@ -465,7 +364,7 @@
       overflow: hidden;
       border-right: 1px solid var(--rule);
       cursor: pointer;
-      min-height: 480px;
+      min-height: 460px;
       background: var(--navy);
     }
 
@@ -493,16 +392,16 @@
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 28px 24px 24px;
+      padding: 26px 22px 22px;
     }
 
     .hero-lead-body h2 {
       font-family: var(--serif);
-      font-size: 1.8rem;
+      font-size: 1.7rem;
       font-weight: 900;
       color: #f4efe8;
       line-height: 1.25;
-      margin: 8px 0 10px;
+      margin: 8px 0 8px;
     }
 
     .hero-excerpt {
@@ -530,7 +429,7 @@
 
     .hero-card {
       flex: 1;
-      padding: 18px;
+      padding: 16px;
       border-bottom: 1px solid var(--rule);
       cursor: pointer;
       transition: background 0.2s;
@@ -547,7 +446,7 @@
 
     .hero-card-img {
       width: 100%;
-      height: 130px;
+      height: 120px;
       object-fit: cover;
       border-radius: 2px;
       margin-bottom: 10px;
@@ -556,7 +455,7 @@
 
     .hero-card h3 {
       font-family: var(--serif);
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       line-height: 1.3;
       color: var(--ink);
@@ -565,7 +464,7 @@
 
     .card-excerpt {
       font-family: var(--prose);
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--ink-2);
       line-height: 1.45;
       margin-bottom: 8px;
@@ -589,7 +488,7 @@
     }
 
     .feed-item {
-      padding: 20px;
+      padding: 18px;
       border-right: 1px solid var(--rule);
       border-bottom: 1px solid var(--rule);
       cursor: pointer;
@@ -602,7 +501,7 @@
 
     .feed-item-img {
       width: 100%;
-      height: 120px;
+      height: 110px;
       object-fit: cover;
       border-radius: 2px;
       margin-bottom: 10px;
@@ -611,14 +510,14 @@
 
     .feed-item h3 {
       font-family: var(--serif);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       line-height: 1.3;
       margin: 6px 0;
     }
 
     .item-excerpt {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--ink-2);
       line-height: 1.45;
       display: -webkit-box;
@@ -633,10 +532,10 @@
       border: none;
       cursor: pointer;
       font-family: var(--ui);
-      font-size: 9.5px;
+      font-size: 9px;
       font-weight: 600;
       color: var(--ink-3);
-      letter-spacing: 0.6px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
@@ -663,16 +562,21 @@
       background: transparent;
       color: var(--ink);
       border: 1.5px solid var(--ink);
-      padding: 14px 40px;
+      padding: 12px 36px;
       cursor: pointer;
       transition: all 0.25s;
+    }
+
+    .load-more-btn:hover {
+      background: var(--ink);
+      color: var(--paper);
     }
 
     .site-footer {
       background: var(--navy);
       color: #8898a8;
       margin-top: 70px;
-      padding: 60px 28px 32px;
+      padding: 48px 28px 28px;
     }
 
     .footer-inner {
@@ -682,60 +586,61 @@
 
     .footer-grid {
       display: grid;
-      grid-template-columns: 260px 1fr 1fr 1fr;
-      gap: 48px;
-      padding-bottom: 44px;
+      grid-template-columns: 240px 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 36px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .footer-brand p {
       font-family: var(--prose);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: #5a6878;
     }
 
     .footer-col h5 {
       font-family: var(--ui);
-      font-size: 9.5px;
+      font-size: 9px;
       font-weight: 700;
-      letter-spacing: 2.5px;
+      letter-spacing: 2px;
       text-transform: uppercase;
       color: #c0ccd8;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .footer-col a {
       display: block;
       font-family: var(--ui);
-      font-size: 13px;
+      font-size: 12px;
       color: #5a6878;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .footer-bottom {
       display: flex;
       justify-content: space-between;
-      padding-top: 26px;
+      padding-top: 24px;
       font-family: var(--ui);
-      font-size: 11px;
+      font-size: 10px;
       color: #3a4858;
     }
 
     .toast {
       position: fixed;
-      bottom: 28px;
+      bottom: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(60px);
       background: var(--ink);
       color: #f4efe8;
       font-family: var(--ui);
-      font-size: 13px;
-      padding: 12px 22px;
+      font-size: 12px;
+      padding: 10px 20px;
       border-radius: 3px;
       z-index: 999;
       opacity: 0;
       transition: all 0.3s ease;
       pointer-events: none;
+      white-space: nowrap;
     }
 
     .toast.show {
@@ -755,7 +660,7 @@
         grid-template-columns: 1fr;
       }
       .hero-lead {
-        min-height: 380px;
+        min-height: 360px;
         border-right: none;
         border-bottom: 1px solid var(--rule);
       }
@@ -765,9 +670,6 @@
       .hero-card {
         border-bottom: none;
         border-right: 1px solid var(--rule);
-      }
-      .hero-card:last-child {
-        border-right: none;
       }
       .feed {
         grid-template-columns: repeat(2, 1fr);
@@ -779,26 +681,26 @@
     }
 
     @media (max-width: 768px) {
-      .top-bar {
-        justify-content: space-between;
-        padding: 8px 0;
+      .masthead-inner {
+        padding: 0 16px;
       }
-      .date-badge,
-      .util-actions {
+      .header-row {
+        gap: 12px;
+      }
+      .nav-center {
+        display: none;
+      }
+      .util-group {
         display: none;
       }
       .mobile-controls {
         display: flex;
       }
-      .nav-strip,
-      .compact-admin {
-        display: none;
+      .logo-img {
+        height: 32px;
       }
-      .compact-logo {
-        display: none;
-      }
-      .nav-row {
-        justify-content: flex-end;
+      .logo-wordmark {
+        font-size: 1.2rem;
       }
       .hero-stack {
         flex-direction: column;
@@ -818,7 +720,7 @@
         padding: 0 16px;
       }
       .hero-lead-body h2 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
       }
       .hero-lead-body .hero-excerpt {
         display: none;
@@ -827,10 +729,13 @@
 
     @media (max-width: 480px) {
       .logo-wordmark {
-        font-size: 1.3rem;
+        font-size: 1rem;
       }
       .logo-img {
-        height: 32px;
+        height: 28px;
+      }
+      .header-row {
+        height: 56px;
       }
     }
   </style>
@@ -839,24 +744,38 @@
 
 <header class="masthead" id="masthead">
   <div class="masthead-inner">
-    <!-- Top bar: logo, date, admin/search (desktop) -->
-    <div class="top-bar">
-      <div class="date-badge" id="headerDate"></div>
+    <!-- Single row: left logo, center nav, right utils -->
+    <div class="header-row">
+      <!-- LEFT: BIG LOGO (no tagline, no extra words) -->
       <div class="logo-area">
-        <a href="index.html">
+        <a href="index.html" style="display: flex; align-items: center;">
           <img src="images/lol.png" class="logo-img" alt="The Alamin Gazette" onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='block';">
           <span class="logo-wordmark" id="fallbackLogo" style="display:none;">The Alamin Gazette</span>
         </a>
-        <div class="logo-tagline">INDEPENDENT · INFORMED · INDISPENSABLE</div>
       </div>
-      <div class="util-actions">
+
+      <!-- CENTER: NAVIGATION (compact) -->
+      <div class="nav-center">
+        <div class="nav-strip" id="navStrip">
+          <button class="nav-btn active" data-cat="">All</button>
+          <button class="nav-btn" data-cat="World Affairs">World Affairs</button>
+          <button class="nav-btn" data-cat="Economy & Markets">Economy</button>
+          <button class="nav-btn" data-cat="Innovation">Innovation</button>
+          <button class="nav-btn" data-cat="Defense & Security">Defense</button>
+          <button class="nav-btn" data-cat="Society">Society</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: UTILITIES -->
+      <div class="util-group">
         <a href="admin.html" class="util-link">Admin</a>
-        <svg class="search-icon" viewBox="0 0 24 24" id="searchIcon">
+        <svg class="search-icon" viewBox="0 0 24 24" id="desktopSearchIcon">
           <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
           <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-linecap="round"/>
         </svg>
       </div>
-      <!-- Mobile controls (hamburger + search) -->
+
+      <!-- MOBILE CONTROLS -->
       <div class="mobile-controls">
         <svg class="mobile-search-icon" viewBox="0 0 24 24" id="mobileSearchIcon">
           <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
@@ -867,24 +786,10 @@
         </button>
       </div>
     </div>
-
-    <!-- Navigation row -->
-    <div class="nav-row">
-      <a href="index.html" class="compact-logo" id="compactLogo">The Alamin Gazette</a>
-      <div class="nav-strip" id="navStrip">
-        <button class="nav-btn active" data-cat="">All</button>
-        <button class="nav-btn" data-cat="World Affairs">World Affairs</button>
-        <button class="nav-btn" data-cat="Economy & Markets">Economy</button>
-        <button class="nav-btn" data-cat="Innovation">Innovation</button>
-        <button class="nav-btn" data-cat="Defense & Security">Defense</button>
-        <button class="nav-btn" data-cat="Society">Society</button>
-      </div>
-      <a href="admin.html" class="compact-admin">Admin</a>
-    </div>
   </div>
 </header>
 
-<!-- Mobile menu overlay + panel -->
+<!-- Mobile slide menu -->
 <div class="menu-overlay" id="menuOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <div class="menu-header">
@@ -906,20 +811,12 @@
 </div>
 
 <main class="page">
-  <div class="section-head">
-    <span class="section-head-label">Top Stories</span>
-    <span class="section-head-rule"></span>
-  </div>
+  <div class="section-head"><span class="section-head-label">Top Stories</span><span class="section-head-rule"></span></div>
   <div id="heroZone"><div class="empty-state">Loading intelligence...</div></div>
   <hr class="divider" style="margin:36px 0 0;">
-  <div class="section-head">
-    <span class="section-head-label">Intelligence Feed</span>
-    <span class="section-head-rule"></span>
-  </div>
+  <div class="section-head"><span class="section-head-label">Intelligence Feed</span><span class="section-head-rule"></span></div>
   <div class="feed" id="feedZone"></div>
-  <div class="load-more-row" id="loadMoreRow" style="display:none;">
-    <button class="load-more-btn" id="loadMoreBtn">Load More Stories</button>
-  </div>
+  <div class="load-more-row" id="loadMoreRow" style="display:none;"><button class="load-more-btn" id="loadMoreBtn">Load More Stories</button></div>
 </main>
 
 <footer class="site-footer">
@@ -938,7 +835,6 @@
   const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  document.getElementById('headerDate').innerText = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
   let allPosts = [], filtered = [], feedOffset = 0, activeCat = '', isLoading = false;
   function chipClass(c) { const m={'World Affairs':'chip-world','Economy & Markets':'chip-economy','Innovation':'chip-innovation','Defense & Security':'chip-defense','Society':'chip-society'}; return m[c]||'chip-default'; }
@@ -956,7 +852,7 @@
   document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>setCategory(b.dataset.cat,b)));
   document.querySelectorAll('[data-cat]').forEach(el=>{if(el.tagName==='A')el.addEventListener('click',(e)=>{e.preventDefault(); setCategory(el.dataset.cat,null);});});
   document.getElementById('loadMoreBtn')?.addEventListener('click',loadMore);
-  let ticking=false; window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(()=>{const scrolled=window.scrollY>50; document.getElementById('masthead').classList.toggle('compacted',scrolled); ticking=false;}); ticking=true;}},{passive:true});
+  let ticking=false; window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(()=>{const scrolled=window.scrollY>20; document.getElementById('masthead').classList.toggle('scrolled',scrolled); ticking=false;}); ticking=true;}},{passive:true});
   const hamburger=document.getElementById('hamburgerBtn'), mobileMenu=document.getElementById('mobileMenu'), overlay=document.getElementById('menuOverlay'), closeBtn=document.getElementById('closeMenuBtn');
   function openMenu(){mobileMenu.classList.add('open');overlay.classList.add('active');document.body.classList.add('menu-open');}
   function closeMenu(){mobileMenu.classList.remove('open');overlay.classList.remove('active');document.body.classList.remove('menu-open');}
