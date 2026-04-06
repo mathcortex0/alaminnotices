@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ---------- RESET & VARIABLES ---------- */
     * {
       margin: 0;
       padding: 0;
@@ -30,7 +29,6 @@
       --ui: 'DM Sans', system-ui, sans-serif;
       
       --header-height: 64px;
-      --transition: 0.2s ease;
     }
 
     html {
@@ -52,61 +50,58 @@
       text-decoration: none;
     }
 
-    /* ---------- MASTHEAD: ULTRA COMPACT, LEFT LOGO ---------- */
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* ---------- MASTHEAD: LOGO + NAME IN STRAIGHT LINE LEFT ---------- */
     .masthead {
       background: var(--paper);
+      border-bottom: 1px solid var(--rule);
       position: sticky;
       top: 0;
       z-index: 100;
       width: 100%;
-      border-bottom: 1px solid var(--rule);
-      transition: box-shadow var(--transition);
-    }
-
-    .masthead.scrolled {
-      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
     }
 
     .masthead-inner {
       max-width: 1400px;
       margin: 0 auto;
       padding: 0 28px;
-    }
-
-    /* SINGLE ROW HEADER: logo left, nav center, utils right */
-    .header-row {
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: var(--header-height);
-      gap: 24px;
     }
 
-    /* LEFT: BIG LOGO (no tagline, no extra words) */
-    .logo-area {
-      flex-shrink: 0;
+    /* LEFT: logo + name in straight horizontal line */
+    .masthead-brand {
       display: flex;
       align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
     }
 
-    .logo-img {
-      height: 38px;
+    .brand-logo-img {
+      height: 34px;
       width: auto;
-      transition: height var(--transition);
       display: block;
     }
 
-    .logo-wordmark {
+    .brand-name {
       font-family: var(--serif);
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       font-weight: 900;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
       color: var(--ink);
       line-height: 1;
-      white-space: nowrap;
     }
 
-    /* CENTER: NAVIGATION (compact, horizontal) */
+    /* CENTER: NAVIGATION */
     .nav-center {
       flex: 1;
       display: flex;
@@ -150,7 +145,7 @@
       border-bottom-color: var(--crimson);
     }
 
-    /* RIGHT: UTILITIES (admin + search) */
+    /* RIGHT: UTILITIES */
     .util-group {
       display: flex;
       align-items: center;
@@ -182,7 +177,7 @@
       color: var(--ink-2);
     }
 
-    /* ----- MOBILE CONTROLS (hidden on desktop) ----- */
+    /* MOBILE CONTROLS */
     .mobile-controls {
       display: none;
       align-items: center;
@@ -217,7 +212,7 @@
       cursor: pointer;
     }
 
-    /* ----- MOBILE SLIDE MENU ----- */
+    /* MOBILE SLIDE MENU */
     .mobile-menu {
       position: fixed;
       top: 0;
@@ -262,7 +257,7 @@
       border-bottom: 1px solid var(--rule);
     }
 
-    .menu-header .logo-wordmark {
+    .menu-header .brand-name {
       font-size: 1.2rem;
     }
 
@@ -315,7 +310,7 @@
       overflow: hidden;
     }
 
-    /* ---------- PAGE CONTENT (stable, professional) ---------- */
+    /* ---------- PAGE CONTENT ---------- */
     .page {
       max-width: 1300px;
       margin: 0 auto;
@@ -479,6 +474,55 @@
       align-items: center;
     }
 
+    .chip {
+      font-family: var(--ui);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .chip-world { background: #0b1927; color: #9ab0c8; }
+    .chip-economy { background: #0e3d27; color: #8ec8a8; }
+    .chip-innovation { background: #0a3d78; color: #90b8e8; }
+    .chip-defense { background: #3d0e1a; color: #c89098; }
+    .chip-society { background: #3d3000; color: #c8b870; }
+    .chip-default { background: #1a1a1a; color: #aaa; }
+    .chip-breaking {
+      background: var(--crimson);
+      color: #fff;
+      animation: pulse-chip 2s ease-in-out infinite;
+      margin-right: 5px;
+    }
+
+    @keyframes pulse-chip {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .share-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--ui);
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--ink-3);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 0;
+    }
+
+    .share-btn:hover {
+      color: var(--crimson);
+    }
+
     .feed {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -527,26 +571,6 @@
       margin-bottom: 8px;
     }
 
-    .share-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: var(--ui);
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--ink-3);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 0;
-    }
-
-    .share-btn:hover {
-      color: var(--crimson);
-    }
-
     .load-more-row {
       text-align: center;
       padding: 44px 0;
@@ -576,7 +600,7 @@
       background: var(--navy);
       color: #8898a8;
       margin-top: 70px;
-      padding: 48px 28px 28px;
+      padding: 48px 28px 32px;
     }
 
     .footer-inner {
@@ -684,9 +708,6 @@
       .masthead-inner {
         padding: 0 16px;
       }
-      .header-row {
-        gap: 12px;
-      }
       .nav-center {
         display: none;
       }
@@ -696,11 +717,11 @@
       .mobile-controls {
         display: flex;
       }
-      .logo-img {
-        height: 32px;
+      .brand-logo-img {
+        height: 28px;
       }
-      .logo-wordmark {
-        font-size: 1.2rem;
+      .brand-name {
+        font-size: 1rem;
       }
       .hero-stack {
         flex-direction: column;
@@ -728,63 +749,56 @@
     }
 
     @media (max-width: 480px) {
-      .logo-wordmark {
-        font-size: 1rem;
+      .brand-name {
+        font-size: 0.9rem;
       }
-      .logo-img {
-        height: 28px;
-      }
-      .header-row {
-        height: 56px;
+      .brand-logo-img {
+        height: 24px;
       }
     }
   </style>
 </head>
 <body>
 
-<header class="masthead" id="masthead">
+<header class="masthead">
   <div class="masthead-inner">
-    <!-- Single row: left logo, center nav, right utils -->
-    <div class="header-row">
-      <!-- LEFT: BIG LOGO (no tagline, no extra words) -->
-      <div class="logo-area">
-        <a href="index.html" style="display: flex; align-items: center;">
-          <img src="images/lol.png" class="logo-img" alt="The Alamin Gazette" onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='block';">
-          <span class="logo-wordmark" id="fallbackLogo" style="display:none;">The Alamin Gazette</span>
-        </a>
-      </div>
+    <!-- LEFT: logo + name in straight horizontal line -->
+    <div class="masthead-brand">
+      <img src="images/lol.png" class="brand-logo-img" alt="The Alamin Gazette" 
+           onerror="this.style.display='none';document.getElementById('fallbackBrandName').style.display='inline-block';">
+      <span class="brand-name" id="fallbackBrandName" style="display:none;">The Alamin Gazette</span>
+    </div>
 
-      <!-- CENTER: NAVIGATION (compact) -->
-      <div class="nav-center">
-        <div class="nav-strip" id="navStrip">
-          <button class="nav-btn active" data-cat="">All</button>
-          <button class="nav-btn" data-cat="World Affairs">World Affairs</button>
-          <button class="nav-btn" data-cat="Economy & Markets">Economy</button>
-          <button class="nav-btn" data-cat="Innovation">Innovation</button>
-          <button class="nav-btn" data-cat="Defense & Security">Defense</button>
-          <button class="nav-btn" data-cat="Society">Society</button>
-        </div>
+    <!-- CENTER: NAVIGATION -->
+    <div class="nav-center">
+      <div class="nav-strip" id="navStrip">
+        <button class="nav-btn active" data-cat="">All</button>
+        <button class="nav-btn" data-cat="World Affairs">World Affairs</button>
+        <button class="nav-btn" data-cat="Economy & Markets">Economy</button>
+        <button class="nav-btn" data-cat="Innovation">Innovation</button>
+        <button class="nav-btn" data-cat="Defense & Security">Defense</button>
+        <button class="nav-btn" data-cat="Society">Society</button>
       </div>
+    </div>
 
-      <!-- RIGHT: UTILITIES -->
-      <div class="util-group">
-        <a href="admin.html" class="util-link">Admin</a>
-        <svg class="search-icon" viewBox="0 0 24 24" id="desktopSearchIcon">
-          <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
-          <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-linecap="round"/>
-        </svg>
-      </div>
+    <!-- RIGHT: UTILITIES -->
+    <div class="util-group">
+      <a href="admin.html" class="util-link">Admin</a>
+      <svg class="search-icon" viewBox="0 0 24 24" id="desktopSearchIcon">
+        <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
+        <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-linecap="round"/>
+      </svg>
+    </div>
 
-      <!-- MOBILE CONTROLS -->
-      <div class="mobile-controls">
-        <svg class="mobile-search-icon" viewBox="0 0 24 24" id="mobileSearchIcon">
-          <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
-          <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-linecap="round"/>
-        </svg>
-        <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+    <!-- MOBILE CONTROLS -->
+    <div class="mobile-controls">
+      <svg class="mobile-search-icon" viewBox="0 0 24 24" id="mobileSearchIcon">
+        <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" fill="none"/>
+        <line x1="16" y1="16" x2="22" y2="22" stroke="currentColor" stroke-linecap="round"/>
+      </svg>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
@@ -793,7 +807,7 @@
 <div class="menu-overlay" id="menuOverlay"></div>
 <div class="mobile-menu" id="mobileMenu">
   <div class="menu-header">
-    <span class="logo-wordmark">The Alamin Gazette</span>
+    <span class="brand-name">The Alamin Gazette</span>
     <button class="close-menu" id="closeMenuBtn">×</button>
   </div>
   <div class="menu-nav" id="mobileNavList">
@@ -811,24 +825,53 @@
 </div>
 
 <main class="page">
-  <div class="section-head"><span class="section-head-label">Top Stories</span><span class="section-head-rule"></span></div>
+  <div class="section-head">
+    <span class="section-head-label">Top Stories</span>
+    <span class="section-head-rule"></span>
+  </div>
   <div id="heroZone"><div class="empty-state">Loading intelligence...</div></div>
+
   <hr class="divider" style="margin:36px 0 0;">
-  <div class="section-head"><span class="section-head-label">Intelligence Feed</span><span class="section-head-rule"></span></div>
+
+  <div class="section-head">
+    <span class="section-head-label">Intelligence Feed</span>
+    <span class="section-head-rule"></span>
+  </div>
   <div class="feed" id="feedZone"></div>
-  <div class="load-more-row" id="loadMoreRow" style="display:none;"><button class="load-more-btn" id="loadMoreBtn">Load More Stories</button></div>
+
+  <div class="load-more-row" id="loadMoreRow" style="display:none;">
+    <button class="load-more-btn" id="loadMoreBtn">Load More Stories</button>
+  </div>
 </main>
 
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-grid">
-      <div class="footer-brand"><p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p></div>
-      <div class="footer-col"><h5>Sections</h5><a href="#" data-cat="World Affairs">World Affairs</a><a href="#" data-cat="Economy & Markets">Economy</a><a href="#" data-cat="Innovation">Innovation</a><a href="#" data-cat="Defense & Security">Defense</a><a href="#" data-cat="Society">Society</a></div>
-      <div class="footer-col"><h5>The Gazette</h5><a href="#">About</a><a href="#">Standards</a><a href="admin.html">Admin</a></div>
+      <div class="footer-brand">
+        <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Sections</h5>
+        <a href="#" data-cat="World Affairs">World Affairs</a>
+        <a href="#" data-cat="Economy & Markets">Economy</a>
+        <a href="#" data-cat="Innovation">Innovation</a>
+        <a href="#" data-cat="Defense & Security">Defense</a>
+        <a href="#" data-cat="Society">Society</a>
+      </div>
+      <div class="footer-col">
+        <h5>The Gazette</h5>
+        <a href="#">About</a>
+        <a href="#">Standards</a>
+        <a href="admin.html">Admin</a>
+      </div>
     </div>
-    <div class="footer-bottom"><span>© 2025 The Alamin Gazette. All rights reserved.</span><span>Supabase · Intelligence</span></div>
+    <div class="footer-bottom">
+      <span>© 2025 The Alamin Gazette. All rights reserved.</span>
+      <span>Supabase · Intelligence</span>
+    </div>
   </div>
 </footer>
+
 <div class="toast" id="toastMsg"></div>
 
 <script>
@@ -836,30 +879,119 @@
   const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+  const PAGE = 12;
   let allPosts = [], filtered = [], feedOffset = 0, activeCat = '', isLoading = false;
-  function chipClass(c) { const m={'World Affairs':'chip-world','Economy & Markets':'chip-economy','Innovation':'chip-innovation','Defense & Security':'chip-defense','Society':'chip-society'}; return m[c]||'chip-default'; }
-  function teaser(p,n) { const t=(p.excerpt||p.content||'').replace(/<[^>]+>/g,''); return t.length>n?t.slice(0,n).trim()+'…':t; }
-  function timeAgo(iso) { const d=Date.now()-new Date(iso).getTime(), m=Math.floor(d/60000); if(m<1)return'Just now'; if(m<60)return m+'m ago'; const h=Math.floor(m/60); if(h<24)return h+'h ago'; const d2=Math.floor(h/24); return d2<7?d2+'d ago':new Date(iso).toLocaleDateString(); }
-  function articleURL(slug){return'article.html?id='+slug;}
-  function escapeHtml(s){if(!s)return'';return s.replace(/[&<>]/g,function(m){if(m==='&')return'&amp;';if(m==='<')return'&lt;';if(m==='>')return'&gt;';return m;});}
-  function showToast(m){const t=document.getElementById('toastMsg');t.innerText=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-  function renderHero(posts){const el=document.getElementById('heroZone');if(!posts.length){el.innerHTML='<div class="empty-state">No stories found.</div>';return;} const lead=posts[0],cards=posts.slice(1,3); el.innerHTML=`<div class="hero"><div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'"><img class="hero-lead-img" src="${lead.image_url||'https://placehold.co/900x560/0b1927/3a5878?text=Gazette'}" alt=""><div class="hero-lead-scrim"></div><div class="hero-lead-body"><div><span class="chip chip-${lead.breaking?'breaking':chipClass(lead.category)}">${lead.breaking?'BREAKING':(lead.category||'World')}</span></div><h2>${escapeHtml(lead.title)}</h2><p class="hero-excerpt">${escapeHtml(teaser(lead,200))}</p><div class="hero-byline"><span>${lead.author||'Alamin Gazette'} · ${timeAgo(lead.created_at)}</span><button class="share-btn" onclick="event.stopPropagation();navigator.clipboard?.writeText(location.origin+'/'+articleURL('${lead.slug}')).then(()=>showToast('Link copied'))"> Share</button></div></div></div><div class="hero-stack">${cards.map(p=>`<div class="hero-card" onclick="location.href='${articleURL(p.slug)}'"><img class="hero-card-img" src="${p.image_url||'https://placehold.co/600x280/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy"><div><span class="chip chip-${p.breaking?'breaking':chipClass(p.category)}">${p.breaking?'BREAKING':(p.category||'World')}</span></div><h3>${escapeHtml(p.title)}</h3><p class="card-excerpt">${escapeHtml(teaser(p,110))}</p><div class="card-meta"><span>${p.author||'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="event.stopPropagation();navigator.clipboard?.writeText(location.origin+'/'+articleURL('${p.slug}')).then(()=>showToast('Link copied'))"> Share</button></div></div>`).join('')}</div></div>`; }
-  function renderFeed(posts,append=false){const el=document.getElementById('feedZone');const html=posts.map(p=>`<div class="feed-item" onclick="location.href='${articleURL(p.slug)}'"><img class="feed-item-img" src="${p.image_url||'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy"><div><span class="chip chip-${p.breaking?'breaking':chipClass(p.category)}">${p.breaking?'BREAKING':(p.category||'World')}</span></div><h3>${escapeHtml(p.title)}</h3><p class="item-excerpt">${escapeHtml(teaser(p,140))}</p><div class="card-meta"><span>${p.author||'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="event.stopPropagation();navigator.clipboard?.writeText(location.origin+'/'+articleURL('${p.slug}')).then(()=>showToast('Link copied'))"> Share</button></div></div>`).join(''); if(append)el.insertAdjacentHTML('beforeend',html); else el.innerHTML=html; }
-  async function loadPosts(){const{data,error}=await sb.from('posts').select('*').eq('is_published',true).order('created_at',{ascending:false}); if(error||!data){document.getElementById('heroZone').innerHTML='<div class="empty-state">Unable to load stories.</div>';return;} allPosts=data.sort((a,b)=>(b.breaking?1:0)-(a.breaking?1:0)||new Date(b.created_at)-new Date(a.created_at)); applyFilter();}
-  function applyFilter(){filtered=activeCat?allPosts.filter(p=>p.category===activeCat):[...allPosts]; renderHero(filtered.slice(0,3)); feedOffset=12; renderFeed(filtered.slice(3,3+12)); document.getElementById('loadMoreRow').style.display=filtered.length>3+12?'block':'none';}
-  function setCategory(cat,btn){activeCat=cat; document.querySelectorAll('.nav-btn').forEach(b=>{if(b.dataset.cat===cat)b.classList.add('active');else b.classList.remove('active');}); applyFilter(); window.scrollTo({top:0,behavior:'smooth'});}
-  async function loadMore(){if(isLoading)return; isLoading=true; const btn=document.getElementById('loadMoreBtn'); btn.innerText='Loading…'; btn.disabled=true; const slice=filtered.slice(3+feedOffset,3+feedOffset+12); renderFeed(slice,true); feedOffset+=12; if(3+feedOffset>=filtered.length)document.getElementById('loadMoreRow').style.display='none'; else{btn.innerText='Load More Stories'; btn.disabled=false;} isLoading=false;}
-  document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>setCategory(b.dataset.cat,b)));
-  document.querySelectorAll('[data-cat]').forEach(el=>{if(el.tagName==='A')el.addEventListener('click',(e)=>{e.preventDefault(); setCategory(el.dataset.cat,null);});});
-  document.getElementById('loadMoreBtn')?.addEventListener('click',loadMore);
-  let ticking=false; window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(()=>{const scrolled=window.scrollY>20; document.getElementById('masthead').classList.toggle('scrolled',scrolled); ticking=false;}); ticking=true;}},{passive:true});
-  const hamburger=document.getElementById('hamburgerBtn'), mobileMenu=document.getElementById('mobileMenu'), overlay=document.getElementById('menuOverlay'), closeBtn=document.getElementById('closeMenuBtn');
-  function openMenu(){mobileMenu.classList.add('open');overlay.classList.add('active');document.body.classList.add('menu-open');}
-  function closeMenu(){mobileMenu.classList.remove('open');overlay.classList.remove('active');document.body.classList.remove('menu-open');}
-  hamburger?.addEventListener('click',openMenu); closeBtn?.addEventListener('click',closeMenu); overlay?.addEventListener('click',closeMenu);
-  document.querySelectorAll('#mobileNavList a').forEach(link=>{link.addEventListener('click',(e)=>{e.preventDefault(); const cat=link.dataset.cat; setCategory(cat,null); closeMenu();});});
-  document.getElementById('mobileSearchTrigger')?.addEventListener('click',(e)=>{e.preventDefault(); showToast('Search coming soon'); closeMenu();});
-  document.querySelectorAll('.search-icon, .mobile-search-icon').forEach(icon=>{icon.addEventListener('click',()=>showToast('Search interface coming soon'));});
+
+  function chipClass(c) {
+    const map = {
+      'World Affairs': 'chip-world',
+      'Economy & Markets': 'chip-economy',
+      'Innovation': 'chip-innovation',
+      'Defense & Security': 'chip-defense',
+      'Society': 'chip-society'
+    };
+    return map[c] || 'chip-default';
+  }
+
+  function teaser(p, n) {
+    const t = (p.excerpt || p.content || '').replace(/<[^>]+>/g, '');
+    return t.length > n ? t.slice(0, n).trim() + '…' : t;
+  }
+
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'Just now';
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    if (d < 7) return `${d}d ago`;
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function fullDate(iso) {
+    return new Date(iso).toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+    });
+  }
+
+  function articleURL(slug) { return `article.html?id=${slug}`; }
+  function shareIco() { return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`; }
+  function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+  function showToast(msg) { const t = document.getElementById('toastMsg'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+
+  window.doShare = function(e, slug, title) {
+    e.stopPropagation();
+    const url = window.location.origin + '/' + articleURL(slug);
+    if (navigator.share) navigator.share({ title, url });
+    else navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
+  };
+
+  function renderHero(posts) {
+    const el = document.getElementById('heroZone');
+    if (!posts.length) { el.innerHTML = '<div class="empty-state">No stories found.</div>'; return; }
+    const lead = posts[0];
+    const cards = posts.slice(1, 3);
+    el.innerHTML = `<div class="hero"><div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'"><img class="hero-lead-img" src="${lead.image_url || 'https://placehold.co/900x560/0b1927/3a5878?text=Gazette'}" alt=""><div class="hero-lead-scrim"></div><div class="hero-lead-body"><div>${lead.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(lead.category)}">${lead.category || 'World'}</span></div><h2>${escapeHtml(lead.title)}</h2><p class="hero-excerpt">${escapeHtml(teaser(lead, 200))}</p><div class="hero-byline"><span>${lead.author || 'Alamin Gazette'} · ${timeAgo(lead.created_at)}</span><button class="share-btn" onclick="doShare(event,'${lead.slug}','${escapeHtml(lead.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div></div><div class="hero-stack">${cards.map(p => `<div class="hero-card" onclick="location.href='${articleURL(p.slug)}'"><img class="hero-card-img" src="${p.image_url || 'https://placehold.co/600x280/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="card-excerpt">${escapeHtml(teaser(p, 110))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('')}</div></div>`;
+  }
+
+  function renderFeed(posts, append = false) {
+    const el = document.getElementById('feedZone');
+    const html = posts.map(p => `<div class="feed-item" onclick="location.href='${articleURL(p.slug)}'"><img class="feed-item-img" src="${p.image_url || 'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="item-excerpt">${escapeHtml(teaser(p, 140))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('');
+    if (append) el.insertAdjacentHTML('beforeend', html);
+    else el.innerHTML = html;
+  }
+
+  async function loadPosts() {
+    const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
+    if (error || !data) { document.getElementById('heroZone').innerHTML = '<div class="empty-state">Unable to load stories.</div>'; console.error(error); return; }
+    allPosts = data.sort((a, b) => { if (a.breaking && !b.breaking) return -1; if (!a.breaking && b.breaking) return 1; return new Date(b.created_at) - new Date(a.created_at); });
+    applyFilter();
+  }
+
+  function applyFilter() {
+    filtered = activeCat ? allPosts.filter(p => p.category === activeCat) : [...allPosts];
+    renderHero(filtered.slice(0, 3));
+    feedOffset = PAGE;
+    renderFeed(filtered.slice(3, 3 + PAGE));
+    document.getElementById('loadMoreRow').style.display = filtered.length > 3 + PAGE ? 'block' : 'none';
+  }
+
+  function setCategory(cat, btnElement) {
+    activeCat = cat;
+    document.querySelectorAll('.nav-btn').forEach(btn => { if (btn.dataset.cat === cat) btn.classList.add('active'); else btn.classList.remove('active'); });
+    applyFilter();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function loadMore() {
+    if (isLoading) return;
+    isLoading = true;
+    const btn = document.getElementById('loadMoreBtn');
+    btn.textContent = 'Loading…'; btn.disabled = true;
+    await new Promise(r => setTimeout(r, 100));
+    const slice = filtered.slice(3 + feedOffset, 3 + feedOffset + PAGE);
+    renderFeed(slice, true);
+    feedOffset += PAGE;
+    if (3 + feedOffset >= filtered.length) document.getElementById('loadMoreRow').style.display = 'none';
+    else { btn.textContent = 'Load More Stories'; btn.disabled = false; }
+    isLoading = false;
+  }
+
+  document.querySelectorAll('.nav-btn').forEach(btn => { btn.addEventListener('click', () => setCategory(btn.dataset.cat, btn)); });
+  document.querySelectorAll('[data-cat]').forEach(el => { if (el.tagName === 'A') el.addEventListener('click', (e) => { e.preventDefault(); setCategory(el.dataset.cat, null); }); });
+  document.getElementById('loadMoreBtn')?.addEventListener('click', loadMore);
+
+  const hamburger = document.getElementById('hamburgerBtn'), mobileMenu = document.getElementById('mobileMenu'), overlay = document.getElementById('menuOverlay'), closeBtn = document.getElementById('closeMenuBtn');
+  function openMenu() { mobileMenu.classList.add('open'); overlay.classList.add('active'); document.body.classList.add('menu-open'); }
+  function closeMenu() { mobileMenu.classList.remove('open'); overlay.classList.remove('active'); document.body.classList.remove('menu-open'); }
+  hamburger?.addEventListener('click', openMenu); closeBtn?.addEventListener('click', closeMenu); overlay?.addEventListener('click', closeMenu);
+  document.querySelectorAll('#mobileNavList a').forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); const cat = link.dataset.cat; setCategory(cat, null); closeMenu(); }); });
+  document.getElementById('mobileSearchTrigger')?.addEventListener('click', (e) => { e.preventDefault(); showToast('Search coming soon'); closeMenu(); });
+  document.querySelectorAll('.search-icon, .mobile-search-icon').forEach(icon => { icon.addEventListener('click', () => showToast('Search interface coming soon')); });
+
   loadPosts();
 </script>
 </body>
