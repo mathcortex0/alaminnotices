@@ -29,6 +29,8 @@
     a { color: inherit; }
     img { display: block; max-width: 100%; }
 
+
+
     /* ── MASTHEAD ──────────────────────────────── */
     .masthead {
       background: var(--paper);
@@ -36,7 +38,6 @@
       position: sticky;
       top: 0;
       z-index: 90;
-      box-shadow: 0 1px 8px rgba(0,0,0,.05);
       transition: box-shadow .3s;
     }
     .masthead.scrolled {
@@ -47,93 +48,117 @@
       margin: 0 auto;
       padding: 0 28px;
     }
+
+    /* Top row: date | logo | admin — only visible when NOT scrolled */
     .masthead-top {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      padding: 14px 0 12px;
+      padding: 12px 0 10px;
       border-bottom: 1px solid var(--rule);
-      transition: padding .3s;
+      overflow: hidden;
+      max-height: 80px;
+      transition: max-height .35s ease, padding .35s ease, opacity .3s ease;
+      opacity: 1;
     }
     .masthead.scrolled .masthead-top {
-      padding: 7px 0 6px;
+      max-height: 0;
+      padding: 0;
+      opacity: 0;
+      border-bottom-color: transparent;
     }
+
     .masthead-date {
       font-family: var(--ui);
       font-size: 11px;
       color: var(--ink-3);
       letter-spacing: .3px;
-      transition: opacity .3s;
-    }
-    .masthead.scrolled .masthead-date {
-      opacity: 0;
-      pointer-events: none;
     }
     .logo-area { text-align: center; }
-    .logo-img-el {
-      height: 44px;
-      width: auto;
-      margin: 0 auto;
-      transition: height .3s;
-    }
-    .masthead.scrolled .logo-img-el {
-      height: 32px;
-    }
+    .logo-img-el { height: 38px; width: auto; margin: 0 auto; }
     .logo-wordmark {
       font-family: var(--serif);
-      font-size: 1.9rem;
+      font-size: 2rem;
       font-weight: 900;
       letter-spacing: -.5px;
       color: var(--ink);
       line-height: 1;
       text-decoration: none;
       display: block;
-      transition: font-size .3s;
     }
-    .masthead.scrolled .logo-wordmark {
-      font-size: 1.35rem;
+    .logo-tagline {
+      font-family: var(--ui);
+      font-size: 9px;
+      letter-spacing: 2.8px;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-top: 3px;
     }
     .masthead-actions {
       display: flex;
       justify-content: flex-end;
       align-items: center;
       gap: 12px;
-      transition: opacity .3s;
-    }
-    .masthead.scrolled .masthead-actions {
-      opacity: 0;
-      pointer-events: none;
     }
     .pill-btn {
       font-family: var(--ui);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 600;
       letter-spacing: .8px;
       text-transform: uppercase;
       text-decoration: none;
       color: var(--ink-3);
-      padding: 7px 16px;
+      padding: 6px 14px;
       border: 1px solid var(--rule);
       transition: all .2s;
     }
     .pill-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+    /* Compact nav row — always visible */
+    .masthead-nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Compact logo — only shows when scrolled */
+    .compact-logo {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--ink);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 8px 0;
+      max-width: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-width .35s ease, opacity .3s ease, padding .3s ease;
+      margin-right: 0;
+    }
+    .masthead.scrolled .compact-logo {
+      max-width: 220px;
+      opacity: 1;
+      margin-right: 20px;
+      padding: 8px 0;
+    }
 
     /* NAV */
     .nav-strip {
       display: flex;
       overflow-x: auto;
       scrollbar-width: none;
-      gap: 0;
+      flex: 1;
     }
     .nav-strip::-webkit-scrollbar { display: none; }
     .nav-btn {
       font-family: var(--ui);
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 1px;
+      letter-spacing: .9px;
       text-transform: uppercase;
       color: var(--ink-2);
-      padding: 9px 16px;
+      padding: 10px 16px;
       border: none;
       background: none;
       cursor: pointer;
@@ -142,6 +167,23 @@
       transition: all .2s;
     }
     .nav-btn:hover, .nav-btn.active { color: var(--ink); border-bottom-color: var(--crimson); }
+
+    /* Compact admin link — visible when scrolled */
+    .compact-admin {
+      font-family: var(--ui);
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      text-decoration: none;
+      padding: 0 0 0 16px;
+      border-left: 1px solid var(--rule);
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color .2s;
+    }
+    .compact-admin:hover { color: var(--crimson); }
 
     /* ── PAGE LAYOUT ──────────────────────────────── */
     .page { max-width: 1300px; margin: 0 auto; padding: 0 28px; }
@@ -460,26 +502,43 @@
     }
 
     /* ── RESPONSIVE ──────────────────────────────── */
-    @media (max-width: 960px) {
+    @media (max-width: 1024px) {
+      .feed { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; }
       .hero-lead { min-height: 360px; border-right: none; border-bottom: 1px solid var(--rule); }
       .hero-stack { flex-direction: row; }
       .hero-card { border-bottom: none; border-right: 1px solid var(--rule); }
       .hero-card:last-child { border-right: none; }
-      .feed { grid-template-columns: repeat(2,1fr); }
       .footer-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 640px) {
+      /* Header */
+      .masthead-top { grid-template-columns: 1fr; justify-items: center; gap: 4px; }
       .masthead-date, .masthead-actions { display: none; }
-      .masthead-top { grid-template-columns: 1fr; justify-items: center; }
-      .logo-wordmark { font-size: 1.6rem; }
-      .masthead.scrolled .logo-wordmark { font-size: 1.2rem; }
+      .logo-wordmark { font-size: 1.65rem; }
+      .logo-img-el { height: 32px; }
+      .compact-logo { font-size: 1rem; }
+      .nav-btn { padding: 10px 12px; font-size: 10.5px; letter-spacing: .6px; }
+      .compact-admin { display: none; }
+      /* Hero */
       .hero-stack { flex-direction: column; }
       .hero-card { border-right: none; border-bottom: 1px solid var(--rule); }
+      .hero-lead { min-height: 280px; }
+      .hero-lead-body h2 { font-size: 1.3rem; }
+      .hero-lead-body .hero-excerpt { display: none; }
+      /* Feed */
       .feed { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .hero-lead-body h2 { font-size: 1.4rem; }
-      .page { padding: 0 16px; }
+      /* Footer */
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      /* Page */
+      .page { padding: 0 14px; }
+      .section-head { margin: 24px 0 16px; }
+    }
+    @media (max-width: 400px) {
+      .logo-wordmark { font-size: 1.4rem; }
+      .nav-btn { padding: 10px 10px; font-size: 10px; }
     }
   </style>
 </head>
@@ -488,6 +547,7 @@
 <!-- MASTHEAD -->
 <header class="masthead" id="masthead">
   <div class="masthead-inner">
+    <!-- Full header: date + logo + admin (collapses on scroll) -->
     <div class="masthead-top">
       <div class="masthead-date" id="hdr-date"></div>
       <div class="logo-area">
@@ -496,19 +556,25 @@
                onerror="this.style.display='none';document.getElementById('logo-wm').style.display='block';" alt="The Alamin Gazette">
           <span class="logo-wordmark" id="logo-wm" style="display:none;">The Alamin Gazette</span>
         </a>
+        <div class="logo-tagline">Independent · Informed · Indispensable</div>
       </div>
       <div class="masthead-actions">
         <a href="admin.html" class="pill-btn">Admin</a>
       </div>
     </div>
-    <nav class="nav-strip">
-      <button class="nav-btn active" onclick="setCategory(this,'')">All</button>
-      <button class="nav-btn" onclick="setCategory(this,'World Affairs')">World Affairs</button>
-      <button class="nav-btn" onclick="setCategory(this,'Economy & Markets')">Economy</button>
-      <button class="nav-btn" onclick="setCategory(this,'Innovation')">Innovation</button>
-      <button class="nav-btn" onclick="setCategory(this,'Defense & Security')">Defense</button>
-      <button class="nav-btn" onclick="setCategory(this,'Society')">Society</button>
-    </nav>
+    <!-- Nav row: compact logo appears here on scroll -->
+    <div class="masthead-nav-row">
+      <a href="index.html" class="compact-logo" id="compact-logo">The Alamin Gazette</a>
+      <nav class="nav-strip">
+        <button class="nav-btn active" onclick="setCategory(this,'')">All</button>
+        <button class="nav-btn" onclick="setCategory(this,'World Affairs')">World Affairs</button>
+        <button class="nav-btn" onclick="setCategory(this,'Economy & Markets')">Economy</button>
+        <button class="nav-btn" onclick="setCategory(this,'Innovation')">Innovation</button>
+        <button class="nav-btn" onclick="setCategory(this,'Defense & Security')">Defense</button>
+        <button class="nav-btn" onclick="setCategory(this,'Society')">Society</button>
+      </nav>
+      <a href="admin.html" class="compact-admin">Admin</a>
+    </div>
   </div>
 </header>
 
@@ -587,12 +653,6 @@ const PAGE = 12;
 
 let allPosts = [], filtered = [], feedOffset = 0, activeCat = '';
 
-// ── SCROLL: shrink header ──────────────────────────
-window.addEventListener('scroll', () => {
-  document.getElementById('masthead')
-    .classList.toggle('scrolled', window.scrollY > 60);
-});
-
 // ── DATE ───────────────────────────────────────────
 document.getElementById('hdr-date').textContent =
   new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -648,7 +708,6 @@ function doShare(e, slug, title) {
   if (navigator.share) navigator.share({ title, url });
   else navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
 }
-
 // ── HERO ───────────────────────────────────────────
 function renderHero(posts) {
   const el = document.getElementById('hero-zone');
@@ -741,11 +800,13 @@ async function loadPosts() {
     return;
   }
 
+  // Breaking always floats up
   allPosts = data.sort((a, b) =>
     (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) ||
     new Date(b.created_at) - new Date(a.created_at)
   );
 
+  buildTicker(data);
   applyFilter();
 }
 
@@ -778,6 +839,12 @@ function loadMore() {
     btn.textContent = 'Load More Stories'; btn.disabled = false;
   }
 }
+
+
+// ── SCROLL-SHRINK HEADER ──────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('masthead').classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
 
 loadPosts();
 </script>
