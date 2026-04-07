@@ -2,45 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>The Alamin Gazette — World Intelligence</title>
   <meta name="description" content="Independent world intelligence. Breaking news across every continent.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --ink:     #0f0f0f;
-      --ink-2:   #3a3a3a;
-      --ink-3:   #6e6e6e;
-      --paper:   #f9f7f3;
-      --paper-2: #f1ece3;
-      --rule:    #cfc8bb;
-      --navy:    #0b1927;
-      --crimson: #b01428;
-      --serif:   'Playfair Display', Georgia, serif;
-      --prose:   'Source Serif 4', Georgia, serif;
-      --ui:      'DM Sans', system-ui, sans-serif;
-      --hdr:     52px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink: #0f0f0f;
+      --ink-2: #3a3a3a;
+      --ink-3: #6e6e6e;
+      --paper: #f9f7f3;
+      --paper-2: #f1ece3;
+      --rule: #cfc8bb;
+      --navy: #0b1927;
+      --crimson: #b01428;
+      --serif: 'Playfair Display', Georgia, serif;
+      --prose: 'Source Serif 4', Georgia, serif;
+      --ui: 'DM Sans', system-ui, sans-serif;
+      --hdr: 52px;
+    }
+
     body {
       font-family: var(--prose);
       background: var(--paper);
       color: var(--ink);
       line-height: 1.5;
     }
-    a { color: inherit; text-decoration: none; }
-    img { max-width: 100%; display: block; }
 
-    /* ========== SINGLE HEADER — NEVER CHANGES ON SCROLL ========== */
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* ========= HEADER — ZERO JITTER AUTO-HIDE (NYT STYLE) ========= */
     .site-header {
-      position: sticky;
+      position: fixed;
       top: 0;
-      z-index: 100;
+      left: 0;
+      right: 0;
+      z-index: 1000;
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
-      width: 100%;
+      transform: translateY(0);
+      transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      will-change: transform;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+    }
+
+    /* Hidden state — moved completely off-screen, no layout shift */
+    .site-header.header-hidden {
+      transform: translateY(-100%);
     }
 
     .header-container {
@@ -49,7 +73,7 @@
       padding: 0 20px;
     }
 
-    /* Top row: hamburger | logo | search */
+    /* Top row: hamburger + logo + search */
     .header-top {
       height: var(--hdr);
       display: flex;
@@ -76,7 +100,6 @@
       justify-content: flex-end;
     }
 
-    /* Icon buttons */
     .icon-btn {
       background: none;
       border: none;
@@ -90,13 +113,17 @@
       border-radius: 4px;
       transition: background 0.15s, color 0.15s;
     }
+
     .icon-btn:hover {
       background: var(--paper-2);
       color: var(--ink);
     }
 
-    /* Logo */
-    .logo-img { height: 120px; width: auto; }
+    .logo-img {
+      height: 120px;
+      width: auto;
+    }
+
     .logo-text {
       font-family: var(--serif);
       font-size: 1.4rem;
@@ -107,7 +134,7 @@
       white-space: nowrap;
     }
 
-    /* Navigation row (inside header, below top row) */
+    /* Navigation row — inside fixed header */
     .nav-row {
       border-top: 1px solid var(--paper-2);
       padding: 6px 0;
@@ -115,13 +142,18 @@
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
-    .nav-row::-webkit-scrollbar { display: none; }
+
+    .nav-row::-webkit-scrollbar {
+      display: none;
+    }
+
     .nav-links {
       display: flex;
       gap: 4px;
       justify-content: center;
       min-width: min-content;
     }
+
     .nav-link {
       font-family: var(--ui);
       font-size: 11px;
@@ -137,13 +169,14 @@
       white-space: nowrap;
       transition: color 0.15s, border-color 0.15s;
     }
+
     .nav-link:hover,
     .nav-link.active {
       color: var(--ink);
       border-bottom-color: var(--crimson);
     }
 
-    /* ========== SEARCH BAR (slides down) ========== */
+    /* ========= SEARCH PANEL (slides from top, below header) ========= */
     .search-panel {
       position: fixed;
       top: var(--hdr);
@@ -155,16 +188,20 @@
       display: flex;
       gap: 12px;
       align-items: center;
-      z-index: 99;
-      transform: translateY(-100%);
+      z-index: 999;
+      transform: translateY(-120%);
       opacity: 0;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease, opacity 0.18s ease;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+      pointer-events: none;
     }
+
     .search-panel.open {
       transform: translateY(0);
       opacity: 1;
+      pointer-events: auto;
     }
+
     .search-input {
       flex: 1;
       font-family: var(--ui);
@@ -176,9 +213,11 @@
       padding: 10px 14px;
       outline: none;
     }
+
     .search-input:focus {
       border-color: var(--navy);
     }
+
     .search-cancel {
       font-family: var(--ui);
       font-size: 12px;
@@ -189,21 +228,24 @@
       cursor: pointer;
       padding: 8px;
     }
+
     .search-cancel:hover {
       color: var(--crimson);
     }
 
-    /* ========== DRAWER (Hamburger Menu) ========== */
+    /* ========= DRAWER (hamburger menu) ========= */
     .drawer-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.4);
-      z-index: 200;
+      z-index: 2000;
       display: none;
     }
+
     .drawer-overlay.open {
       display: block;
     }
+
     .drawer {
       position: fixed;
       top: 0;
@@ -211,16 +253,18 @@
       bottom: 0;
       width: min(280px, 80vw);
       background: var(--paper);
-      z-index: 201;
+      z-index: 2001;
       transform: translateX(-100%);
       transition: transform 0.25s ease;
       display: flex;
       flex-direction: column;
-      box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
     }
+
     .drawer.open {
       transform: translateX(0);
     }
+
     .drawer-header {
       display: flex;
       align-items: center;
@@ -228,12 +272,14 @@
       padding: 18px 20px;
       border-bottom: 2px solid var(--ink);
     }
+
     .drawer-brand {
       font-family: var(--serif);
       font-size: 1.1rem;
       font-weight: 900;
       color: var(--ink);
     }
+
     .drawer-close-x {
       background: none;
       border: none;
@@ -247,14 +293,17 @@
       border-radius: 4px;
       transition: background 0.15s, color 0.15s;
     }
+
     .drawer-close-x:hover {
       background: var(--paper-2);
       color: var(--crimson);
     }
+
     .drawer-body {
       flex: 1;
       padding: 12px 0;
     }
+
     .drawer-item {
       display: block;
       width: 100%;
@@ -270,19 +319,23 @@
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
     }
+
     .drawer-item:hover {
       background: var(--paper-2);
       color: var(--ink);
     }
+
     .drawer-item.active {
       color: var(--crimson);
       border-left: 3px solid var(--crimson);
-      background: rgba(176,20,40,0.04);
+      background: rgba(176, 20, 40, 0.04);
     }
+
     .drawer-footer {
       padding: 20px 24px;
       border-top: 1px solid var(--rule);
     }
+
     .drawer-admin {
       font-family: var(--ui);
       font-size: 12px;
@@ -292,22 +345,26 @@
       color: var(--ink-3);
       transition: color 0.15s;
     }
+
     .drawer-admin:hover {
       color: var(--crimson);
     }
 
-    /* ========== MAIN CONTENT ========== */
+    /* ========= MAIN CONTENT (add top padding because header is fixed) ========= */
     .page {
       max-width: 1300px;
       margin: 0 auto;
       padding: 0 20px;
+      padding-top: 88px; /* header height approx 52+36 = 88px */
     }
+
     .section-head {
       display: flex;
       align-items: center;
       gap: 12px;
       margin: 32px 0 20px;
     }
+
     .section-label {
       font-family: var(--ui);
       font-size: 9px;
@@ -316,18 +373,20 @@
       text-transform: uppercase;
       color: var(--crimson);
     }
+
     .section-line {
       flex: 1;
       height: 1px;
       background: var(--rule);
     }
+
     .divider {
       border: none;
       border-top: 2px solid var(--ink);
       margin: 32px 0 0;
     }
 
-    /* Chips */
+    /* chips */
     .chip {
       font-family: var(--ui);
       font-size: 9px;
@@ -338,26 +397,63 @@
       border-radius: 2px;
       display: inline-block;
     }
-    .chip-world { background: #0b1927; color: #9ab0c8; }
-    .chip-economy { background: #0e3d27; color: #8ec8a8; }
-    .chip-innovation { background: #0a3d78; color: #90b8e8; }
-    .chip-defense { background: #3d0e1a; color: #c89098; }
-    .chip-society { background: #3d3000; color: #c8b870; }
-    .chip-default { background: #2a2a2a; color: #bbb; }
+
+    .chip-world {
+      background: #0b1927;
+      color: #9ab0c8;
+    }
+
+    .chip-economy {
+      background: #0e3d27;
+      color: #8ec8a8;
+    }
+
+    .chip-innovation {
+      background: #0a3d78;
+      color: #90b8e8;
+    }
+
+    .chip-defense {
+      background: #3d0e1a;
+      color: #c89098;
+    }
+
+    .chip-society {
+      background: #3d3000;
+      color: #c8b870;
+    }
+
+    .chip-default {
+      background: #2a2a2a;
+      color: #bbb;
+    }
+
     .chip-breaking {
       background: var(--crimson);
       color: white;
       animation: blink 2s infinite;
       margin-right: 4px;
     }
-    @keyframes blink { 0%,100%{ opacity: 1; } 50%{ opacity: 0.6; } }
 
-    /* Hero */
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    /* hero */
     .hero {
       display: grid;
       grid-template-columns: 1fr 300px;
       border: 1px solid var(--rule);
     }
+
     .hero-main {
       position: relative;
       overflow: hidden;
@@ -365,6 +461,7 @@
       border-right: 1px solid var(--rule);
       min-height: 460px;
     }
+
     .hero-main-img {
       position: absolute;
       inset: 0;
@@ -373,12 +470,17 @@
       object-fit: cover;
       transition: transform 0.4s;
     }
-    .hero-main:hover .hero-main-img { transform: scale(1.02); }
+
+    .hero-main:hover .hero-main-img {
+      transform: scale(1.02);
+    }
+
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(6,10,18,0.94) 0%, rgba(6,10,18,0.4) 60%, transparent 100%);
+      background: linear-gradient(to top, rgba(6, 10, 18, 0.94) 0%, rgba(6, 10, 18, 0.4) 60%, transparent 100%);
     }
+
     .hero-content {
       position: absolute;
       bottom: 0;
@@ -386,6 +488,7 @@
       right: 0;
       padding: 28px 24px 22px;
     }
+
     .hero-content h2 {
       font-family: var(--serif);
       font-size: 1.8rem;
@@ -394,11 +497,13 @@
       line-height: 1.2;
       margin: 8px 0 10px;
     }
+
     .hero-excerpt {
       font-size: 0.88rem;
       color: #c8c0b0;
       margin-bottom: 12px;
     }
+
     .hero-meta {
       font-family: var(--ui);
       font-size: 10px;
@@ -407,7 +512,12 @@
       justify-content: space-between;
       align-items: center;
     }
-    .hero-stack { display: flex; flex-direction: column; }
+
+    .hero-stack {
+      display: flex;
+      flex-direction: column;
+    }
+
     .hero-side {
       flex: 1;
       padding: 18px;
@@ -415,25 +525,35 @@
       cursor: pointer;
       transition: background 0.15s;
     }
-    .hero-side:last-child { border-bottom: none; }
-    .hero-side:hover { background: var(--paper-2); }
+
+    .hero-side:last-child {
+      border-bottom: none;
+    }
+
+    .hero-side:hover {
+      background: var(--paper-2);
+    }
+
     .hero-side-img {
       width: 100%;
       height: 130px;
       object-fit: cover;
       margin-bottom: 10px;
     }
+
     .hero-side h3 {
       font-family: var(--serif);
       font-size: 1rem;
       font-weight: 700;
       margin: 5px 0;
     }
+
     .side-excerpt {
       font-size: 0.78rem;
       color: var(--ink-2);
       margin-bottom: 8px;
     }
+
     .card-meta {
       font-family: var(--ui);
       font-size: 10px;
@@ -443,13 +563,14 @@
       align-items: center;
     }
 
-    /* Feed Grid */
+    /* feed */
     .feed {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       border-left: 1px solid var(--rule);
       border-top: 1px solid var(--rule);
     }
+
     .feed-item {
       padding: 20px;
       border-right: 1px solid var(--rule);
@@ -457,19 +578,25 @@
       cursor: pointer;
       transition: background 0.15s;
     }
-    .feed-item:hover { background: var(--paper-2); }
+
+    .feed-item:hover {
+      background: var(--paper-2);
+    }
+
     .feed-img {
       width: 100%;
       height: 120px;
       object-fit: cover;
       margin-bottom: 10px;
     }
+
     .feed-item h3 {
       font-family: var(--serif);
       font-size: 0.95rem;
       font-weight: 700;
       margin: 5px 0;
     }
+
     .feed-excerpt {
       font-size: 0.78rem;
       color: var(--ink-2);
@@ -479,6 +606,7 @@
       overflow: hidden;
       margin-bottom: 10px;
     }
+
     .share-btn {
       background: none;
       border: none;
@@ -492,13 +620,17 @@
       gap: 4px;
       text-transform: uppercase;
     }
-    .share-btn:hover { color: var(--crimson); }
+
+    .share-btn:hover {
+      color: var(--crimson);
+    }
 
     .load-more-row {
       text-align: center;
       padding: 40px 0;
       border-top: 1px solid var(--rule);
     }
+
     .load-btn {
       font-family: var(--ui);
       font-size: 11px;
@@ -512,27 +644,38 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .load-btn:hover { background: var(--ink); color: var(--paper); }
-    .load-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* Footer */
+    .load-btn:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .load-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* footer */
     .footer {
       background: var(--navy);
       color: #8898a8;
       margin-top: 60px;
       padding: 48px 20px 28px;
     }
+
     .footer-inner {
       max-width: 1300px;
       margin: 0 auto;
     }
+
     .footer-grid {
       display: grid;
       grid-template-columns: 240px 1fr 1fr 1fr;
       gap: 40px;
       padding-bottom: 36px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
+
     .footer-brand {
       font-family: var(--serif);
       font-size: 1.3rem;
@@ -541,11 +684,13 @@
       display: block;
       margin-bottom: 12px;
     }
+
     .footer-brand p {
       font-size: 0.82rem;
       color: #5a6a7a;
       line-height: 1.5;
     }
+
     .footer-col h5 {
       font-family: var(--ui);
       font-size: 9px;
@@ -555,13 +700,18 @@
       color: #b8c8d8;
       margin-bottom: 16px;
     }
+
     .footer-col a {
       display: block;
       font-size: 13px;
       color: #5a6a7a;
       margin-bottom: 10px;
     }
-    .footer-col a:hover { color: #c8d8e8; }
+
+    .footer-col a:hover {
+      color: #c8d8e8;
+    }
+
     .footer-bottom {
       display: flex;
       justify-content: space-between;
@@ -581,13 +731,18 @@
       font-size: 13px;
       padding: 10px 20px;
       border-radius: 4px;
-      z-index: 300;
+      z-index: 3000;
       opacity: 0;
       transition: all 0.25s;
       pointer-events: none;
       white-space: nowrap;
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -596,37 +751,87 @@
     }
 
     @media (max-width: 860px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-main { min-height: 360px; border-right: none; border-bottom: 1px solid var(--rule); }
-      .hero-stack { flex-direction: row; }
-      .hero-side { border-bottom: none; border-right: 1px solid var(--rule); }
-      .hero-side:last-child { border-right: none; }
-      .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-main {
+        min-height: 360px;
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .hero-stack {
+        flex-direction: row;
+      }
+
+      .hero-side {
+        border-bottom: none;
+        border-right: 1px solid var(--rule);
+      }
+
+      .hero-side:last-child {
+        border-right: none;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+      }
+
+      .page {
+        padding-top: 82px;
+      }
     }
+
     @media (max-width: 640px) {
-      .feed { grid-template-columns: 1fr; }
-      .hero-stack { flex-direction: column; }
-      .hero-side { border-right: none; border-bottom: 1px solid var(--rule); }
-      .hero-main { min-height: 280px; }
-      .hero-content h2 { font-size: 1.3rem; }
-      .logo-text { font-size: 1.1rem; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .nav-links { justify-content: flex-start; }
+      .feed {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stack {
+        flex-direction: column;
+      }
+
+      .hero-side {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .hero-main {
+        min-height: 280px;
+      }
+
+      .hero-content h2 {
+        font-size: 1.3rem;
+      }
+
+      .logo-text {
+        font-size: 1.1rem;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- SINGLE HEADER — NEVER CHANGES ON SCROLL -->
-<header class="site-header">
+<!-- FIXED HEADER — ZERO JITTER AUTO-HIDE -->
+<header class="site-header" id="siteHeader">
   <div class="header-container">
     <div class="header-top">
       <div class="header-left">
         <button class="icon-btn" id="hamburgerBtn" aria-label="Menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
       </div>
@@ -639,7 +844,8 @@
       <div class="header-right">
         <button class="icon-btn" id="searchIconBtn" aria-label="Search">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </button>
       </div>
@@ -659,18 +865,19 @@
 
 <!-- SEARCH PANEL -->
 <div class="search-panel" id="searchPanel">
-  <input type="text" class="search-input" id="searchInput" placeholder="Search articles..." onkeydown="if(event.key==='Escape')closeSearch()">
-  <button class="search-cancel" onclick="closeSearch()">Cancel</button>
+  <input type="text" class="search-input" id="searchInput" placeholder="Search articles..." autocomplete="off">
+  <button class="search-cancel" id="searchCancelBtn">Cancel</button>
 </div>
 
-<!-- DRAWER (Hamburger Menu) with X close button only -->
+<!-- DRAWER -->
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
     <span class="drawer-brand">The Alamin Gazette</span>
     <button class="drawer-close-x" id="drawerCloseBtn" aria-label="Close">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
       </svg>
     </button>
   </div>
@@ -689,7 +896,7 @@
 
 <main class="page">
   <div class="section-head"><span class="section-label">TOP STORIES</span><span class="section-line"></span></div>
-  <div id="heroZone"><div class="empty-state">Loading...</div></div>
+  <div id="heroZone"><div class="empty-state">Loading intelligence ...</div></div>
   <hr class="divider">
   <div class="section-head"><span class="section-label">LATEST</span><span class="section-line"></span></div>
   <div class="feed" id="feedZone"></div>
@@ -715,210 +922,290 @@
 <div class="toast" id="toastMsg"></div>
 
 <script>
-// Supabase
-const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const PAGE_SIZE = 12;
+  // SUPABASE CONFIG
+  const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const PAGE_SIZE = 12;
 
-let allPosts = [];
-let filteredPosts = [];
-let feedOffset = 0;
-let activeCategory = '';
+  let allPosts = [];
+  let filteredPosts = [];
+  let feedOffset = 0;
+  let activeCategory = '';
 
-// DOM elements
-const heroZone = document.getElementById('heroZone');
-const feedZone = document.getElementById('feedZone');
-const loadRow = document.getElementById('loadMoreRow');
-const loadBtn = document.getElementById('loadMoreBtn');
+  // DOM
+  const heroZone = document.getElementById('heroZone');
+  const feedZone = document.getElementById('feedZone');
+  const loadRow = document.getElementById('loadMoreRow');
+  const loadBtn = document.getElementById('loadMoreBtn');
+  const siteHeader = document.getElementById('siteHeader');
 
-// Helper functions
-function getChipClass(cat) {
-  const map = {
-    'World Affairs': 'chip-world',
-    'Economy & Markets': 'chip-economy',
-    'Innovation': 'chip-innovation',
-    'Defense & Security': 'chip-defense',
-    'Society': 'chip-society'
-  };
-  return map[cat] || 'chip-default';
-}
+  // ========== ZERO JITTER AUTO-HIDE HEADER (NYT STYLE) ==========
+  let lastScrollPosition = 0;
+  let ticking = false;
+  const SCROLL_THRESHOLD_DOWN = 8;    // tiny buffer to avoid micro-jitter
+  const SCROLL_THRESHOLD_UP = 5;
+  const TOP_SAFE_ZONE = 65;            // always show header near top
 
-function truncate(text, len) {
-  if (!text) return '';
-  const plain = text.replace(/<[^>]+>/g, '');
-  return plain.length > len ? plain.slice(0, len).trim() + '…' : plain;
-}
+  function handleScroll() {
+    const currentScrollY = window.scrollY;
+    const scrollDelta = currentScrollY - lastScrollPosition;
 
-function timeAgo(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
+    // Always show header when near the very top (no jitter)
+    if (currentScrollY <= TOP_SAFE_ZONE) {
+      siteHeader.classList.remove('header-hidden');
+      lastScrollPosition = currentScrollY;
+      ticking = false;
+      return;
+    }
 
-function articleUrl(slug) { return `article.html?id=${slug}`; }
+    // Scrolling down & past threshold -> hide header
+    if (scrollDelta > SCROLL_THRESHOLD_DOWN && !siteHeader.classList.contains('header-hidden')) {
+      siteHeader.classList.add('header-hidden');
+    }
+    // Scrolling up & past threshold -> show header
+    else if (scrollDelta < -SCROLL_THRESHOLD_UP && siteHeader.classList.contains('header-hidden')) {
+      siteHeader.classList.remove('header-hidden');
+    }
 
-function shareArticle(event, slug, title) {
-  event.stopPropagation();
-  const url = `${window.location.origin}/article.html?id=${slug}`;
-  if (navigator.share) navigator.share({ title, url });
-  else navigator.clipboard.writeText(url).then(() => showToast('Link copied'));
-}
-
-function showToast(msg) {
-  const toast = document.getElementById('toastMsg');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
-}
-
-function renderChips(post) {
-  let html = '';
-  if (post.breaking) html += '<span class="chip chip-breaking">Breaking</span>';
-  html += `<span class="chip ${getChipClass(post.category)}">${post.category || 'World'}</span>`;
-  return html;
-}
-
-// Render hero (top 3 stories)
-function renderHero(posts) {
-  if (!posts.length) { heroZone.innerHTML = '<div class="empty-state">No stories found</div>'; return; }
-  const main = posts[0];
-  const sides = posts.slice(1, 3);
-  heroZone.innerHTML = `
-    <div class="hero">
-      <div class="hero-main" onclick="location.href='${articleUrl(main.slug)}'">
-        <img class="hero-main-img" src="${main.image_url || 'https://placehold.co/900x460/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/900x460/0b1927/3a5878?text=Gazette'" alt="">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-          <div>${renderChips(main)}</div>
-          <h2>${main.title}</h2>
-          <div class="hero-excerpt">${truncate(main.excerpt || main.content, 160)}</div>
-          <div class="hero-meta"><span>${main.author || 'Alamin Gazette'} · ${timeAgo(main.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${main.slug}','${main.title.replace(/'/g, "\\'")}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button></div>
-        </div>
-      </div>
-      <div class="hero-stack">
-        ${sides.map(p => `
-          <div class="hero-side" onclick="location.href='${articleUrl(p.slug)}'">
-            <img class="hero-side-img" src="${p.image_url || 'https://placehold.co/600x260/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/600x260/0b1927/3a5878?text=Gazette'" alt="">
-            <div>${renderChips(p)}</div>
-            <h3>${p.title}</h3>
-            <div class="side-excerpt">${truncate(p.excerpt || p.content, 95)}</div>
-            <div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${p.slug}','${p.title.replace(/'/g, "\\'")}')">Share</button></div>
-          </div>
-        `).join('')}
-      </div>
-    </div>`;
-}
-
-function renderFeed(posts, append = false) {
-  if (!posts.length && !append) { feedZone.innerHTML = '<div class="empty-state">No more stories</div>'; return; }
-  const html = posts.map(p => `
-    <div class="feed-item" onclick="location.href='${articleUrl(p.slug)}'">
-      <img class="feed-img" src="${p.image_url || 'https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'}" onerror="this.src='https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
-      <div>${renderChips(p)}</div>
-      <h3>${p.title}</h3>
-      <div class="feed-excerpt">${truncate(p.excerpt || p.content, 120)}</div>
-      <div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${p.slug}','${p.title.replace(/'/g, "\\'")}')">Share</button></div>
-    </div>
-  `).join('');
-  if (append) feedZone.innerHTML += html;
-  else feedZone.innerHTML = html;
-}
-
-function applyFilter(category) {
-  if (category !== undefined) activeCategory = category;
-  filteredPosts = activeCategory ? allPosts.filter(p => p.category === activeCategory) : [...allPosts];
-  renderHero(filteredPosts.slice(0, 3));
-  feedOffset = 8;
-  renderFeed(filteredPosts.slice(3, 3 + 8));
-  const hasMore = filteredPosts.length > 3 + 8;
-  loadRow.style.display = hasMore ? 'block' : 'none';
-  if (hasMore) { loadBtn.disabled = false; loadBtn.textContent = 'Load More Stories'; }
-}
-
-function loadMore() {
-  const start = 3 + feedOffset;
-  const nextBatch = filteredPosts.slice(start, start + PAGE_SIZE);
-  if (nextBatch.length) {
-    renderFeed(nextBatch, true);
-    feedOffset += PAGE_SIZE;
+    lastScrollPosition = currentScrollY;
+    ticking = false;
   }
-  if (3 + feedOffset >= filteredPosts.length) loadRow.style.display = 'none';
-  else { loadBtn.disabled = false; loadBtn.textContent = 'Load More Stories'; }
-}
 
-// Fetch posts
-async function loadPosts() {
-  heroZone.innerHTML = '<div class="empty-state">Loading stories...</div>';
-  const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
-  if (error) { heroZone.innerHTML = `<div class="empty-state">Error: ${error.message}</div>`; return; }
-  if (!data || !data.length) { heroZone.innerHTML = '<div class="empty-state">No published stories yet.</div>'; return; }
-  allPosts = data.sort((a,b) => (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) || new Date(b.created_at) - new Date(a.created_at));
-  applyFilter('');
-}
+  function onScrollHandler() {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        handleScroll();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
 
-// Navigation & Drawer
-function setActiveNav(cat) {
-  document.querySelectorAll('.nav-link').forEach(btn => {
-    if (btn.dataset.cat === cat || (!cat && btn.dataset.cat === '')) btn.classList.add('active');
-    else btn.classList.remove('active');
-  });
-  document.querySelectorAll('.drawer-item').forEach(btn => {
-    if (btn.dataset.cat === cat || (!cat && btn.dataset.cat === '')) btn.classList.add('active');
-    else btn.classList.remove('active');
-  });
-}
+  window.addEventListener('scroll', onScrollHandler, { passive: true });
 
-function handleCategorySelect(cat) {
-  setActiveNav(cat);
-  applyFilter(cat);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  closeDrawer();
-  closeSearch();
-}
+  // Helper functions
+  function getChipClass(cat) {
+    const map = {
+      'World Affairs': 'chip-world',
+      'Economy & Markets': 'chip-economy',
+      'Innovation': 'chip-innovation',
+      'Defense & Security': 'chip-defense',
+      'Society': 'chip-society'
+    };
+    return map[cat] || 'chip-default';
+  }
 
-// Drawer
-function openDrawer() { document.getElementById('drawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('open'); document.body.style.overflow = 'hidden'; }
-function closeDrawer() { document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+  function truncate(text, len) {
+    if (!text) return '';
+    const plain = text.replace(/<[^>]+>/g, '');
+    return plain.length > len ? plain.slice(0, len).trim() + '…' : plain;
+  }
 
-// Search
-function openSearch() { document.getElementById('searchPanel').classList.add('open'); document.getElementById('searchInput').focus(); }
-function closeSearch() { document.getElementById('searchPanel').classList.remove('open'); document.getElementById('searchInput').value = ''; applyFilter(activeCategory); }
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
 
-function doSearch() {
-  const term = document.getElementById('searchInput').value.trim().toLowerCase();
-  if (!term) { applyFilter(activeCategory); return; }
-  const results = allPosts.filter(p => p.title.toLowerCase().includes(term) || (p.excerpt || '').toLowerCase().includes(term) || (p.content || '').toLowerCase().includes(term));
-  renderHero(results.slice(0, 3));
-  renderFeed(results.slice(3, 3 + 12));
-  loadRow.style.display = 'none';
-}
+  function articleUrl(slug) {
+    return `article.html?id=${slug}`;
+  }
 
-// Event binding
-document.getElementById('hamburgerBtn').addEventListener('click', openDrawer);
-document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
-document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
-document.getElementById('searchIconBtn').addEventListener('click', openSearch);
-document.getElementById('searchInput').addEventListener('input', doSearch);
-document.getElementById('loadMoreBtn').addEventListener('click', loadMore);
+  function shareArticle(event, slug, title) {
+    event.stopPropagation();
+    const url = `${window.location.origin}/article.html?id=${slug}`;
+    if (navigator.share) navigator.share({ title, url });
+    else navigator.clipboard.writeText(url).then(() => showToast('Link copied'));
+  }
 
-document.querySelectorAll('.nav-link').forEach(btn => {
-  btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat));
-});
-document.querySelectorAll('.drawer-item').forEach(btn => {
-  btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat));
-});
-document.querySelectorAll('.footer-nav-link').forEach(link => {
-  link.addEventListener('click', (e) => { e.preventDefault(); handleCategorySelect(link.dataset.cat); });
-});
+  function showToast(msg) {
+    const toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
 
-loadPosts();
+  function renderChips(post) {
+    let html = '';
+    if (post.breaking) html += '<span class="chip chip-breaking">Breaking</span>';
+    html += `<span class="chip ${getChipClass(post.category)}">${post.category || 'World'}</span>`;
+    return html;
+  }
+
+  function renderHero(posts) {
+    if (!posts.length) {
+      heroZone.innerHTML = '<div class="empty-state">No stories found</div>';
+      return;
+    }
+    const main = posts[0];
+    const sides = posts.slice(1, 3);
+    heroZone.innerHTML = `
+      <div class="hero">
+        <div class="hero-main" onclick="location.href='${articleUrl(main.slug)}'">
+          <img class="hero-main-img" src="${main.image_url || 'https://placehold.co/900x460/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/900x460/0b1927/3a5878?text=Gazette'" alt="">
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div>${renderChips(main)}</div>
+            <h2>${escapeHtml(main.title)}</h2>
+            <div class="hero-excerpt">${truncate(main.excerpt || main.content, 160)}</div>
+            <div class="hero-meta"><span>${main.author || 'Alamin Gazette'} · ${timeAgo(main.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${main.slug}','${escapeHtml(main.title).replace(/'/g, "\\'")}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button></div>
+          </div>
+        </div>
+        <div class="hero-stack">
+          ${sides.map(p => `
+            <div class="hero-side" onclick="location.href='${articleUrl(p.slug)}'">
+              <img class="hero-side-img" src="${p.image_url || 'https://placehold.co/600x260/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/600x260/0b1927/3a5878?text=Gazette'" alt="">
+              <div>${renderChips(p)}</div>
+              <h3>${escapeHtml(p.title)}</h3>
+              <div class="side-excerpt">${truncate(p.excerpt || p.content, 95)}</div>
+              <div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">Share</button></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function renderFeed(posts, append = false) {
+    if (!posts.length && !append) {
+      feedZone.innerHTML = '<div class="empty-state">No more stories</div>';
+      return;
+    }
+    const html = posts.map(p => `
+      <div class="feed-item" onclick="location.href='${articleUrl(p.slug)}'">
+        <img class="feed-img" src="${p.image_url || 'https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'}" onerror="this.src='https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
+        <div>${renderChips(p)}</div>
+        <h3>${escapeHtml(p.title)}</h3>
+        <div class="feed-excerpt">${truncate(p.excerpt || p.content, 120)}</div>
+        <div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">Share</button></div>
+      </div>
+    `).join('');
+    if (append) feedZone.innerHTML += html;
+    else feedZone.innerHTML = html;
+  }
+
+  function applyFilter(category) {
+    if (category !== undefined) activeCategory = category;
+    filteredPosts = activeCategory ? allPosts.filter(p => p.category === activeCategory) : [...allPosts];
+    renderHero(filteredPosts.slice(0, 3));
+    feedOffset = 8;
+    renderFeed(filteredPosts.slice(3, 3 + 8));
+    const hasMore = filteredPosts.length > 3 + 8;
+    loadRow.style.display = hasMore ? 'block' : 'none';
+    if (hasMore) {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Load More Stories';
+    }
+  }
+
+  function loadMore() {
+    const start = 3 + feedOffset;
+    const nextBatch = filteredPosts.slice(start, start + PAGE_SIZE);
+    if (nextBatch.length) {
+      renderFeed(nextBatch, true);
+      feedOffset += PAGE_SIZE;
+    }
+    if (3 + feedOffset >= filteredPosts.length) loadRow.style.display = 'none';
+    else {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Load More Stories';
+    }
+  }
+
+  async function loadPosts() {
+    heroZone.innerHTML = '<div class="empty-state">Loading stories...</div>';
+    const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
+    if (error) {
+      heroZone.innerHTML = `<div class="empty-state">Error: ${error.message}</div>`;
+      return;
+    }
+    if (!data || !data.length) {
+      heroZone.innerHTML = '<div class="empty-state">No published stories yet.</div>';
+      return;
+    }
+    allPosts = data.sort((a, b) => (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) || new Date(b.created_at) - new Date(a.created_at));
+    applyFilter('');
+  }
+
+  function setActiveNav(cat) {
+    document.querySelectorAll('.nav-link').forEach(btn => {
+      if (btn.dataset.cat === cat || (!cat && btn.dataset.cat === '')) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+    document.querySelectorAll('.drawer-item').forEach(btn => {
+      if (btn.dataset.cat === cat || (!cat && btn.dataset.cat === '')) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+  }
+
+  function handleCategorySelect(cat) {
+    setActiveNav(cat);
+    applyFilter(cat);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    closeDrawer();
+    closeSearch();
+  }
+
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function openSearch() {
+    document.getElementById('searchPanel').classList.add('open');
+    document.getElementById('searchInput').focus();
+  }
+  function closeSearch() {
+    document.getElementById('searchPanel').classList.remove('open');
+    document.getElementById('searchInput').value = '';
+    applyFilter(activeCategory);
+  }
+  function doSearch() {
+    const term = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (!term) {
+      applyFilter(activeCategory);
+      return;
+    }
+    const results = allPosts.filter(p => p.title.toLowerCase().includes(term) || (p.excerpt || '').toLowerCase().includes(term) || (p.content || '').toLowerCase().includes(term));
+    renderHero(results.slice(0, 3));
+    renderFeed(results.slice(3, 3 + 12));
+    loadRow.style.display = 'none';
+  }
+
+  // event listeners
+  document.getElementById('hamburgerBtn').addEventListener('click', openDrawer);
+  document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
+  document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+  document.getElementById('searchIconBtn').addEventListener('click', openSearch);
+  document.getElementById('searchCancelBtn').addEventListener('click', closeSearch);
+  document.getElementById('searchInput').addEventListener('input', doSearch);
+  loadBtn.addEventListener('click', loadMore);
+  document.querySelectorAll('.nav-link').forEach(btn => btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat)));
+  document.querySelectorAll('.drawer-item').forEach(btn => btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat)));
+  document.querySelectorAll('.footer-nav-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); handleCategorySelect(link.dataset.cat); }));
+
+  loadPosts();
 </script>
 </body>
 </html>
