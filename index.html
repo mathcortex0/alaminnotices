@@ -27,13 +27,13 @@
       --serif: 'Playfair Display', Georgia, serif;
       --prose: 'Source Serif 4', Georgia, serif;
       --ui: 'DM Sans', system-ui, sans-serif;
-      --header-height: 52px;
-      --compact-header-height: 44px;
+      --header-height: 64px;
+      --categories-height: 42px;
     }
 
     html {
       scroll-behavior: smooth;
-      scroll-padding-top: 55px;
+      scroll-padding-top: calc(var(--header-height) + var(--categories-height) + 10px);
     }
 
     body {
@@ -55,59 +55,26 @@
       max-width: 100%;
     }
 
-    /* ---------- MASTER HEADER CONTAINER (NO SHAKE) ---------- */
+    /* ---------- HEADER CONTAINER (NO SHAKE) ---------- */
     .header-container {
       position: sticky;
       top: 0;
       z-index: 100;
       background: var(--paper);
-      border-bottom: 1px solid var(--rule);
+    }
+
+    /* MAIN HEADER ROW: left logo+name, right search+menu */
+    .main-header {
       height: var(--header-height);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      background: var(--paper);
       transition: height 0.2s ease;
     }
 
-    .header-container.compact {
-      height: var(--compact-header-height);
-    }
-
-    /* MAIN HEADER (visible at top) */
-    .main-header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: var(--header-height);
-      display: flex;
-      align-items: center;
-      background: var(--paper);
-      transition: opacity 0.2s ease, visibility 0.2s ease;
-      opacity: 1;
-      visibility: visible;
-    }
-
     .header-container.compact .main-header {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    /* COMPACT HEADER (visible on scroll) */
-    .compact-header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: var(--compact-header-height);
-      display: flex;
-      align-items: center;
-      background: var(--paper);
-      transition: opacity 0.2s ease, visibility 0.2s ease;
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    .header-container.compact .compact-header {
-      opacity: 1;
-      visibility: visible;
+      height: 52px;
     }
 
     .header-inner {
@@ -120,35 +87,120 @@
       justify-content: space-between;
     }
 
-    /* ---------- MAIN HEADER CONTENT ---------- */
-    /* Left: Logo (NYT style font) */
-    .main-logo {
+    /* LEFT: Logo + Name (NYT style, side by side) */
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .logo-img {
+      height: 34px;
+      width: auto;
+      display: block;
+    }
+
+    .logo-name {
       font-family: var(--serif);
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       font-weight: 900;
       letter-spacing: -0.02em;
       color: var(--ink);
       line-height: 1;
       white-space: nowrap;
+      transition: font-size 0.2s ease;
     }
 
-    .main-logo-img {
-      height: 32px;
-      width: auto;
-      display: block;
+    .header-container.compact .logo-name {
+      font-size: 1.1rem;
     }
 
-    /* Center: Categories (straight line) */
-    .main-categories {
-      flex: 1;
+    .header-container.compact .logo-img {
+      height: 28px;
+    }
+
+    /* RIGHT: Search + Menu text */
+    .header-right {
       display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-shrink: 0;
+    }
+
+    .search-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
       justify-content: center;
+      color: var(--ink-2);
+      transition: color 0.2s;
+      padding: 4px;
+    }
+
+    .search-btn:hover {
+      color: var(--crimson);
+    }
+
+    .search-icon {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .menu-text {
+      font-family: var(--ui);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+    }
+
+    .menu-text:hover {
+      color: var(--crimson);
+    }
+
+    /* CATEGORIES ROW (below header) */
+    .categories-row {
+      height: var(--categories-height);
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper);
+      transition: opacity 0.2s ease, visibility 0.2s ease;
       overflow-x: auto;
       scrollbar-width: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .main-categories::-webkit-scrollbar {
+    .categories-row::-webkit-scrollbar {
       display: none;
+    }
+
+    .header-container.compact .categories-row {
+      opacity: 0;
+      visibility: hidden;
+      height: 0;
+      border-bottom: none;
+    }
+
+    .categories-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 28px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 4px;
     }
 
     .cat-btn {
@@ -158,7 +210,7 @@
       letter-spacing: 0.4px;
       text-transform: uppercase;
       color: var(--ink-2);
-      padding: 6px 12px;
+      padding: 8px 16px;
       border: none;
       background: none;
       cursor: pointer;
@@ -177,117 +229,8 @@
       border-bottom-color: var(--crimson);
     }
 
-    /* Right: Search + Hamburger */
-    .main-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-shrink: 0;
-    }
-
-    .icon-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--ink-2);
-      transition: color 0.2s;
-      padding: 4px;
-    }
-
-    .icon-btn:hover {
-      color: var(--crimson);
-    }
-
-    .search-icon {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-    }
-
-    .hamburger-icon {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .hamburger-icon span {
-      width: 100%;
-      height: 2px;
-      background: currentColor;
-      transition: all 0.2s;
-    }
-
-    /* ---------- COMPACT HEADER CONTENT (scroll) ---------- */
-    .compact-logo {
-      font-family: var(--serif);
-      font-size: 1rem;
-      font-weight: 900;
-      color: var(--ink);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .compact-logo-img {
-      height: 28px;
-      width: auto;
-      display: block;
-    }
-
-    .compact-categories {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      overflow-x: auto;
-      scrollbar-width: none;
-      gap: 2px;
-    }
-
-    .compact-categories::-webkit-scrollbar {
-      display: none;
-    }
-
-    .compact-cat-btn {
-      font-family: var(--ui);
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      color: var(--ink-2);
-      padding: 4px 10px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      white-space: nowrap;
-      border-bottom: 1.5px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .compact-cat-btn:hover {
-      color: var(--ink);
-    }
-
-    .compact-cat-btn.active {
-      color: var(--crimson);
-      font-weight: 600;
-      border-bottom-color: var(--crimson);
-    }
-
-    .compact-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-
-    /* ---------- MOBILE DRAWER MENU ---------- */
-    .drawer-overlay {
+    /* ---------- MENU PANEL (slide from left) ---------- */
+    .menu-overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -297,20 +240,20 @@
       z-index: 199;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.25s;
+      transition: opacity 0.25s ease;
     }
 
-    .drawer-overlay.open {
+    .menu-overlay.open {
       opacity: 1;
       visibility: visible;
     }
 
-    .mobile-drawer {
+    .menu-panel {
       position: fixed;
       top: 0;
       left: 0;
-      width: 80%;
-      max-width: 280px;
+      width: 85%;
+      max-width: 320px;
       height: 100vh;
       background: var(--paper);
       z-index: 200;
@@ -322,11 +265,11 @@
       flex-direction: column;
     }
 
-    .mobile-drawer.open {
+    .menu-panel.open {
       transform: translateX(0);
     }
 
-    .drawer-header {
+    .menu-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -334,22 +277,27 @@
       border-bottom: 1px solid var(--rule);
     }
 
-    .drawer-logo {
+    .menu-header-logo {
       font-family: var(--serif);
       font-size: 1.2rem;
       font-weight: 900;
       color: var(--ink);
     }
 
-    .close-drawer {
+    .close-menu {
       background: none;
       border: none;
       font-size: 28px;
       cursor: pointer;
       color: var(--ink-2);
+      transition: color 0.2s;
     }
 
-    .drawer-nav {
+    .close-menu:hover {
+      color: var(--crimson);
+    }
+
+    .menu-nav {
       flex: 1;
       padding: 24px 20px;
       display: flex;
@@ -357,7 +305,7 @@
       gap: 6px;
     }
 
-    .drawer-nav a {
+    .menu-nav a {
       font-family: var(--ui);
       font-size: 15px;
       font-weight: 500;
@@ -365,27 +313,35 @@
       padding: 12px 0;
       border-bottom: 1px solid var(--rule);
       cursor: pointer;
+      transition: color 0.2s;
     }
 
-    .drawer-nav a:hover,
-    .drawer-nav a.active-drawer {
+    .menu-nav a:hover,
+    .menu-nav a.active-menu {
       color: var(--crimson);
       font-weight: 600;
     }
 
-    .drawer-footer {
+    .menu-footer {
       padding: 20px;
       border-top: 1px solid var(--rule);
     }
 
-    .drawer-footer a {
+    .menu-footer a {
       font-family: var(--ui);
       font-size: 13px;
       font-weight: 500;
       color: var(--ink-3);
+      display: block;
+      padding: 8px 0;
+      transition: color 0.2s;
     }
 
-    body.drawer-open {
+    .menu-footer a:hover {
+      color: var(--crimson);
+    }
+
+    body.menu-open {
       overflow: hidden;
     }
 
@@ -785,20 +741,21 @@
     }
 
     @media (max-width: 768px) {
-      .header-inner {
+      .header-inner,
+      .categories-wrapper {
         padding: 0 16px;
       }
-      .main-categories {
-        display: none;
+      .logo-name {
+        font-size: 1.2rem;
       }
-      .compact-categories {
-        display: none;
+      .logo-img {
+        height: 28px;
       }
-      .main-logo {
-        font-size: 1.1rem;
+      .header-container.compact .logo-name {
+        font-size: 0.95rem;
       }
-      .compact-logo {
-        font-size: 0.9rem;
+      .header-container.compact .logo-img {
+        height: 24px;
       }
       .hero-stack {
         flex-direction: column;
@@ -826,95 +783,65 @@
     }
 
     @media (max-width: 480px) {
-      .main-logo {
-        font-size: 0.95rem;
+      .logo-name {
+        font-size: 1rem;
       }
-      .main-logo-img {
+      .logo-img {
         height: 24px;
       }
-      .compact-logo-img {
-        height: 22px;
+      .header-left {
+        gap: 8px;
+      }
+      .header-right {
+        gap: 14px;
       }
     }
   </style>
 </head>
 <body>
 
-<!-- HEADER CONTAINER (swaps between main and compact on scroll) -->
 <div class="header-container" id="headerContainer">
-  <!-- MAIN HEADER (visible at top) -->
+  <!-- MAIN HEADER ROW: left logo+name, right search+menu -->
   <div class="main-header">
     <div class="header-inner">
-      <div class="main-logo">
-        <img src="images/lol.png" class="main-logo-img" alt="The Alamin Gazette" 
-             onerror="this.style.display='none';document.getElementById('mainLogoText').style.display='block';">
-        <span class="main-logo" id="mainLogoText" style="display:none;">The Alamin Gazette</span>
+      <div class="header-left">
+        <img src="images/lol.png" class="logo-img" alt="The Alamin Gazette" 
+             onerror="this.style.display='none';document.getElementById('logoNameFallback').style.display='inline-block';">
+        <span class="logo-name" id="logoNameFallback" style="display:none;">The Alamin Gazette</span>
       </div>
-      <div class="main-categories">
-        <button class="cat-btn active" data-cat="">All</button>
-        <button class="cat-btn" data-cat="World Affairs">World Affairs</button>
-        <button class="cat-btn" data-cat="Economy & Markets">Economy</button>
-        <button class="cat-btn" data-cat="Innovation">Innovation</button>
-        <button class="cat-btn" data-cat="Defense & Security">Defense</button>
-        <button class="cat-btn" data-cat="Society">Society</button>
-      </div>
-      <div class="main-actions">
-        <button class="icon-btn" id="searchBtn">
+      <div class="header-right">
+        <button class="search-btn" id="searchBtn">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <circle cx="10.5" cy="10.5" r="7.5"/>
             <line x1="16" y1="16" x2="22" y2="22"/>
           </svg>
         </button>
-        <button class="icon-btn" id="hamburgerBtn">
-          <div class="hamburger-icon">
-            <span></span><span></span><span></span>
-          </div>
-        </button>
+        <button class="menu-text" id="menuBtn">Menu</button>
       </div>
     </div>
   </div>
 
-  <!-- COMPACT HEADER (visible on scroll) -->
-  <div class="compact-header">
-    <div class="header-inner">
-      <div class="compact-logo">
-        <img src="images/lol.png" class="compact-logo-img" alt="The Alamin Gazette" 
-             onerror="this.style.display='none';document.getElementById('compactLogoText').style.display='block';">
-        <span class="compact-logo" id="compactLogoText" style="display:none;">The Alamin Gazette</span>
-      </div>
-      <div class="compact-categories">
-        <button class="compact-cat-btn active" data-cat="">All</button>
-        <button class="compact-cat-btn" data-cat="World Affairs">World</button>
-        <button class="compact-cat-btn" data-cat="Economy & Markets">Econ</button>
-        <button class="compact-cat-btn" data-cat="Innovation">Innov</button>
-        <button class="compact-cat-btn" data-cat="Defense & Security">Defense</button>
-        <button class="compact-cat-btn" data-cat="Society">Society</button>
-      </div>
-      <div class="compact-actions">
-        <button class="icon-btn" id="compactSearchBtn">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="10.5" cy="10.5" r="7.5"/>
-            <line x1="16" y1="16" x2="22" y2="22"/>
-          </svg>
-        </button>
-        <button class="icon-btn" id="compactHamburgerBtn">
-          <div class="hamburger-icon">
-            <span></span><span></span><span></span>
-          </div>
-        </button>
-      </div>
+  <!-- CATEGORIES ROW (below header) -->
+  <div class="categories-row">
+    <div class="categories-wrapper">
+      <button class="cat-btn active" data-cat="">All</button>
+      <button class="cat-btn" data-cat="World Affairs">World Affairs</button>
+      <button class="cat-btn" data-cat="Economy & Markets">Economy</button>
+      <button class="cat-btn" data-cat="Innovation">Innovation</button>
+      <button class="cat-btn" data-cat="Defense & Security">Defense</button>
+      <button class="cat-btn" data-cat="Society">Society</button>
     </div>
   </div>
 </div>
 
-<!-- Mobile Drawer Menu -->
-<div class="drawer-overlay" id="drawerOverlay"></div>
-<div class="mobile-drawer" id="mobileDrawer">
-  <div class="drawer-header">
-    <span class="drawer-logo">The Alamin Gazette</span>
-    <button class="close-drawer" id="closeDrawerBtn">×</button>
+<!-- MENU PANEL (slide from left) -->
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="menu-panel" id="menuPanel">
+  <div class="menu-header">
+    <span class="menu-header-logo">The Alamin Gazette</span>
+    <button class="close-menu" id="closeMenuBtn">×</button>
   </div>
-  <div class="drawer-nav" id="drawerNav">
+  <div class="menu-nav" id="menuNav">
     <a data-cat="">All Stories</a>
     <a data-cat="World Affairs">World Affairs</a>
     <a data-cat="Economy & Markets">Economy & Markets</a>
@@ -922,7 +849,7 @@
     <a data-cat="Defense & Security">Defense & Security</a>
     <a data-cat="Society">Society</a>
   </div>
-  <div class="drawer-footer">
+  <div class="menu-footer">
     <a href="admin.html">Admin Portal</a>
   </div>
 </div>
@@ -1064,13 +991,13 @@
 
   function setCategory(cat) {
     activeCat = cat;
-    document.querySelectorAll('.cat-btn, .compact-cat-btn').forEach(btn => {
+    document.querySelectorAll('.cat-btn').forEach(btn => {
       if (btn.dataset.cat === cat) btn.classList.add('active');
       else btn.classList.remove('active');
     });
-    document.querySelectorAll('#drawerNav a').forEach(link => {
-      if (link.dataset.cat === cat) link.classList.add('active-drawer');
-      else link.classList.remove('active-drawer');
+    document.querySelectorAll('#menuNav a').forEach(link => {
+      if (link.dataset.cat === cat) link.classList.add('active-menu');
+      else link.classList.remove('active-menu');
     });
     applyFilter();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1090,12 +1017,12 @@
     isLoading = false;
   }
 
-  // Scroll handler - no shake, just toggle class
+  // Scroll handler - no shake, just toggle compact class
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       requestAnimationFrame(() => {
-        const scrolled = window.scrollY > 30;
+        const scrolled = window.scrollY > 40;
         document.getElementById('headerContainer').classList.toggle('compact', scrolled);
         ticking = false;
       });
@@ -1103,29 +1030,26 @@
     }
   }, { passive: true });
 
-  // Event listeners
-  document.querySelectorAll('.cat-btn, .compact-cat-btn').forEach(btn => {
+  // Category event listeners
+  document.querySelectorAll('.cat-btn').forEach(btn => {
     btn.addEventListener('click', () => setCategory(btn.dataset.cat));
   });
-  document.querySelectorAll('#drawerNav a').forEach(link => {
-    link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat); closeDrawer(); });
+  document.querySelectorAll('#menuNav a').forEach(link => {
+    link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat); closeMenu(); });
   });
   document.querySelectorAll('.footer-col a[data-cat]').forEach(link => {
     link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat); });
   });
   document.getElementById('loadMoreBtn')?.addEventListener('click', loadMore);
 
-  // Drawer functions
-  const drawer = document.getElementById('mobileDrawer');
-  const overlay = document.getElementById('drawerOverlay');
-  function openDrawer() { drawer.classList.add('open'); overlay.classList.add('open'); document.body.classList.add('drawer-open'); }
-  function closeDrawer() { drawer.classList.remove('open'); overlay.classList.remove('open'); document.body.classList.remove('drawer-open'); }
-  
-  document.querySelectorAll('#hamburgerBtn, #compactHamburgerBtn').forEach(btn => {
-    btn.addEventListener('click', openDrawer);
-  });
-  document.getElementById('closeDrawerBtn')?.addEventListener('click', closeDrawer);
-  overlay?.addEventListener('click', closeDrawer);
+  // Menu panel functions
+  const menuPanel = document.getElementById('menuPanel');
+  const menuOverlay = document.getElementById('menuOverlay');
+  function openMenu() { menuPanel.classList.add('open'); menuOverlay.classList.add('open'); document.body.classList.add('menu-open'); }
+  function closeMenu() { menuPanel.classList.remove('open'); menuOverlay.classList.remove('open'); document.body.classList.remove('menu-open'); }
+  document.getElementById('menuBtn')?.addEventListener('click', openMenu);
+  document.getElementById('closeMenuBtn')?.addEventListener('click', closeMenu);
+  menuOverlay?.addEventListener('click', closeMenu);
 
   // Search function
   function openSearch() {
@@ -1141,6 +1065,9 @@
         renderHero(results.slice(0, 3));
         renderFeed(results.slice(3, 3 + PAGE));
         document.getElementById('loadMoreRow').style.display = results.length > 3 + PAGE ? 'block' : 'none';
+        activeCat = '';
+        document.querySelectorAll('.cat-btn, #menuNav a').forEach(el => el.classList.remove('active'));
+        if (document.querySelector('.cat-btn[data-cat=""]')) document.querySelector('.cat-btn[data-cat=""]').classList.add('active');
       } else {
         showToast('No results found');
         applyFilter();
@@ -1148,9 +1075,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
-  document.querySelectorAll('#searchBtn, #compactSearchBtn').forEach(btn => {
-    btn.addEventListener('click', openSearch);
-  });
+  document.getElementById('searchBtn')?.addEventListener('click', openSearch);
 
   loadPosts();
 </script>
