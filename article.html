@@ -25,17 +25,20 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--prose); background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; }
     a { color: inherit; }
-    img { display: block; max-width: 100%; }
 
-    /* PROGRESS */
+    /* PROGRESS BAR */
     #read-progress {
       position: fixed; top: 0; left: 0; height: 3px;
-      background: var(--crimson); width: 0%; z-index: 300;
+      background: var(--crimson); width: 0%; z-index: 1001;
       transition: width .08s linear;
     }
 
-    /* MASTHEAD */
+    /* ========= FIXED HEADER WITH AUTO-HIDE (same as index) ========= */
     .masthead {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
       padding: 0 28px;
@@ -43,9 +46,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0; z-index: 100;
-      box-shadow: 0 1px 10px rgba(0,0,0,.06);
+      z-index: 1000;
+      transform: translateY(0);
+      transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      will-change: transform;
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
+    }
+    .masthead.header-hidden {
+      transform: translateY(-100%);
     }
     .back-link {
       font-family: var(--ui);
@@ -70,7 +78,6 @@
       color: var(--ink);
       text-decoration: none;
     }
-    .back-label { /* hide on very small mobile */ }
     .art-search-btn {
       background: none; border: none; cursor: pointer;
       color: var(--ink-3); padding: 6px;
@@ -78,6 +85,13 @@
       border-radius: 2px; transition: color .2s;
     }
     .art-search-btn:hover { color: var(--crimson); }
+
+    /* Add top padding to main content (header is fixed) */
+    .article-outer {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 80px 28px 80px;
+    }
 
     /* CHIPS */
     .chip { font-family:var(--ui); font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 9px; border-radius:2px; display:inline-block; }
@@ -88,10 +102,6 @@
     @keyframes pulse-c{0%,100%{opacity:1}50%{opacity:.6}}
 
     /* ARTICLE LAYOUT */
-    .article-outer { max-width: 760px; margin: 0 auto; padding: 52px 28px 80px; }
-
-    .article-kicker { margin-bottom: 20px; }
-
     h1.article-title {
       font-family: var(--serif);
       font-size: clamp(1.9rem, 4vw, 3rem);
@@ -184,6 +194,38 @@
       color: var(--crimson);
     }
 
+    /* BACK TO TOP BUTTON */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--navy);
+      color: var(--paper);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.25s ease;
+      z-index: 999;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+    .back-to-top:hover {
+      background: var(--crimson);
+      transform: scale(1.05);
+    }
+
     /* BOTTOM SHARE */
     .bottom-share {
       margin-top: 54px;
@@ -243,11 +285,13 @@
 
     @media(max-width:768px) {
       .footer-grid { grid-template-columns:1fr 1fr; }
+      .back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; }
     }
     @media(max-width:640px) {
       .masthead { padding: 0 16px; }
       .back-link span { display:none; }
       .article-outer,.related-outer { padding-left:16px; padding-right:16px; }
+      .article-outer { padding-top: 72px; }
       h1.article-title { font-size:1.7rem; }
       .article-deck { font-size:1rem; }
       .article-body { font-size:1rem; }
@@ -259,23 +303,20 @@
       .share-bar { flex-wrap:wrap; }
       .bottom-share { flex-direction:column; gap:10px; }
     }
-    @media(max-width:400px) {
-      h1.article-title { font-size:1.5rem; }
-    }
   </style>
 </head>
 <body>
 
 <div id="read-progress"></div>
 
-<header class="masthead">
+<!-- FIXED HEADER WITH AUTO-HIDE (same as index) -->
+<header class="masthead" id="siteHeader">
   <a href="index.html" class="back-link">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
     <span class="back-label">All Stories</span>
   </a>
   <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
-    <img src="images/lol.png" class="mast-logo-img"
-         onerror="this.style.display='none';document.getElementById('mast-wm').style.display='block';" alt="The Alamin Gazette">
+    <img src="images/lol.png" class="mast-logo-img" onerror="this.style.display='none';document.getElementById('mast-wm').style.display='block';" alt="The Alamin Gazette">
     <span class="mast-logo-txt" id="mast-wm" style="display:none;">The Alamin Gazette</span>
   </a>
   <div style="min-width:110px;display:flex;justify-content:flex-end;">
@@ -284,6 +325,13 @@
     </button>
   </div>
 </header>
+
+<!-- BACK TO TOP BUTTON -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</button>
 
 <article class="article-outer" id="article-outer">
   <div style="text-align:center;padding:70px 0;font-family:var(--ui);font-size:12px;letter-spacing:2px;color:var(--ink-3);text-transform:uppercase;">
@@ -298,8 +346,7 @@
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-brand">
-        <img src="images/lol.png" style="height:40px;filter:brightness(10);opacity:.8;margin-bottom:12px;"
-             onerror="this.style.display='none';document.getElementById('afl').style.display='block';" alt="">
+        <img src="images/lol.png" style="height:40px;filter:brightness(10);opacity:.8;margin-bottom:12px;" onerror="this.style.display='none';document.getElementById('afl').style.display='block';" alt="">
         <span class="footer-brand-logo" id="afl" style="display:none;">The Alamin Gazette</span>
         <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
       </div>
@@ -341,9 +388,65 @@ const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
 const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
 const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
-// Read slug — supports both ?id= and direct
+// Read slug
 const params = new URLSearchParams(location.search);
 const slug = params.get('id') || params.get('slug') || '';
+
+// ========== ZERO JITTER AUTO-HIDE HEADER (same as index) ==========
+const siteHeader = document.getElementById('siteHeader');
+let lastScrollPosition = 0;
+let ticking = false;
+const SCROLL_THRESHOLD_DOWN = 8;
+const SCROLL_THRESHOLD_UP = 5;
+const TOP_SAFE_ZONE = 65;
+
+function handleScroll() {
+  const currentScrollY = window.scrollY;
+  const scrollDelta = currentScrollY - lastScrollPosition;
+
+  if (currentScrollY <= TOP_SAFE_ZONE) {
+    siteHeader.classList.remove('header-hidden');
+    lastScrollPosition = currentScrollY;
+    ticking = false;
+    return;
+  }
+
+  if (scrollDelta > SCROLL_THRESHOLD_DOWN && !siteHeader.classList.contains('header-hidden')) {
+    siteHeader.classList.add('header-hidden');
+  } else if (scrollDelta < -SCROLL_THRESHOLD_UP && siteHeader.classList.contains('header-hidden')) {
+    siteHeader.classList.remove('header-hidden');
+  }
+
+  lastScrollPosition = currentScrollY;
+  ticking = false;
+}
+
+function onScrollHandler() {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      handleScroll();
+      ticking = false;
+    });
+    ticking = true;
+  }
+}
+
+window.addEventListener('scroll', onScrollHandler, { passive: true });
+
+// ========== BACK TO TOP BUTTON ==========
+const backToTop = document.getElementById('backToTop');
+
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 500) {
+    backToTop.classList.add('visible');
+  } else {
+    backToTop.classList.remove('visible');
+  }
+});
+
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 // Helpers
 function chipClass(c) {
@@ -364,7 +467,6 @@ function timeAgo(iso) {
 }
 
 function formatPublished(iso) {
-  // Always show exact date + time
   const d = new Date(iso);
   const date = d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const time = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', timeZoneName:'short' });
@@ -430,11 +532,21 @@ async function loadRelated(category, currentSlug) {
             <img src="${p.image_url||'https://placehold.co/300x96/e8e2d8/9a8a7a?text=Gazette'}"
                  onerror="this.src='https://placehold.co/300x96/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
             <span class="rc-cat">${p.category||'World'}</span>
-            <h4>${p.title}</h4>
+            <h4>${escapeHtml(p.title)}</h4>
             <div class="rc-meta">${p.author||'Alamin Gazette'} · ${formatPublished(p.created_at).split(' at ')[0]}</div>
           </div>`).join('')}
       </div>
     </div>`;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
 }
 
 // Main load
@@ -453,22 +565,7 @@ async function loadArticle() {
     return;
   }
 
-  // Page title
   document.title = `${data.title} — The Alamin Gazette`;
-
-  // OG / Twitter meta
-  const metas = [
-    ['og:type','article'], ['og:title', data.title],
-    ['og:description', data.excerpt || (data.content||'').replace(/<[^>]+>/g,'').slice(0,160)],
-    ['og:image', data.image_url || ''], ['og:url', shareURL()],
-    ['twitter:card','summary_large_image'], ['twitter:title', data.title],
-    ['twitter:description', data.excerpt || (data.content||'').slice(0,160)]
-  ];
-  metas.forEach(([n,c]) => {
-    const m = document.createElement('meta');
-    m.setAttribute(n.startsWith('twitter')||n.startsWith('article') ? 'name' : 'property', n);
-    m.setAttribute('content', c); document.head.appendChild(m);
-  });
 
   const st = data.title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
   const pubFull = formatPublished(data.created_at);
@@ -482,13 +579,13 @@ async function loadArticle() {
       <span class="chip ${chipClass(data.category)}">${data.category || 'World'}</span>
     </div>
 
-    <h1 class="article-title">${data.title}</h1>
+    <h1 class="article-title">${escapeHtml(data.title)}</h1>
 
-    ${data.excerpt ? `<p class="article-deck">${data.excerpt}</p>` : ''}
+    ${data.excerpt ? `<p class="article-deck">${escapeHtml(data.excerpt)}</p>` : ''}
 
     <div class="article-meta-bar">
       <div class="meta-left">
-        <span class="meta-author">By ${data.author || 'Alamin Gazette Staff'}</span>
+        <span class="meta-author">By ${escapeHtml(data.author || 'Alamin Gazette Staff')}</span>
         <span class="meta-sep">|</span>
         <span class="meta-time">
           Published <abbr title="${timeTooltip}">${timeDisplay}</abbr>
@@ -512,7 +609,7 @@ async function loadArticle() {
     </div>
 
     ${data.image_url ? `
-      <img src="${data.image_url}" class="article-hero-img" alt="${data.title}" onerror="this.style.display='none'">
+      <img src="${data.image_url}" class="article-hero-img" alt="${escapeHtml(data.title)}" onerror="this.style.display='none'">
       <p class="img-caption">Photo: The Alamin Gazette</p>` : ''}
 
     <div class="article-body">${formatContent(data.content)}</div>
