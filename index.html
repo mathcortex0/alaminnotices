@@ -2,504 +2,423 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Alamin Gazette — World Intelligence</title>
-  <meta name="description" content="Independent world intelligence. Breaking news, analysis and reporting across every continent.">
+  <meta name="description" content="Independent world intelligence. Breaking news across every continent.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     :root {
-      --ink: #0f0f0f;
-      --ink-2: #3a3a3a;
-      --ink-3: #6e6e6e;
-      --paper: #f9f7f3;
+      --ink:     #0f0f0f;
+      --ink-2:   #3a3a3a;
+      --ink-3:   #6e6e6e;
+      --paper:   #f9f7f3;
       --paper-2: #f1ece3;
-      --rule: #cfc8bb;
-      --navy: #0b1927;
+      --rule:    #cfc8bb;
+      --navy:    #0b1927;
       --crimson: #b01428;
-      --serif: 'Playfair Display', Georgia, serif;
-      --prose: 'Source Serif 4', Georgia, serif;
-      --ui: 'DM Sans', system-ui, sans-serif;
-      --header-height: 64px;
-      --categories-height: 42px;
+      --gold:    #c8922a;
+      --serif:   'Playfair Display', Georgia, serif;
+      --prose:   'Source Serif 4', Georgia, serif;
+      --ui:      'DM Sans', system-ui, sans-serif;
+      --hdr:     52px;   /* ONE fixed header height — never changes */
     }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--prose); background: var(--paper); color: var(--ink);
+           line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
 
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: calc(var(--header-height) + var(--categories-height) + 10px);
-    }
-
-    body {
-      font-family: var(--prose);
-      background: var(--paper);
-      color: var(--ink);
-      font-size: 16px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    img {
-      display: block;
-      max-width: 100%;
-    }
-
-    /* ---------- HEADER CONTAINER (NO SHAKE) ---------- */
-    .header-container {
+    /* ════════════════════════════════════════
+       HEADER  — CNN pattern
+       Single row, always exactly --hdr tall.
+       On scroll: shadow appears, nav row fades
+       in OVER the logo row using pointer-events
+       trick — no height change ever.
+       ════════════════════════════════════════ */
+    .hdr {
       position: sticky;
       top: 0;
       z-index: 100;
+      height: var(--hdr);
       background: var(--paper);
-    }
-
-    /* MAIN HEADER ROW: left logo+name, right search+menu */
-    .main-header {
-      height: var(--header-height);
       border-bottom: 1px solid var(--rule);
-      display: flex;
-      align-items: center;
-      background: var(--paper);
-      transition: height 0.2s ease;
+      /* shadow added by JS class */
+      will-change: box-shadow;
+      transition: box-shadow .2s;
     }
+    .hdr.shadow { box-shadow: 0 2px 12px rgba(0,0,0,.09); }
 
-    .header-container.compact .main-header {
-      height: 52px;
-    }
-
-    .header-inner {
-      max-width: 1400px;
+    /* Inner container — always full height */
+    .hdr-inner {
+      position: relative;
+      max-width: 1300px;
       margin: 0 auto;
-      padding: 0 28px;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 0 16px;
+      height: 100%;
     }
 
-    /* LEFT: Logo + Name (NYT style, side by side) */
-    .header-left {
+    /* ── ROW A: hamburger | logo | search  (default) ── */
+    .hdr-row-a {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
-      gap: 12px;
+      padding: 0 16px;
+      transition: opacity .18s ease, transform .18s ease;
+      /* always visible at top */
+    }
+    .hdr.compact .hdr-row-a {
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+    }
+
+    /* ── ROW B: logo | nav categories | search  (on scroll) ── */
+    .hdr-row-b {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .hdr.compact .hdr-row-b {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Icon button — used in both rows */
+    .hdr-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--ink-2);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
+      border-radius: 2px;
+      transition: color .15s, background .15s;
     }
+    .hdr-btn:hover { color: var(--ink); background: var(--paper-2); }
 
-    .logo-img {
-      height: 34px;
-      width: auto;
-      display: block;
+    /* Logo — centre of row A */
+    .hdr-logo {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-
-    .logo-name {
+    .hdr-logo-img { height: 28px; width: auto; }
+    .hdr-logo-txt {
       font-family: var(--serif);
       font-size: 1.5rem;
       font-weight: 900;
-      letter-spacing: -0.02em;
+      letter-spacing: -.3px;
       color: var(--ink);
       line-height: 1;
       white-space: nowrap;
-      transition: font-size 0.2s ease;
     }
 
-    .header-container.compact .logo-name {
-      font-size: 1.1rem;
-    }
-
-    .header-container.compact .logo-img {
-      height: 28px;
-    }
-
-    /* RIGHT: Search + Menu text */
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 20px;
+    /* Row B: compact logo + nav strip + search */
+    .hdr-b-logo {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: var(--ink);
+      white-space: nowrap;
       flex-shrink: 0;
+      margin-right: 4px;
+      padding-right: 14px;
+      border-right: 1px solid var(--rule);
+      letter-spacing: -.2px;
     }
-
-    .search-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
+    .hdr-nav {
+      flex: 1;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--ink-2);
-      transition: color 0.2s;
-      padding: 4px;
-    }
-
-    .search-btn:hover {
-      color: var(--crimson);
-    }
-
-    .search-icon {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-    }
-
-    .menu-text {
-      font-family: var(--ui);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      cursor: pointer;
-      transition: color 0.2s;
-      background: none;
-      border: none;
-    }
-
-    .menu-text:hover {
-      color: var(--crimson);
-    }
-
-    /* CATEGORIES ROW (below header) */
-    .categories-row {
-      height: var(--categories-height);
-      border-bottom: 1px solid var(--rule);
-      background: var(--paper);
-      transition: opacity 0.2s ease, visibility 0.2s ease;
       overflow-x: auto;
       scrollbar-width: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
-
-    .categories-row::-webkit-scrollbar {
-      display: none;
-    }
-
-    .header-container.compact .categories-row {
-      opacity: 0;
-      visibility: hidden;
-      height: 0;
-      border-bottom: none;
-    }
-
-    .categories-wrapper {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 28px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .cat-btn {
+    .hdr-nav::-webkit-scrollbar { display: none; }
+    .hdr-nav-btn {
       font-family: var(--ui);
       font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.4px;
+      font-weight: 600;
+      letter-spacing: .8px;
       text-transform: uppercase;
-      color: var(--ink-2);
-      padding: 8px 16px;
-      border: none;
+      color: var(--ink-3);
       background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 0 13px;
+      height: var(--hdr);
       cursor: pointer;
       white-space: nowrap;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
+      transition: color .15s, border-color .15s;
     }
+    .hdr-nav-btn:hover,
+    .hdr-nav-btn.active { color: var(--ink); border-bottom-color: var(--crimson); }
 
-    .cat-btn:hover {
-      color: var(--ink);
-    }
-
-    .cat-btn.active {
-      color: var(--crimson);
-      font-weight: 600;
-      border-bottom-color: var(--crimson);
-    }
-
-    /* ---------- MENU PANEL (slide from left) ---------- */
-    .menu-overlay {
+    /* ── SEARCH BAR (slides down below header) ── */
+    .search-bar {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      z-index: 199;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.25s ease;
-    }
-
-    .menu-overlay.open {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .menu-panel {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 85%;
-      max-width: 320px;
-      height: 100vh;
+      top: var(--hdr);
+      left: 0; right: 0;
       background: var(--paper);
-      z-index: 200;
+      border-bottom: 1px solid var(--rule);
+      padding: 10px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      z-index: 99;
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform .2s ease, opacity .2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .search-bar.open { transform: translateY(0); opacity: 1; }
+    .search-input {
+      flex: 1;
+      font-family: var(--ui);
+      font-size: 15px;
+      color: var(--ink);
+      background: var(--paper-2);
+      border: 1.5px solid var(--rule);
+      border-radius: 3px;
+      padding: 9px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-input:focus { border-color: var(--navy); }
+    .search-close {
+      font-family: var(--ui);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-3);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      transition: color .15s;
+    }
+    .search-close:hover { color: var(--crimson); }
+
+    /* ── DRAWER ── */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.35);
+      z-index: 98;
+    }
+    .drawer-overlay.open { display: block; }
+
+    .drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: min(300px, 85vw);
+      background: var(--paper);
+      z-index: 99;
       transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
-      border-right: 1px solid var(--rule);
+      transition: transform .26s ease;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
     }
+    .drawer.open { transform: translateX(0); }
 
-    .menu-panel.open {
-      transform: translateX(0);
-    }
-
-    .menu-header {
+    .drawer-hdr {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px;
-      border-bottom: 1px solid var(--rule);
+      padding: 14px 20px;
+      border-bottom: 2px solid var(--ink);
+      flex-shrink: 0;
     }
-
-    .menu-header-logo {
+    .drawer-brand {
       font-family: var(--serif);
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 900;
       color: var(--ink);
     }
+    .drawer-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-3); padding: 4px;
+      transition: color .15s;
+    }
+    .drawer-close:hover { color: var(--crimson); }
 
-    .close-menu {
+    .drawer-body { padding: 8px 0; flex: 1; }
+    .drawer-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-family: var(--ui);
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--ink-2);
       background: none;
       border: none;
-      font-size: 28px;
-      cursor: pointer;
-      color: var(--ink-2);
-      transition: color 0.2s;
-    }
-
-    .close-menu:hover {
-      color: var(--crimson);
-    }
-
-    .menu-nav {
-      flex: 1;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .menu-nav a {
-      font-family: var(--ui);
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--ink-2);
-      padding: 12px 0;
       border-bottom: 1px solid var(--rule);
+      padding: 15px 20px;
       cursor: pointer;
-      transition: color 0.2s;
+      letter-spacing: .2px;
+      transition: background .15s, color .15s;
     }
+    .drawer-item:hover { background: var(--paper-2); color: var(--ink); }
+    .drawer-item.active { color: var(--crimson); border-left: 3px solid var(--crimson); padding-left: 17px; }
 
-    .menu-nav a:hover,
-    .menu-nav a.active-menu {
-      color: var(--crimson);
-      font-weight: 600;
-    }
-
-    .menu-footer {
+    .drawer-footer {
       padding: 20px;
       border-top: 1px solid var(--rule);
+      flex-shrink: 0;
     }
-
-    .menu-footer a {
+    .drawer-admin-link {
       font-family: var(--ui);
-      font-size: 13px;
-      font-weight: 500;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
       color: var(--ink-3);
-      display: block;
-      padding: 8px 0;
-      transition: color 0.2s;
+      transition: color .15s;
     }
+    .drawer-admin-link:hover { color: var(--crimson); }
 
-    .menu-footer a:hover {
-      color: var(--crimson);
-    }
+    /* ════════════════════════════════════════
+       PAGE LAYOUT
+       ════════════════════════════════════════ */
+    .page { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-    body.menu-open {
-      overflow: hidden;
-    }
-
-    /* ---------- PAGE CONTENT ---------- */
-    .page {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 0 28px;
-    }
-
-    .section-head {
+    .sec-head {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin: 34px 0 22px;
+      gap: 12px;
+      margin: 28px 0 18px;
     }
-
-    .section-head-label {
+    .sec-label {
       font-family: var(--ui);
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       letter-spacing: 2.5px;
       text-transform: uppercase;
       color: var(--crimson);
       white-space: nowrap;
     }
+    .sec-rule { flex: 1; height: 1px; background: var(--rule); }
+    .divider { border: none; border-top: 2px solid var(--ink); margin: 28px 0 0; }
 
-    .section-head-rule {
-      flex: 1;
-      height: 1px;
-      background: var(--rule);
+    /* ── CHIPS ── */
+    .chip {
+      font-family: var(--ui); font-size: 9px; font-weight: 700;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 2px; display: inline-block;
     }
-
-    .divider {
-      border: none;
-      border-top: 2px solid var(--ink);
-      margin: 0;
+    .chip-world     { background:#0b1927; color:#9ab0c8; }
+    .chip-economy   { background:#0e3d27; color:#8ec8a8; }
+    .chip-innovation{ background:#0a3d78; color:#90b8e8; }
+    .chip-defense   { background:#3d0e1a; color:#c89098; }
+    .chip-society   { background:#3d3000; color:#c8b870; }
+    .chip-default   { background:#2a2a2a; color:#bbb; }
+    .chip-breaking  {
+      background: var(--crimson); color: #fff;
+      animation: blink-c 2s ease-in-out infinite;
+      margin-right: 4px;
     }
+    @keyframes blink-c { 0%,100%{opacity:1} 50%{opacity:.6} }
 
+    /* ── HERO ── */
     .hero {
       display: grid;
-      grid-template-columns: 1fr 320px;
+      grid-template-columns: 1fr 300px;
       border: 1px solid var(--rule);
-      background: var(--paper);
-      min-height: 460px;
     }
-
-    .hero-lead {
+    .hero-main {
       position: relative;
       overflow: hidden;
-      border-right: 1px solid var(--rule);
       cursor: pointer;
+      border-right: 1px solid var(--rule);
       min-height: 460px;
-      background: var(--navy);
     }
-
-    .hero-lead-img {
-      width: 100%;
-      height: 100%;
+    .hero-main-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       object-fit: cover;
+      transition: transform .5s ease;
+    }
+    .hero-main:hover .hero-main-img { transform: scale(1.03); }
+    .hero-scrim {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(6,10,18,.94) 0%, rgba(6,10,18,.4) 55%, transparent 100%);
+    }
+    .hero-body {
       position: absolute;
-      inset: 0;
-      transition: transform 0.4s ease;
+      bottom: 0; left: 0; right: 0;
+      padding: 28px 24px 22px;
     }
-
-    .hero-lead:hover .hero-lead-img {
-      transform: scale(1.02);
-    }
-
-    .hero-lead-scrim {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(8, 12, 20, 0.92) 0%, rgba(8, 12, 20, 0.4) 60%, transparent 100%);
-    }
-
-    .hero-lead-body {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 26px 22px 22px;
-    }
-
-    .hero-lead-body h2 {
+    .hero-body h2 {
       font-family: var(--serif);
-      font-size: 1.7rem;
+      font-size: 1.85rem;
       font-weight: 900;
-      color: #f4efe8;
-      line-height: 1.25;
-      margin: 8px 0 8px;
+      color: #f3ede4;
+      line-height: 1.2;
+      margin: 7px 0 9px;
     }
-
-    .hero-excerpt {
+    .hero-body .hero-ex {
       font-family: var(--prose);
-      font-size: 0.85rem;
-      color: #c0b8a8;
+      font-size: .88rem;
+      color: #b8b0a0;
       line-height: 1.5;
       margin-bottom: 12px;
     }
-
     .hero-byline {
       font-family: var(--ui);
-      font-size: 11px;
-      color: #7a7060;
+      font-size: 10.5px;
+      color: #6e6658;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .hero-stack {
-      display: flex;
-      flex-direction: column;
-      background: var(--paper);
-    }
-
-    .hero-card {
+    .hero-stack { display: flex; flex-direction: column; }
+    .hero-side {
       flex: 1;
-      padding: 16px;
+      padding: 18px 18px;
       border-bottom: 1px solid var(--rule);
       cursor: pointer;
-      transition: background 0.2s;
-      background: var(--paper);
+      transition: background .18s;
     }
-
-    .hero-card:last-child {
-      border-bottom: none;
+    .hero-side:last-child { border-bottom: none; }
+    .hero-side:hover { background: var(--paper-2); }
+    .hero-side-img {
+      width: 100%; height: 130px;
+      object-fit: cover; border-radius: 2px;
+      display: block; margin-bottom: 10px;
     }
-
-    .hero-card:hover {
-      background: var(--paper-2);
-    }
-
-    .hero-card-img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 2px;
-      margin-bottom: 10px;
-      background: #e8e2d8;
-    }
-
-    .hero-card h3 {
+    .hero-side h3 {
       font-family: var(--serif);
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 700;
       line-height: 1.3;
       color: var(--ink);
-      margin: 6px 0;
+      margin: 5px 0 5px;
     }
-
-    .card-excerpt {
+    .hero-side .side-ex {
       font-family: var(--prose);
-      font-size: 0.75rem;
+      font-size: .78rem;
       color: var(--ink-2);
-      line-height: 1.45;
-      margin-bottom: 8px;
+      line-height: 1.5;
+      margin-bottom: 7px;
     }
-
     .card-meta {
       font-family: var(--ui);
       font-size: 10px;
@@ -509,575 +428,546 @@
       align-items: center;
     }
 
-    .chip {
-      font-family: var(--ui);
-      font-size: 9.5px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 3px 9px;
-      border-radius: 2px;
-      display: inline-block;
-    }
-
-    .chip-world { background: #0b1927; color: #9ab0c8; }
-    .chip-economy { background: #0e3d27; color: #8ec8a8; }
-    .chip-innovation { background: #0a3d78; color: #90b8e8; }
-    .chip-defense { background: #3d0e1a; color: #c89098; }
-    .chip-society { background: #3d3000; color: #c8b870; }
-    .chip-default { background: #1a1a1a; color: #aaa; }
-    .chip-breaking {
-      background: var(--crimson);
-      color: #fff;
-      animation: pulse-chip 2s ease-in-out infinite;
-      margin-right: 5px;
-    }
-
-    @keyframes pulse-chip {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .share-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: var(--ui);
-      font-size: 9.5px;
-      font-weight: 600;
-      color: var(--ink-3);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 0;
-    }
-
-    .share-btn:hover {
-      color: var(--crimson);
-    }
-
+    /* ── FEED ── */
     .feed {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       border-left: 1px solid var(--rule);
       border-top: 1px solid var(--rule);
-      background: var(--paper);
     }
-
     .feed-item {
-      padding: 18px;
+      padding: 20px;
       border-right: 1px solid var(--rule);
       border-bottom: 1px solid var(--rule);
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background .18s;
     }
-
-    .feed-item:hover {
-      background: var(--paper-2);
-    }
-
+    .feed-item:hover { background: var(--paper-2); }
     .feed-item-img {
-      width: 100%;
-      height: 110px;
-      object-fit: cover;
-      border-radius: 2px;
-      margin-bottom: 10px;
-      background: #e8e2d8;
+      width: 100%; height: 120px;
+      object-fit: cover; border-radius: 2px;
+      display: block; margin-bottom: 9px;
     }
-
     .feed-item h3 {
       font-family: var(--serif);
-      font-size: 0.9rem;
+      font-size: .97rem;
       font-weight: 700;
       line-height: 1.3;
-      margin: 6px 0;
+      color: var(--ink);
+      margin: 5px 0 5px;
     }
-
-    .item-excerpt {
-      font-size: 0.75rem;
+    .feed-item .item-ex {
+      font-family: var(--prose);
+      font-size: .78rem;
       color: var(--ink-2);
-      line-height: 1.45;
+      line-height: 1.5;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 9px;
     }
 
-    .load-more-row {
+    /* ── SHARE BTN ── */
+    .shr {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--ui); font-size: 9.5px; font-weight: 600;
+      color: var(--ink-3); letter-spacing: .7px; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 0; transition: color .15s;
+    }
+    .shr:hover { color: var(--crimson); }
+
+    /* ── LOAD MORE ── */
+    .load-row {
       text-align: center;
-      padding: 44px 0;
+      padding: 40px 0;
       border-top: 1px solid var(--rule);
     }
-
-    .load-more-btn {
-      font-family: var(--ui);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      background: transparent;
-      color: var(--ink);
+    .load-btn {
+      font-family: var(--ui); font-size: 11px; font-weight: 700;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      background: transparent; color: var(--ink);
       border: 1.5px solid var(--ink);
-      padding: 12px 36px;
-      cursor: pointer;
-      transition: all 0.25s;
+      padding: 12px 36px; cursor: pointer;
+      transition: all .22s;
     }
+    .load-btn:hover { background: var(--ink); color: var(--paper); }
+    .load-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-    .load-more-btn:hover {
-      background: var(--ink);
-      color: var(--paper);
+    /* ── FOOTER ── */
+    .ft {
+      background: var(--navy); color: #8898a8;
+      margin-top: 60px; padding: 52px 20px 28px;
     }
-
-    .site-footer {
-      background: var(--navy);
-      color: #8898a8;
-      margin-top: 70px;
-      padding: 48px 28px 32px;
-    }
-
-    .footer-inner {
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-
-    .footer-grid {
+    .ft-inner { max-width: 1300px; margin: 0 auto; }
+    .ft-grid {
       display: grid;
       grid-template-columns: 240px 1fr 1fr 1fr;
       gap: 40px;
       padding-bottom: 36px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .ft-brand-name {
+      font-family: var(--serif); font-size: 1.5rem; font-weight: 900;
+      color: #e4ddd4; display: block; margin-bottom: 12px;
+    }
+    .ft-brand p { font-family: var(--prose); font-size: .82rem; color: #4e5e6e; line-height: 1.65; }
+    .ft-col h5 {
+      font-family: var(--ui); font-size: 9px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: #b8c8d8; margin-bottom: 16px;
+    }
+    .ft-col a {
+      display: block; font-family: var(--ui); font-size: 13px;
+      color: #4e5e6e; margin-bottom: 9px; transition: color .15s;
+    }
+    .ft-col a:hover { color: #c8d8e8; }
+    .ft-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 22px; font-family: var(--ui); font-size: 11px; color: #2e3e4e;
     }
 
-    .footer-brand p {
-      font-family: var(--prose);
-      font-size: 0.8rem;
-      color: #5a6878;
-    }
-
-    .footer-col h5 {
-      font-family: var(--ui);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #c0ccd8;
-      margin-bottom: 16px;
-    }
-
-    .footer-col a {
-      display: block;
-      font-family: var(--ui);
-      font-size: 12px;
-      color: #5a6878;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      padding-top: 24px;
-      font-family: var(--ui);
-      font-size: 10px;
-      color: #3a4858;
-    }
-
+    /* ── TOAST ── */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(60px);
-      background: var(--ink);
-      color: #f4efe8;
-      font-family: var(--ui);
-      font-size: 12px;
-      padding: 10px 20px;
-      border-radius: 3px;
-      z-index: 999;
-      opacity: 0;
-      transition: all 0.3s ease;
-      pointer-events: none;
-      white-space: nowrap;
+      background: var(--ink); color: #f4ede4;
+      font-family: var(--ui); font-size: 13px;
+      padding: 11px 20px; border-radius: 3px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.28);
+      z-index: 999; opacity: 0;
+      transition: all .28s; pointer-events: none; white-space: nowrap;
     }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+    /* ── EMPTY ── */
+    .empty { text-align: center; padding: 70px 20px; color: var(--ink-3); font-family: var(--ui); font-size: 14px; }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .feed { grid-template-columns: repeat(2,1fr); }
     }
-
-    .empty-state {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--ink-3);
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-main { min-height: 340px; border-right: none; border-bottom: 1px solid var(--rule); }
+      .hero-stack { flex-direction: row; }
+      .hero-side { border-bottom: none; border-right: 1px solid var(--rule); }
+      .hero-side:last-child { border-right: none; }
+      .ft-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
     }
-
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-      .hero-lead {
-        min-height: 360px;
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-      }
-      .hero-stack {
-        flex-direction: row;
-      }
-      .hero-card {
-        border-bottom: none;
-        border-right: 1px solid var(--rule);
-      }
-      .feed {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .footer-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 32px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .header-inner,
-      .categories-wrapper {
-        padding: 0 16px;
-      }
-      .logo-name {
-        font-size: 1.2rem;
-      }
-      .logo-img {
-        height: 28px;
-      }
-      .header-container.compact .logo-name {
-        font-size: 0.95rem;
-      }
-      .header-container.compact .logo-img {
-        height: 24px;
-      }
-      .hero-stack {
-        flex-direction: column;
-      }
-      .hero-card {
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-      }
-      .feed {
-        grid-template-columns: 1fr;
-      }
-      .footer-grid {
-        grid-template-columns: 1fr;
-        gap: 28px;
-      }
-      .page {
-        padding: 0 16px;
-      }
-      .hero-lead-body h2 {
-        font-size: 1.2rem;
-      }
-      .hero-lead-body .hero-excerpt {
-        display: none;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .logo-name {
-        font-size: 1rem;
-      }
-      .logo-img {
-        height: 24px;
-      }
-      .header-left {
-        gap: 8px;
-      }
-      .header-right {
-        gap: 14px;
-      }
+    @media (max-width: 600px) {
+      .feed { grid-template-columns: 1fr; }
+      .hero-stack { flex-direction: column; }
+      .hero-side { border-right: none; border-bottom: 1px solid var(--rule); }
+      .hero-side:last-child { border-bottom: none; }
+      .hero-main { min-height: 260px; }
+      .hero-body h2 { font-size: 1.35rem; }
+      .hero-body .hero-ex { display: none; }
+      .ft-grid { grid-template-columns: 1fr; }
+      .page { padding: 0 14px; }
+      /* Hide compact nav on mobile — use drawer instead */
+      .hdr-row-b .hdr-nav { display: none; }
+      .hdr-b-logo { border-right: none; padding-right: 0; }
     }
   </style>
 </head>
 <body>
 
-<div class="header-container" id="headerContainer">
-  <!-- MAIN HEADER ROW: left logo+name, right search+menu -->
-  <div class="main-header">
-    <div class="header-inner">
-      <div class="header-left">
-        <img src="images/lol.png" class="logo-img" alt="The Alamin Gazette" 
-             onerror="this.style.display='none';document.getElementById('logoNameFallback').style.display='inline-block';">
-        <span class="logo-name" id="logoNameFallback" style="display:none;">The Alamin Gazette</span>
-      </div>
-      <div class="header-right">
-        <button class="search-btn" id="searchBtn">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="10.5" cy="10.5" r="7.5"/>
-            <line x1="16" y1="16" x2="22" y2="22"/>
-          </svg>
-        </button>
-        <button class="menu-text" id="menuBtn">Menu</button>
-      </div>
-    </div>
-  </div>
+<!-- ══ HEADER ══════════════════════════════════ -->
+<!--
+  ZERO-SHAKE GUARANTEE:
+  .hdr is always exactly --hdr (52px) tall, border included.
+  Row A and Row B are both position:absolute inside it.
+  They cross-fade. The header box NEVER resizes.
+-->
+<header class="hdr" id="hdr">
+  <div class="hdr-inner">
 
-  <!-- CATEGORIES ROW (below header) -->
-  <div class="categories-row">
-    <div class="categories-wrapper">
-      <button class="cat-btn active" data-cat="">All</button>
-      <button class="cat-btn" data-cat="World Affairs">World Affairs</button>
-      <button class="cat-btn" data-cat="Economy & Markets">Economy</button>
-      <button class="cat-btn" data-cat="Innovation">Innovation</button>
-      <button class="cat-btn" data-cat="Defense & Security">Defense</button>
-      <button class="cat-btn" data-cat="Society">Society</button>
+    <!-- ROW A: default (hamburger | logo | search) -->
+    <div class="hdr-row-a">
+      <!-- Left: hamburger -->
+      <button class="hdr-btn" onclick="openDrawer()" aria-label="Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- Centre: logo -->
+      <div class="hdr-logo">
+        <a href="index.html">
+          <img src="images/lol.png" class="hdr-logo-img"
+               onerror="this.style.display='none';document.getElementById('hdr-wm').style.display='block';" alt="">
+          <span class="hdr-logo-txt" id="hdr-wm" style="display:none;">The Alamin Gazette</span>
+        </a>
+      </div>
+
+      <!-- Right: search -->
+      <button class="hdr-btn" onclick="toggleSearch()" aria-label="Search" style="margin-left:auto;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
     </div>
+
+    <!-- ROW B: compact scroll (logo | nav | search) -->
+    <div class="hdr-row-b">
+      <a href="index.html" class="hdr-b-logo">The Alamin Gazette</a>
+      <nav class="hdr-nav" id="hdr-nav">
+        <button class="hdr-nav-btn active" onclick="pickCat(this,'')">All</button>
+        <button class="hdr-nav-btn" onclick="pickCat(this,'World Affairs')">World Affairs</button>
+        <button class="hdr-nav-btn" onclick="pickCat(this,'Economy & Markets')">Economy</button>
+        <button class="hdr-nav-btn" onclick="pickCat(this,'Innovation')">Innovation</button>
+        <button class="hdr-nav-btn" onclick="pickCat(this,'Defense & Security')">Defense</button>
+        <button class="hdr-nav-btn" onclick="pickCat(this,'Society')">Society</button>
+      </nav>
+      <button class="hdr-btn" onclick="toggleSearch()" aria-label="Search" style="flex-shrink:0;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<!-- SEARCH BAR -->
+<div class="search-bar" id="search-bar">
+  <input class="search-input" id="search-input" type="text"
+         placeholder="Search The Alamin Gazette…"
+         oninput="doSearch(this.value)"
+         onkeydown="if(event.key==='Escape')closeSearch()">
+  <button class="search-close" onclick="closeSearch()">Cancel</button>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-hdr">
+    <span class="drawer-brand">The Alamin Gazette</span>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <button class="drawer-item active" onclick="drawerPick(this,'')">All Stories</button>
+    <button class="drawer-item" onclick="drawerPick(this,'World Affairs')">World Affairs</button>
+    <button class="drawer-item" onclick="drawerPick(this,'Economy &amp; Markets')">Economy &amp; Markets</button>
+    <button class="drawer-item" onclick="drawerPick(this,'Innovation')">Innovation</button>
+    <button class="drawer-item" onclick="drawerPick(this,'Defense &amp; Security')">Defense &amp; Security</button>
+    <button class="drawer-item" onclick="drawerPick(this,'Society')">Society</button>
+  </div>
+  <div class="drawer-footer">
+    <a href="admin.html" class="drawer-admin-link">Admin Portal →</a>
   </div>
 </div>
 
-<!-- MENU PANEL (slide from left) -->
-<div class="menu-overlay" id="menuOverlay"></div>
-<div class="menu-panel" id="menuPanel">
-  <div class="menu-header">
-    <span class="menu-header-logo">The Alamin Gazette</span>
-    <button class="close-menu" id="closeMenuBtn">×</button>
-  </div>
-  <div class="menu-nav" id="menuNav">
-    <a data-cat="">All Stories</a>
-    <a data-cat="World Affairs">World Affairs</a>
-    <a data-cat="Economy & Markets">Economy & Markets</a>
-    <a data-cat="Innovation">Innovation</a>
-    <a data-cat="Defense & Security">Defense & Security</a>
-    <a data-cat="Society">Society</a>
-  </div>
-  <div class="menu-footer">
-    <a href="admin.html">Admin Portal</a>
-  </div>
-</div>
-
+<!-- MAIN -->
 <main class="page">
-  <div class="section-head">
-    <span class="section-head-label">Top Stories</span>
-    <span class="section-head-rule"></span>
-  </div>
-  <div id="heroZone"><div class="empty-state">Loading intelligence...</div></div>
+  <div class="sec-head"><span class="sec-label">Top Stories</span><span class="sec-rule"></span></div>
+  <div id="hero-zone"><div class="empty">Loading…</div></div>
 
-  <hr class="divider" style="margin:36px 0 0;">
+  <hr class="divider">
 
-  <div class="section-head">
-    <span class="section-head-label">Intelligence Feed</span>
-    <span class="section-head-rule"></span>
-  </div>
-  <div class="feed" id="feedZone"></div>
+  <div class="sec-head"><span class="sec-label">Latest Stories</span><span class="sec-rule"></span></div>
+  <div class="feed" id="feed-zone"></div>
 
-  <div class="load-more-row" id="loadMoreRow" style="display:none;">
-    <button class="load-more-btn" id="loadMoreBtn">Load More Stories</button>
+  <div class="load-row" id="load-row" style="display:none;">
+    <button class="load-btn" id="load-btn" onclick="loadMore()">Load More Stories</button>
   </div>
 </main>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
+<!-- FOOTER -->
+<footer class="ft">
+  <div class="ft-inner">
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <img src="images/lol.png" style="height:34px;filter:brightness(10);opacity:.8;margin-bottom:10px;"
+             onerror="this.style.display='none';document.getElementById('ft-nm').style.display='block';" alt="">
+        <span class="ft-brand-name" id="ft-nm" style="display:none;">The Alamin Gazette</span>
+        <p>Independent world intelligence. Reporting the stories that define tomorrow across every continent.</p>
       </div>
-      <div class="footer-col">
+      <div class="ft-col">
+        <h5>Regions</h5>
+        <a href="#">Asia-Pacific</a><a href="#">EMEA</a>
+        <a href="#">Americas</a><a href="#">Middle East</a><a href="#">Africa</a>
+      </div>
+      <div class="ft-col">
         <h5>Sections</h5>
-        <a data-cat="World Affairs">World Affairs</a>
-        <a data-cat="Economy & Markets">Economy</a>
-        <a data-cat="Innovation">Innovation</a>
-        <a data-cat="Defense & Security">Defense</a>
-        <a data-cat="Society">Society</a>
+        <a href="#" onclick="pickCat(null,'World Affairs')">World Affairs</a>
+        <a href="#" onclick="pickCat(null,'Economy & Markets')">Economy &amp; Markets</a>
+        <a href="#" onclick="pickCat(null,'Innovation')">Innovation</a>
+        <a href="#" onclick="pickCat(null,'Defense & Security')">Defense &amp; Security</a>
+        <a href="#" onclick="pickCat(null,'Society')">Society</a>
       </div>
-      <div class="footer-col">
+      <div class="ft-col">
         <h5>The Gazette</h5>
-        <a href="#">About</a>
-        <a href="#">Standards</a>
-        <a href="admin.html">Admin</a>
+        <a href="#">About Us</a><a href="#">Editorial Standards</a>
+        <a href="#">Contact</a><a href="admin.html">Admin Portal</a>
       </div>
     </div>
-    <div class="footer-bottom">
+    <div class="ft-bottom">
       <span>© 2025 The Alamin Gazette. All rights reserved.</span>
-      <span>Supabase · Intelligence</span>
+      <span>Powered by Supabase · Built by Alamin</span>
     </div>
   </div>
 </footer>
 
-<div class="toast" id="toastMsg"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-  const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* ── SUPABASE ──────────────────────────────── */
+const SURL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
+const SKEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+const sb   = supabase.createClient(SURL, SKEY);
+const PG   = 12;
 
-  const PAGE = 12;
-  let allPosts = [], filtered = [], feedOffset = 0, activeCat = '', isLoading = false;
+let allPosts=[], filtered=[], feedOffset=0, activeCat='';
 
-  function chipClass(c) {
-    const map = {
-      'World Affairs': 'chip-world',
-      'Economy & Markets': 'chip-economy',
-      'Innovation': 'chip-innovation',
-      'Defense & Security': 'chip-defense',
-      'Society': 'chip-society'
-    };
-    return map[c] || 'chip-default';
+/* ── HEADER SCROLL — zero shake ────────────
+   Only a CSS class toggles. Header height = --hdr always.
+   Row A and B cross-fade inside fixed container. */
+window.addEventListener('scroll', () => {
+  const hdr = document.getElementById('hdr');
+  if (window.scrollY > 50) hdr.classList.add('compact','shadow');
+  else                      hdr.classList.remove('compact','shadow');
+}, { passive: true });
+
+/* ── DRAWER ───────────────────────────────── */
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function drawerPick(btn, cat) {
+  document.querySelectorAll('.drawer-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  closeDrawer();
+  applyFilter(cat);
+}
+
+/* ── SEARCH ───────────────────────────────── */
+let searchOpen = false;
+function toggleSearch() {
+  searchOpen ? closeSearch() : openSearch();
+}
+function openSearch() {
+  searchOpen = true;
+  const bar = document.getElementById('search-bar');
+  bar.classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 50);
+}
+function closeSearch() {
+  searchOpen = false;
+  document.getElementById('search-bar').classList.remove('open');
+  document.getElementById('search-input').value = '';
+  // Restore normal feed
+  applyFilter(activeCat);
+}
+function doSearch(q) {
+  const term = q.trim().toLowerCase();
+  if (!term) { applyFilter(activeCat); return; }
+  const res = allPosts.filter(p =>
+    p.title.toLowerCase().includes(term) ||
+    (p.excerpt||'').toLowerCase().includes(term) ||
+    (p.content||'').toLowerCase().includes(term) ||
+    (p.category||'').toLowerCase().includes(term)
+  );
+  renderHero(res.slice(0,3));
+  renderFeed(res.slice(3));
+  document.getElementById('load-row').style.display = 'none';
+}
+
+/* ── NAV ──────────────────────────────────── */
+function pickCat(btn, cat) {
+  if (btn) {
+    document.querySelectorAll('.hdr-nav-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   }
+  applyFilter(cat);
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
 
-  function teaser(p, n) {
-    const t = (p.excerpt || p.content || '').replace(/<[^>]+>/g, '');
-    return t.length > n ? t.slice(0, n).trim() + '…' : t;
-  }
-
-  function timeAgo(iso) {
-    const diff = Date.now() - new Date(iso).getTime();
-    const m = Math.floor(diff / 60000);
-    if (m < 1) return 'Just now';
-    if (m < 60) return `${m}m ago`;
-    const h = Math.floor(m / 60);
-    if (h < 24) return `${h}h ago`;
-    const d = Math.floor(h / 24);
-    if (d < 7) return `${d}d ago`;
-    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  function fullDate(iso) {
-    return new Date(iso).toLocaleDateString('en-US', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
-    });
-  }
-
-  function articleURL(slug) { return `article.html?id=${slug}`; }
-  function shareIco() { return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`; }
-  function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
-  function showToast(msg) { const t = document.getElementById('toastMsg'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
-
-  window.doShare = function(e, slug, title) {
-    e.stopPropagation();
-    const url = window.location.origin + '/' + articleURL(slug);
-    if (navigator.share) navigator.share({ title, url });
-    else navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
-  };
-
-  function renderHero(posts) {
-    const el = document.getElementById('heroZone');
-    if (!posts.length) { el.innerHTML = '<div class="empty-state">No stories found.</div>'; return; }
-    const lead = posts[0];
-    const cards = posts.slice(1, 3);
-    el.innerHTML = `<div class="hero"><div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'"><img class="hero-lead-img" src="${lead.image_url || 'https://placehold.co/900x560/0b1927/3a5878?text=Gazette'}" alt=""><div class="hero-lead-scrim"></div><div class="hero-lead-body"><div>${lead.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(lead.category)}">${lead.category || 'World'}</span></div><h2>${escapeHtml(lead.title)}</h2><p class="hero-excerpt">${escapeHtml(teaser(lead, 200))}</p><div class="hero-byline"><span>${lead.author || 'Alamin Gazette'} · ${timeAgo(lead.created_at)}</span><button class="share-btn" onclick="doShare(event,'${lead.slug}','${escapeHtml(lead.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div></div><div class="hero-stack">${cards.map(p => `<div class="hero-card" onclick="location.href='${articleURL(p.slug)}'"><img class="hero-card-img" src="${p.image_url || 'https://placehold.co/600x280/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="card-excerpt">${escapeHtml(teaser(p, 110))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('')}</div></div>`;
-  }
-
-  function renderFeed(posts, append = false) {
-    const el = document.getElementById('feedZone');
-    const html = posts.map(p => `<div class="feed-item" onclick="location.href='${articleURL(p.slug)}'"><img class="feed-item-img" src="${p.image_url || 'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="item-excerpt">${escapeHtml(teaser(p, 140))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('');
-    if (append) el.insertAdjacentHTML('beforeend', html);
-    else el.innerHTML = html;
-  }
-
-  async function loadPosts() {
-    const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
-    if (error || !data) { document.getElementById('heroZone').innerHTML = '<div class="empty-state">Unable to load stories.</div>'; console.error(error); return; }
-    allPosts = data.sort((a, b) => { if (a.breaking && !b.breaking) return -1; if (!a.breaking && b.breaking) return 1; return new Date(b.created_at) - new Date(a.created_at); });
-    applyFilter();
-  }
-
-  function applyFilter() {
-    filtered = activeCat ? allPosts.filter(p => p.category === activeCat) : [...allPosts];
-    renderHero(filtered.slice(0, 3));
-    feedOffset = PAGE;
-    renderFeed(filtered.slice(3, 3 + PAGE));
-    document.getElementById('loadMoreRow').style.display = filtered.length > 3 + PAGE ? 'block' : 'none';
-  }
-
-  function setCategory(cat) {
-    activeCat = cat;
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-      if (btn.dataset.cat === cat) btn.classList.add('active');
-      else btn.classList.remove('active');
-    });
-    document.querySelectorAll('#menuNav a').forEach(link => {
-      if (link.dataset.cat === cat) link.classList.add('active-menu');
-      else link.classList.remove('active-menu');
-    });
-    applyFilter();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  async function loadMore() {
-    if (isLoading) return;
-    isLoading = true;
-    const btn = document.getElementById('loadMoreBtn');
-    btn.textContent = 'Loading…'; btn.disabled = true;
-    await new Promise(r => setTimeout(r, 100));
-    const slice = filtered.slice(3 + feedOffset, 3 + feedOffset + PAGE);
-    renderFeed(slice, true);
-    feedOffset += PAGE;
-    if (3 + feedOffset >= filtered.length) document.getElementById('loadMoreRow').style.display = 'none';
-    else { btn.textContent = 'Load More Stories'; btn.disabled = false; }
-    isLoading = false;
-  }
-
-  // Scroll handler - no shake, just toggle compact class
-  let ticking = false;
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        const scrolled = window.scrollY > 40;
-        document.getElementById('headerContainer').classList.toggle('compact', scrolled);
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }, { passive: true });
-
-  // Category event listeners
-  document.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => setCategory(btn.dataset.cat));
+/* ── HELPERS ──────────────────────────────── */
+function cc(c) {
+  return {'World Affairs':'chip-world','Economy & Markets':'chip-economy',
+    'Innovation':'chip-innovation','Defense & Security':'chip-defense',
+    'Society':'chip-society'}[c]||'chip-default';
+}
+function tsr(p,n) {
+  const t=(p.excerpt||p.content||'').replace(/<[^>]+>/g,'');
+  return t.length>n ? t.slice(0,n).trim()+'…' : t;
+}
+function ago(iso) {
+  const d=Date.now()-new Date(iso).getTime(), m=Math.floor(d/60000);
+  if(m<1)  return 'Just now';
+  if(m<60) return `${m}m ago`;
+  const h=Math.floor(m/60);
+  if(h<24) return `${h}h ago`;
+  const dy=Math.floor(h/24);
+  if(dy<7) return `${dy}d ago`;
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function full(iso) {
+  return new Date(iso).toLocaleDateString('en-US',{
+    weekday:'long',year:'numeric',month:'long',day:'numeric',
+    hour:'2-digit',minute:'2-digit',timeZoneName:'short'
   });
-  document.querySelectorAll('#menuNav a').forEach(link => {
-    link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat); closeMenu(); });
-  });
-  document.querySelectorAll('.footer-col a[data-cat]').forEach(link => {
-    link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat); });
-  });
-  document.getElementById('loadMoreBtn')?.addEventListener('click', loadMore);
+}
+function aURL(slug) { return `article.html?id=${slug}`; }
+function sIco() {
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+  </svg>`;
+}
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function shr(e, slug, title) {
+  e.stopPropagation();
+  const url=`${location.origin}/article.html?id=${slug}`;
+  if(navigator.share) navigator.share({title,url});
+  else navigator.clipboard.writeText(url).then(()=>showToast('Link copied'));
+}
+function chips(p) {
+  return `${p.breaking?'<span class="chip chip-breaking">Breaking</span>':''}
+          <span class="chip ${cc(p.category)}">${p.category||'World'}</span>`;
+}
 
-  // Menu panel functions
-  const menuPanel = document.getElementById('menuPanel');
-  const menuOverlay = document.getElementById('menuOverlay');
-  function openMenu() { menuPanel.classList.add('open'); menuOverlay.classList.add('open'); document.body.classList.add('menu-open'); }
-  function closeMenu() { menuPanel.classList.remove('open'); menuOverlay.classList.remove('open'); document.body.classList.remove('menu-open'); }
-  document.getElementById('menuBtn')?.addEventListener('click', openMenu);
-  document.getElementById('closeMenuBtn')?.addEventListener('click', closeMenu);
-  menuOverlay?.addEventListener('click', closeMenu);
+/* ── RENDER HERO ──────────────────────────── */
+function renderHero(posts) {
+  const el=document.getElementById('hero-zone');
+  if(!posts.length){el.innerHTML='<div class="empty">No stories found.</div>';return;}
+  const m=posts[0], sides=posts.slice(1,3);
+  el.innerHTML=`
+    <div class="hero">
+      <div class="hero-main" onclick="location.href='${aURL(m.slug)}'">
+        <img class="hero-main-img"
+          src="${m.image_url||'https://placehold.co/900x460/0b1927/3a5878?text=Gazette'}"
+          onerror="this.src='https://placehold.co/900x460/0b1927/3a5878?text=Gazette'" alt="">
+        <div class="hero-scrim"></div>
+        <div class="hero-body">
+          <div>${chips(m)}</div>
+          <h2>${m.title}</h2>
+          <p class="hero-ex">${tsr(m,190)}</p>
+          <div class="hero-byline">
+            <span title="${full(m.created_at)}">${m.author||'Alamin Gazette'} · ${ago(m.created_at)}</span>
+            <button class="shr" style="color:#6e6658" onclick="shr(event,'${m.slug}','${m.title.replace(/'/g,"\\'")}')">
+              ${sIco()} Share
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-stack">
+        ${sides.map(p=>`
+          <div class="hero-side" onclick="location.href='${aURL(p.slug)}'">
+            <img class="hero-side-img"
+              src="${p.image_url||'https://placehold.co/600x260/0b1927/3a5878?text=Gazette'}"
+              onerror="this.src='https://placehold.co/600x260/0b1927/3a5878?text=Gazette'" loading="lazy" alt="">
+            <div>${chips(p)}</div>
+            <h3>${p.title}</h3>
+            <p class="side-ex">${tsr(p,100)}</p>
+            <div class="card-meta">
+              <span title="${full(p.created_at)}">${p.author||'Alamin Gazette'} · ${ago(p.created_at)}</span>
+              <button class="shr" onclick="shr(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
+                ${sIco()} Share
+              </button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
 
-  // Search function
-  function openSearch() {
-    const q = prompt('Search The Alamin Gazette:');
-    if (q && q.trim()) {
-      const term = q.trim().toLowerCase();
-      const results = allPosts.filter(p => 
-        p.title.toLowerCase().includes(term) || 
-        (p.excerpt || '').toLowerCase().includes(term) ||
-        (p.content || '').toLowerCase().includes(term)
-      );
-      if (results.length) {
-        renderHero(results.slice(0, 3));
-        renderFeed(results.slice(3, 3 + PAGE));
-        document.getElementById('loadMoreRow').style.display = results.length > 3 + PAGE ? 'block' : 'none';
-        activeCat = '';
-        document.querySelectorAll('.cat-btn, #menuNav a').forEach(el => el.classList.remove('active'));
-        if (document.querySelector('.cat-btn[data-cat=""]')) document.querySelector('.cat-btn[data-cat=""]').classList.add('active');
-      } else {
-        showToast('No results found');
-        applyFilter();
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+/* ── RENDER FEED ──────────────────────────── */
+function renderFeed(posts, append=false) {
+  const el=document.getElementById('feed-zone');
+  const html=posts.map(p=>`
+    <div class="feed-item" onclick="location.href='${aURL(p.slug)}'">
+      <img class="feed-item-img"
+        src="${p.image_url||'https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'}"
+        onerror="this.src='https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
+      <div>${chips(p)}</div>
+      <h3>${p.title}</h3>
+      <p class="item-ex">${tsr(p,130)}</p>
+      <div class="card-meta">
+        <span title="${full(p.created_at)}">${p.author||'Alamin Gazette'} · ${ago(p.created_at)}</span>
+        <button class="shr" onclick="shr(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
+          ${sIco()} Share
+        </button>
+      </div>
+    </div>`).join('');
+  if(append) el.innerHTML+=html; else el.innerHTML=html;
+}
+
+/* ── LOAD POSTS ───────────────────────────── */
+async function loadPosts() {
+  /* Show loading state immediately */
+  document.getElementById('hero-zone').innerHTML = '<div class="empty">Loading stories…</div>';
+
+  const { data, error } = await sb
+    .from('posts')
+    .select('*')
+    .eq('is_published', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Supabase error:', error);
+    document.getElementById('hero-zone').innerHTML =
+      `<div class="empty">Unable to load stories.<br><small style="color:var(--ink-3)">${error.message}</small></div>`;
+    return;
   }
-  document.getElementById('searchBtn')?.addEventListener('click', openSearch);
 
-  loadPosts();
+  if (!data || data.length === 0) {
+    document.getElementById('hero-zone').innerHTML =
+      '<div class="empty">No published stories yet. Add your first article in the Admin panel.</div>';
+    return;
+  }
+
+  /* Breaking posts float to top within their date group */
+  allPosts = data.sort((a,b) =>
+    (b.breaking?1:0)-(a.breaking?1:0) || new Date(b.created_at)-new Date(a.created_at)
+  );
+
+  applyFilter('');
+}
+
+/* ── FILTER ───────────────────────────────── */
+function applyFilter(cat) {
+  if(cat !== undefined) activeCat = cat;
+  filtered = activeCat ? allPosts.filter(p=>p.category===activeCat) : allPosts;
+  renderHero(filtered.slice(0,3));
+  feedOffset = PG;
+  renderFeed(filtered.slice(3, 3+PG));
+  const more = filtered.length > 3+PG;
+  document.getElementById('load-row').style.display = more ? 'block' : 'none';
+  if(more) { const b=document.getElementById('load-btn'); b.textContent='Load More Stories'; b.disabled=false; }
+}
+
+/* ── LOAD MORE ────────────────────────────── */
+function loadMore() {
+  const btn=document.getElementById('load-btn');
+  btn.textContent='Loading…'; btn.disabled=true;
+  renderFeed(filtered.slice(3+feedOffset, 3+feedOffset+PG), true);
+  feedOffset+=PG;
+  if(3+feedOffset>=filtered.length) document.getElementById('load-row').style.display='none';
+  else { btn.textContent='Load More Stories'; btn.disabled=false; }
+}
+
+loadPosts();
 </script>
 </body>
 </html>
