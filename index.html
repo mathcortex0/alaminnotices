@@ -22,7 +22,7 @@
       --serif:   'Playfair Display', Georgia, serif;
       --prose:   'Source Serif 4', Georgia, serif;
       --ui:      'DM Sans', system-ui, sans-serif;
-      --hdr:     52px;   /* ONE fixed header height — never changes */
+      --hdr:     52px;   /* ONE fixed header height — never changes, even on scroll */
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -32,11 +32,9 @@
     img { display: block; max-width: 100%; }
 
     /* ════════════════════════════════════════
-       HEADER  — CNN pattern
-       Single row, always exactly --hdr tall.
-       On scroll: shadow appears, nav row fades
-       in OVER the logo row using pointer-events
-       trick — no height change ever.
+       HEADER — ABSOLUTELY NO HEIGHT CHANGE
+       Sticky, fixed 52px tall. Two rows cross-fade.
+       Shadow appears on scroll, no dimension change.
        ════════════════════════════════════════ */
     .hdr {
       position: sticky;
@@ -45,13 +43,11 @@
       height: var(--hdr);
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
-      /* shadow added by JS class */
-      will-change: box-shadow;
       transition: box-shadow .2s;
+      will-change: box-shadow;
     }
     .hdr.shadow { box-shadow: 0 2px 12px rgba(0,0,0,.09); }
 
-    /* Inner container — always full height */
     .hdr-inner {
       position: relative;
       max-width: 1300px;
@@ -60,23 +56,23 @@
       height: 100%;
     }
 
-    /* ── ROW A: hamburger | logo | search  (default) ── */
+    /* ROW A: hamburger | logo | search  (default, always visible) */
     .hdr-row-a {
       position: absolute;
       inset: 0;
       display: flex;
       align-items: center;
       padding: 0 16px;
-      transition: opacity .18s ease, transform .18s ease;
-      /* always visible at top */
+      transition: opacity .2s ease, transform .2s ease;
     }
+    /* When scrolled, row A fades out (but does not affect header height) */
     .hdr.compact .hdr-row-a {
       opacity: 0;
       transform: translateY(-4px);
       pointer-events: none;
     }
 
-    /* ── ROW B: logo | nav categories | search  (on scroll) ── */
+    /* ROW B: compact logo | nav categories | search (appears on scroll) */
     .hdr-row-b {
       position: absolute;
       inset: 0;
@@ -86,7 +82,7 @@
       opacity: 0;
       transform: translateY(4px);
       pointer-events: none;
-      transition: opacity .18s ease, transform .18s ease;
+      transition: opacity .2s ease, transform .2s ease;
     }
     .hdr.compact .hdr-row-b {
       opacity: 1;
@@ -94,7 +90,7 @@
       pointer-events: auto;
     }
 
-    /* Icon button — used in both rows */
+    /* Icon buttons */
     .hdr-btn {
       background: none;
       border: none;
@@ -111,7 +107,7 @@
     }
     .hdr-btn:hover { color: var(--ink); background: var(--paper-2); }
 
-    /* Logo — centre of row A */
+    /* Logo row A */
     .hdr-logo {
       flex: 1;
       display: flex;
@@ -130,7 +126,7 @@
       white-space: nowrap;
     }
 
-    /* Row B: compact logo + nav strip + search */
+    /* Row B elements */
     .hdr-b-logo {
       font-family: var(--serif);
       font-size: 1.05rem;
@@ -169,7 +165,7 @@
     .hdr-nav-btn:hover,
     .hdr-nav-btn.active { color: var(--ink); border-bottom-color: var(--crimson); }
 
-    /* ── SEARCH BAR (slides down below header) ── */
+    /* SEARCH BAR (slides down from below header) */
     .search-bar {
       position: fixed;
       top: var(--hdr);
@@ -197,7 +193,6 @@
       border-radius: 3px;
       padding: 9px 14px;
       outline: none;
-      transition: border-color .2s;
     }
     .search-input:focus { border-color: var(--navy); }
     .search-close {
@@ -209,11 +204,10 @@
       border: none;
       cursor: pointer;
       padding: 8px;
-      transition: color .15s;
     }
     .search-close:hover { color: var(--crimson); }
 
-    /* ── DRAWER ── */
+    /* DRAWER (Hamburger Menu) with explicit CLOSE button */
     .drawer-overlay {
       display: none;
       position: fixed;
@@ -237,6 +231,7 @@
     }
     .drawer.open { transform: translateX(0); }
 
+    /* Drawer header includes brand AND a close button (X) */
     .drawer-hdr {
       display: flex;
       align-items: center;
@@ -253,8 +248,11 @@
     }
     .drawer-close {
       background: none; border: none; cursor: pointer;
-      color: var(--ink-3); padding: 4px;
+      color: var(--ink-3); padding: 6px;
       transition: color .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .drawer-close:hover { color: var(--crimson); }
 
@@ -294,9 +292,7 @@
     }
     .drawer-admin-link:hover { color: var(--crimson); }
 
-    /* ════════════════════════════════════════
-       PAGE LAYOUT
-       ════════════════════════════════════════ */
+    /* PAGE LAYOUT */
     .page { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
     .sec-head {
@@ -317,7 +313,7 @@
     .sec-rule { flex: 1; height: 1px; background: var(--rule); }
     .divider { border: none; border-top: 2px solid var(--ink); margin: 28px 0 0; }
 
-    /* ── CHIPS ── */
+    /* CHIPS */
     .chip {
       font-family: var(--ui); font-size: 9px; font-weight: 700;
       letter-spacing: 1.4px; text-transform: uppercase;
@@ -336,7 +332,7 @@
     }
     @keyframes blink-c { 0%,100%{opacity:1} 50%{opacity:.6} }
 
-    /* ── HERO ── */
+    /* HERO */
     .hero {
       display: grid;
       grid-template-columns: 1fr 300px;
@@ -428,7 +424,7 @@
       align-items: center;
     }
 
-    /* ── FEED ── */
+    /* FEED */
     .feed {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -468,7 +464,6 @@
       margin-bottom: 9px;
     }
 
-    /* ── SHARE BTN ── */
     .shr {
       background: none; border: none; cursor: pointer;
       font-family: var(--ui); font-size: 9.5px; font-weight: 600;
@@ -478,12 +473,7 @@
     }
     .shr:hover { color: var(--crimson); }
 
-    /* ── LOAD MORE ── */
-    .load-row {
-      text-align: center;
-      padding: 40px 0;
-      border-top: 1px solid var(--rule);
-    }
+    .load-row { text-align: center; padding: 40px 0; border-top: 1px solid var(--rule); }
     .load-btn {
       font-family: var(--ui); font-size: 11px; font-weight: 700;
       letter-spacing: 1.4px; text-transform: uppercase;
@@ -495,7 +485,7 @@
     .load-btn:hover { background: var(--ink); color: var(--paper); }
     .load-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-    /* ── FOOTER ── */
+    /* FOOTER */
     .ft {
       background: var(--navy); color: #8898a8;
       margin-top: 60px; padding: 52px 20px 28px;
@@ -528,7 +518,6 @@
       padding-top: 22px; font-family: var(--ui); font-size: 11px; color: #2e3e4e;
     }
 
-    /* ── TOAST ── */
     .toast {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(60px);
@@ -540,13 +529,8 @@
       transition: all .28s; pointer-events: none; white-space: nowrap;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── EMPTY ── */
     .empty { text-align: center; padding: 70px 20px; color: var(--ink-3); font-family: var(--ui); font-size: 14px; }
 
-    /* ════════════════════════════════════════
-       RESPONSIVE
-       ════════════════════════════════════════ */
     @media (max-width: 1024px) {
       .feed { grid-template-columns: repeat(2,1fr); }
     }
@@ -568,7 +552,6 @@
       .hero-body .hero-ex { display: none; }
       .ft-grid { grid-template-columns: 1fr; }
       .page { padding: 0 14px; }
-      /* Hide compact nav on mobile — use drawer instead */
       .hdr-row-b .hdr-nav { display: none; }
       .hdr-b-logo { border-right: none; padding-right: 0; }
     }
@@ -576,28 +559,18 @@
 </head>
 <body>
 
-<!-- ══ HEADER ══════════════════════════════════ -->
-<!--
-  ZERO-SHAKE GUARANTEE:
-  .hdr is always exactly --hdr (52px) tall, border included.
-  Row A and Row B are both position:absolute inside it.
-  They cross-fade. The header box NEVER resizes.
--->
+<!-- HEADER — FIXED HEIGHT, NEVER CHANGES -->
 <header class="hdr" id="hdr">
   <div class="hdr-inner">
-
-    <!-- ROW A: default (hamburger | logo | search) -->
+    <!-- ROW A (default: hamburger, logo, search) -->
     <div class="hdr-row-a">
-      <!-- Left: hamburger -->
-      <button class="hdr-btn" onclick="openDrawer()" aria-label="Menu">
+      <button class="hdr-btn" id="openDrawerBtn" aria-label="Menu">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="3" y1="6"  x2="21" y2="6"/>
           <line x1="3" y1="12" x2="21" y2="12"/>
           <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
       </button>
-
-      <!-- Centre: logo -->
       <div class="hdr-logo">
         <a href="index.html">
           <img src="images/lol.png" class="hdr-logo-img"
@@ -605,8 +578,6 @@
           <span class="hdr-logo-txt" id="hdr-wm" style="display:none;">The Alamin Gazette</span>
         </a>
       </div>
-
-      <!-- Right: search -->
       <button class="hdr-btn" onclick="toggleSearch()" aria-label="Search" style="margin-left:auto;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -614,7 +585,7 @@
       </button>
     </div>
 
-    <!-- ROW B: compact scroll (logo | nav | search) -->
+    <!-- ROW B (compact view on scroll) -->
     <div class="hdr-row-b">
       <a href="index.html" class="hdr-b-logo">The Alamin Gazette</a>
       <nav class="hdr-nav" id="hdr-nav">
@@ -631,7 +602,6 @@
         </svg>
       </button>
     </div>
-
   </div>
 </header>
 
@@ -644,13 +614,13 @@
   <button class="search-close" onclick="closeSearch()">Cancel</button>
 </div>
 
-<!-- DRAWER -->
+<!-- DRAWER with explicit CLOSE BUTTON inside header -->
 <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-hdr">
     <span class="drawer-brand">The Alamin Gazette</span>
-    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <button class="drawer-close" id="drawerCloseButton" aria-label="Close Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
@@ -668,22 +638,17 @@
   </div>
 </div>
 
-<!-- MAIN -->
 <main class="page">
   <div class="sec-head"><span class="sec-label">Top Stories</span><span class="sec-rule"></span></div>
   <div id="hero-zone"><div class="empty">Loading…</div></div>
-
   <hr class="divider">
-
   <div class="sec-head"><span class="sec-label">Latest Stories</span><span class="sec-rule"></span></div>
   <div class="feed" id="feed-zone"></div>
-
   <div class="load-row" id="load-row" style="display:none;">
     <button class="load-btn" id="load-btn" onclick="loadMore()">Load More Stories</button>
   </div>
 </main>
 
-<!-- FOOTER -->
 <footer class="ft">
   <div class="ft-inner">
     <div class="ft-grid">
@@ -693,36 +658,17 @@
         <span class="ft-brand-name" id="ft-nm" style="display:none;">The Alamin Gazette</span>
         <p>Independent world intelligence. Reporting the stories that define tomorrow across every continent.</p>
       </div>
-      <div class="ft-col">
-        <h5>Regions</h5>
-        <a href="#">Asia-Pacific</a><a href="#">EMEA</a>
-        <a href="#">Americas</a><a href="#">Middle East</a><a href="#">Africa</a>
-      </div>
-      <div class="ft-col">
-        <h5>Sections</h5>
-        <a href="#" onclick="pickCat(null,'World Affairs')">World Affairs</a>
-        <a href="#" onclick="pickCat(null,'Economy & Markets')">Economy &amp; Markets</a>
-        <a href="#" onclick="pickCat(null,'Innovation')">Innovation</a>
-        <a href="#" onclick="pickCat(null,'Defense & Security')">Defense &amp; Security</a>
-        <a href="#" onclick="pickCat(null,'Society')">Society</a>
-      </div>
-      <div class="ft-col">
-        <h5>The Gazette</h5>
-        <a href="#">About Us</a><a href="#">Editorial Standards</a>
-        <a href="#">Contact</a><a href="admin.html">Admin Portal</a>
-      </div>
+      <div class="ft-col"><h5>Regions</h5><a href="#">Asia-Pacific</a><a href="#">EMEA</a><a href="#">Americas</a><a href="#">Middle East</a><a href="#">Africa</a></div>
+      <div class="ft-col"><h5>Sections</h5><a href="#" onclick="pickCat(null,'World Affairs')">World Affairs</a><a href="#" onclick="pickCat(null,'Economy & Markets')">Economy</a><a href="#" onclick="pickCat(null,'Innovation')">Innovation</a><a href="#" onclick="pickCat(null,'Defense & Security')">Defense</a><a href="#" onclick="pickCat(null,'Society')">Society</a></div>
+      <div class="ft-col"><h5>The Gazette</h5><a href="#">About Us</a><a href="#">Editorial Standards</a><a href="#">Contact</a><a href="admin.html">Admin Portal</a></div>
     </div>
-    <div class="ft-bottom">
-      <span>© 2025 The Alamin Gazette. All rights reserved.</span>
-      <span>Powered by Supabase · Built by Alamin</span>
-    </div>
+    <div class="ft-bottom"><span>© 2025 The Alamin Gazette. All rights reserved.</span><span>Powered by Supabase · Built by Alamin</span></div>
   </div>
 </footer>
-
 <div class="toast" id="toast"></div>
 
 <script>
-/* ── SUPABASE ──────────────────────────────── */
+/* SUPABASE CONFIG */
 const SURL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
 const SKEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
 const sb   = supabase.createClient(SURL, SKEY);
@@ -730,16 +676,14 @@ const PG   = 12;
 
 let allPosts=[], filtered=[], feedOffset=0, activeCat='';
 
-/* ── HEADER SCROLL — zero shake ────────────
-   Only a CSS class toggles. Header height = --hdr always.
-   Row A and B cross-fade inside fixed container. */
+/* HEADER SCROLL — ONLY TOGGLES SHADOW & COMPACT CLASS, HEIGHT NEVER CHANGES */
 window.addEventListener('scroll', () => {
   const hdr = document.getElementById('hdr');
   if (window.scrollY > 50) hdr.classList.add('compact','shadow');
-  else                      hdr.classList.remove('compact','shadow');
+  else hdr.classList.remove('compact','shadow');
 }, { passive: true });
 
-/* ── DRAWER ───────────────────────────────── */
+/* DRAWER LOGIC — explicit open/close with dedicated button */
 function openDrawer() {
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('open');
@@ -750,6 +694,10 @@ function closeDrawer() {
   document.getElementById('drawer-overlay').classList.remove('open');
   document.body.style.overflow = '';
 }
+/* Attach event listeners for drawer buttons */
+document.getElementById('openDrawerBtn').addEventListener('click', openDrawer);
+document.getElementById('drawerCloseButton').addEventListener('click', closeDrawer);
+
 function drawerPick(btn, cat) {
   document.querySelectorAll('.drawer-item').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -757,22 +705,18 @@ function drawerPick(btn, cat) {
   applyFilter(cat);
 }
 
-/* ── SEARCH ───────────────────────────────── */
+/* SEARCH */
 let searchOpen = false;
-function toggleSearch() {
-  searchOpen ? closeSearch() : openSearch();
-}
+function toggleSearch() { searchOpen ? closeSearch() : openSearch(); }
 function openSearch() {
   searchOpen = true;
-  const bar = document.getElementById('search-bar');
-  bar.classList.add('open');
+  document.getElementById('search-bar').classList.add('open');
   setTimeout(() => document.getElementById('search-input').focus(), 50);
 }
 function closeSearch() {
   searchOpen = false;
   document.getElementById('search-bar').classList.remove('open');
   document.getElementById('search-input').value = '';
-  // Restore normal feed
   applyFilter(activeCat);
 }
 function doSearch(q) {
@@ -789,7 +733,6 @@ function doSearch(q) {
   document.getElementById('load-row').style.display = 'none';
 }
 
-/* ── NAV ──────────────────────────────────── */
 function pickCat(btn, cat) {
   if (btn) {
     document.querySelectorAll('.hdr-nav-btn').forEach(b => b.classList.remove('active'));
@@ -799,19 +742,16 @@ function pickCat(btn, cat) {
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
-/* ── HELPERS ──────────────────────────────── */
+/* HELPERS */
 function cc(c) {
   return {'World Affairs':'chip-world','Economy & Markets':'chip-economy',
     'Innovation':'chip-innovation','Defense & Security':'chip-defense',
     'Society':'chip-society'}[c]||'chip-default';
 }
-function tsr(p,n) {
-  const t=(p.excerpt||p.content||'').replace(/<[^>]+>/g,'');
-  return t.length>n ? t.slice(0,n).trim()+'…' : t;
-}
+function tsr(p,n) { const t=(p.excerpt||p.content||'').replace(/<[^>]+>/g,''); return t.length>n ? t.slice(0,n).trim()+'…' : t; }
 function ago(iso) {
   const d=Date.now()-new Date(iso).getTime(), m=Math.floor(d/60000);
-  if(m<1)  return 'Just now';
+  if(m<1) return 'Just now';
   if(m<60) return `${m}m ago`;
   const h=Math.floor(m/60);
   if(h<24) return `${h}h ago`;
@@ -819,133 +759,35 @@ function ago(iso) {
   if(dy<7) return `${dy}d ago`;
   return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 }
-function full(iso) {
-  return new Date(iso).toLocaleDateString('en-US',{
-    weekday:'long',year:'numeric',month:'long',day:'numeric',
-    hour:'2-digit',minute:'2-digit',timeZoneName:'short'
-  });
-}
+function full(iso) { return new Date(iso).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
 function aURL(slug) { return `article.html?id=${slug}`; }
-function sIco() {
-  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-  </svg>`;
-}
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
-function shr(e, slug, title) {
-  e.stopPropagation();
-  const url=`${location.origin}/article.html?id=${slug}`;
-  if(navigator.share) navigator.share({title,url});
-  else navigator.clipboard.writeText(url).then(()=>showToast('Link copied'));
-}
-function chips(p) {
-  return `${p.breaking?'<span class="chip chip-breaking">Breaking</span>':''}
-          <span class="chip ${cc(p.category)}">${p.category||'World'}</span>`;
-}
+function sIco() { return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`; }
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+function shr(e, slug, title) { e.stopPropagation(); const url=`${location.origin}/article.html?id=${slug}`; if(navigator.share) navigator.share({title,url}); else navigator.clipboard.writeText(url).then(()=>showToast('Link copied')); }
+function chips(p) { return `${p.breaking?'<span class="chip chip-breaking">Breaking</span>':''}<span class="chip ${cc(p.category)}">${p.category||'World'}</span>`; }
 
-/* ── RENDER HERO ──────────────────────────── */
 function renderHero(posts) {
   const el=document.getElementById('hero-zone');
   if(!posts.length){el.innerHTML='<div class="empty">No stories found.</div>';return;}
   const m=posts[0], sides=posts.slice(1,3);
-  el.innerHTML=`
-    <div class="hero">
-      <div class="hero-main" onclick="location.href='${aURL(m.slug)}'">
-        <img class="hero-main-img"
-          src="${m.image_url||'https://placehold.co/900x460/0b1927/3a5878?text=Gazette'}"
-          onerror="this.src='https://placehold.co/900x460/0b1927/3a5878?text=Gazette'" alt="">
-        <div class="hero-scrim"></div>
-        <div class="hero-body">
-          <div>${chips(m)}</div>
-          <h2>${m.title}</h2>
-          <p class="hero-ex">${tsr(m,190)}</p>
-          <div class="hero-byline">
-            <span title="${full(m.created_at)}">${m.author||'Alamin Gazette'} · ${ago(m.created_at)}</span>
-            <button class="shr" style="color:#6e6658" onclick="shr(event,'${m.slug}','${m.title.replace(/'/g,"\\'")}')">
-              ${sIco()} Share
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="hero-stack">
-        ${sides.map(p=>`
-          <div class="hero-side" onclick="location.href='${aURL(p.slug)}'">
-            <img class="hero-side-img"
-              src="${p.image_url||'https://placehold.co/600x260/0b1927/3a5878?text=Gazette'}"
-              onerror="this.src='https://placehold.co/600x260/0b1927/3a5878?text=Gazette'" loading="lazy" alt="">
-            <div>${chips(p)}</div>
-            <h3>${p.title}</h3>
-            <p class="side-ex">${tsr(p,100)}</p>
-            <div class="card-meta">
-              <span title="${full(p.created_at)}">${p.author||'Alamin Gazette'} · ${ago(p.created_at)}</span>
-              <button class="shr" onclick="shr(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
-                ${sIco()} Share
-              </button>
-            </div>
-          </div>`).join('')}
-      </div>
-    </div>`;
+  el.innerHTML=`<div class="hero"><div class="hero-main" onclick="location.href='${aURL(m.slug)}'"><img class="hero-main-img" src="${m.image_url||'https://placehold.co/900x460/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/900x460/0b1927/3a5878?text=Gazette'" alt=""><div class="hero-scrim"></div><div class="hero-body"><div>${chips(m)}</div><h2>${m.title}</h2><p class="hero-ex">${tsr(m,190)}</p><div class="hero-byline"><span title="${full(m.created_at)}">${m.author||'Alamin Gazette'} · ${ago(m.created_at)}</span><button class="shr" style="color:#6e6658" onclick="shr(event,'${m.slug}','${m.title.replace(/'/g,"\\'")}')">${sIco()} Share</button></div></div></div><div class="hero-stack">${sides.map(p=>`<div class="hero-side" onclick="location.href='${aURL(p.slug)}'"><img class="hero-side-img" src="${p.image_url||'https://placehold.co/600x260/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/600x260/0b1927/3a5878?text=Gazette'" loading="lazy" alt=""><div>${chips(p)}</div><h3>${p.title}</h3><p class="side-ex">${tsr(p,100)}</p><div class="card-meta"><span title="${full(p.created_at)}">${p.author||'Alamin Gazette'} · ${ago(p.created_at)}</span><button class="shr" onclick="shr(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">${sIco()} Share</button></div></div>`).join('')}</div></div>`;
 }
 
-/* ── RENDER FEED ──────────────────────────── */
 function renderFeed(posts, append=false) {
   const el=document.getElementById('feed-zone');
-  const html=posts.map(p=>`
-    <div class="feed-item" onclick="location.href='${aURL(p.slug)}'">
-      <img class="feed-item-img"
-        src="${p.image_url||'https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'}"
-        onerror="this.src='https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
-      <div>${chips(p)}</div>
-      <h3>${p.title}</h3>
-      <p class="item-ex">${tsr(p,130)}</p>
-      <div class="card-meta">
-        <span title="${full(p.created_at)}">${p.author||'Alamin Gazette'} · ${ago(p.created_at)}</span>
-        <button class="shr" onclick="shr(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
-          ${sIco()} Share
-        </button>
-      </div>
-    </div>`).join('');
+  const html=posts.map(p=>`<div class="feed-item" onclick="location.href='${aURL(p.slug)}'"><img class="feed-item-img" src="${p.image_url||'https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'}" onerror="this.src='https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt=""><div>${chips(p)}</div><h3>${p.title}</h3><p class="item-ex">${tsr(p,130)}</p><div class="card-meta"><span title="${full(p.created_at)}">${p.author||'Alamin Gazette'} · ${ago(p.created_at)}</span><button class="shr" onclick="shr(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">${sIco()} Share</button></div></div>`).join('');
   if(append) el.innerHTML+=html; else el.innerHTML=html;
 }
 
-/* ── LOAD POSTS ───────────────────────────── */
 async function loadPosts() {
-  /* Show loading state immediately */
   document.getElementById('hero-zone').innerHTML = '<div class="empty">Loading stories…</div>';
-
-  const { data, error } = await sb
-    .from('posts')
-    .select('*')
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Supabase error:', error);
-    document.getElementById('hero-zone').innerHTML =
-      `<div class="empty">Unable to load stories.<br><small style="color:var(--ink-3)">${error.message}</small></div>`;
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    document.getElementById('hero-zone').innerHTML =
-      '<div class="empty">No published stories yet. Add your first article in the Admin panel.</div>';
-    return;
-  }
-
-  /* Breaking posts float to top within their date group */
-  allPosts = data.sort((a,b) =>
-    (b.breaking?1:0)-(a.breaking?1:0) || new Date(b.created_at)-new Date(a.created_at)
-  );
-
+  const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
+  if (error) { document.getElementById('hero-zone').innerHTML = `<div class="empty">Unable to load stories.<br><small>${error.message}</small></div>`; return; }
+  if (!data || data.length === 0) { document.getElementById('hero-zone').innerHTML = '<div class="empty">No published stories yet. Add your first article in the Admin panel.</div>'; return; }
+  allPosts = data.sort((a,b) => (b.breaking?1:0)-(a.breaking?1:0) || new Date(b.created_at)-new Date(a.created_at));
   applyFilter('');
 }
 
-/* ── FILTER ───────────────────────────────── */
 function applyFilter(cat) {
   if(cat !== undefined) activeCat = cat;
   filtered = activeCat ? allPosts.filter(p=>p.category===activeCat) : allPosts;
@@ -957,7 +799,6 @@ function applyFilter(cat) {
   if(more) { const b=document.getElementById('load-btn'); b.textContent='Load More Stories'; b.disabled=false; }
 }
 
-/* ── LOAD MORE ────────────────────────────── */
 function loadMore() {
   const btn=document.getElementById('load-btn');
   btn.textContent='Loading…'; btn.disabled=true;
