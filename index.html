@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>The Alamin Gazette — World Intelligence</title>
   <meta name="description" content="Independent world intelligence. Breaking news, analysis and reporting across every continent.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     :root {
       --ink: #0f0f0f;
       --ink-2: #3a3a3a;
@@ -18,175 +24,377 @@
       --rule: #cfc8bb;
       --navy: #0b1927;
       --crimson: #b01428;
-      --gold: #c8922a;
       --serif: 'Playfair Display', Georgia, serif;
       --prose: 'Source Serif 4', Georgia, serif;
       --ui: 'DM Sans', system-ui, sans-serif;
+      --header-height: 52px;
+      --compact-header-height: 44px;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: var(--prose); background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-    a { color: inherit; }
-    img { display: block; max-width: 100%; }
 
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 55px;
+    }
 
-
-    /* ── MASTHEAD ──────────────────────────────── */
-    .masthead {
+    body {
+      font-family: var(--prose);
       background: var(--paper);
-      border-bottom: 1px solid var(--rule);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* ---------- MASTER HEADER CONTAINER (NO SHAKE) ---------- */
+    .header-container {
       position: sticky;
       top: 0;
-      z-index: 90;
-      transition: box-shadow .3s;
+      z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--rule);
+      height: var(--header-height);
+      transition: height 0.2s ease;
     }
-    .masthead.scrolled {
-      box-shadow: 0 2px 16px rgba(0,0,0,.09);
+
+    .header-container.compact {
+      height: var(--compact-header-height);
     }
-    .masthead-inner {
-      max-width: 1300px;
+
+    /* MAIN HEADER (visible at top) */
+    .main-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      background: var(--paper);
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .header-container.compact .main-header {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* COMPACT HEADER (visible on scroll) */
+    .compact-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--compact-header-height);
+      display: flex;
+      align-items: center;
+      background: var(--paper);
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .header-container.compact .compact-header {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .header-inner {
+      max-width: 1400px;
       margin: 0 auto;
       padding: 0 28px;
-    }
-
-    /* Top row: date | logo | admin — only visible when NOT scrolled */
-    .masthead-top {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      padding: 12px 0 10px;
-      border-bottom: 1px solid var(--rule);
-      overflow: hidden;
-      max-height: 80px;
-      transition: max-height .35s ease, padding .35s ease, opacity .3s ease;
-      opacity: 1;
-    }
-    .masthead.scrolled .masthead-top {
-      max-height: 0;
-      padding: 0;
-      opacity: 0;
-      border-bottom-color: transparent;
-    }
-
-    .masthead-date {
-      font-family: var(--ui);
-      font-size: 11px;
-      color: var(--ink-3);
-      letter-spacing: .3px;
-    }
-    .logo-area { text-align: center; }
-    .logo-img-el { height: 38px; width: auto; margin: 0 auto; }
-    .logo-wordmark {
-      font-family: var(--serif);
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: -.5px;
-      color: var(--ink);
-      line-height: 1;
-      text-decoration: none;
-      display: block;
-    }
-    .logo-tagline {
-      font-family: var(--ui);
-      font-size: 9px;
-      letter-spacing: 2.8px;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      margin-top: 3px;
-    }
-    .masthead-actions {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 12px;
-    }
-    .pill-btn {
-      font-family: var(--ui);
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      text-decoration: none;
-      color: var(--ink-3);
-      padding: 6px 14px;
-      border: 1px solid var(--rule);
-      transition: all .2s;
-    }
-    .pill-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-
-    /* Compact nav row — always visible */
-    .masthead-nav-row {
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    /* Compact logo — only shows when scrolled */
-    .compact-logo {
+    /* ---------- MAIN HEADER CONTENT ---------- */
+    /* Left: Logo (NYT style font) */
+    .main-logo {
       font-family: var(--serif);
-      font-size: 1.1rem;
+      font-size: 1.4rem;
       font-weight: 900;
+      letter-spacing: -0.02em;
       color: var(--ink);
-      text-decoration: none;
+      line-height: 1;
       white-space: nowrap;
-      padding: 8px 0;
-      max-width: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition: max-width .35s ease, opacity .3s ease, padding .3s ease;
-      margin-right: 0;
-    }
-    .masthead.scrolled .compact-logo {
-      max-width: 220px;
-      opacity: 1;
-      margin-right: 20px;
-      padding: 8px 0;
     }
 
-    /* NAV */
-    .nav-strip {
+    .main-logo-img {
+      height: 32px;
+      width: auto;
+      display: block;
+    }
+
+    /* Center: Categories (straight line) */
+    .main-categories {
+      flex: 1;
       display: flex;
+      justify-content: center;
       overflow-x: auto;
       scrollbar-width: none;
-      flex: 1;
     }
-    .nav-strip::-webkit-scrollbar { display: none; }
-    .nav-btn {
+
+    .main-categories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-btn {
       font-family: var(--ui);
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .9px;
+      font-weight: 500;
+      letter-spacing: 0.4px;
       text-transform: uppercase;
       color: var(--ink-2);
-      padding: 10px 16px;
+      padding: 6px 12px;
       border: none;
       background: none;
       cursor: pointer;
       white-space: nowrap;
       border-bottom: 2px solid transparent;
-      transition: all .2s;
+      transition: all 0.2s;
     }
-    .nav-btn:hover, .nav-btn.active { color: var(--ink); border-bottom-color: var(--crimson); }
 
-    /* Compact admin link — visible when scrolled */
-    .compact-admin {
-      font-family: var(--ui);
-      font-size: 10.5px;
+    .cat-btn:hover {
+      color: var(--ink);
+    }
+
+    .cat-btn.active {
+      color: var(--crimson);
       font-weight: 600;
-      letter-spacing: .6px;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      text-decoration: none;
-      padding: 0 0 0 16px;
-      border-left: 1px solid var(--rule);
+      border-bottom-color: var(--crimson);
+    }
+
+    /* Right: Search + Hamburger */
+    .main-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-2);
+      transition: color 0.2s;
+      padding: 4px;
+    }
+
+    .icon-btn:hover {
+      color: var(--crimson);
+    }
+
+    .search-icon {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .hamburger-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hamburger-icon span {
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      transition: all 0.2s;
+    }
+
+    /* ---------- COMPACT HEADER CONTENT (scroll) ---------- */
+    .compact-logo {
+      font-family: var(--serif);
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--ink);
       white-space: nowrap;
       flex-shrink: 0;
-      transition: color .2s;
     }
-    .compact-admin:hover { color: var(--crimson); }
 
-    /* ── PAGE LAYOUT ──────────────────────────────── */
-    .page { max-width: 1300px; margin: 0 auto; padding: 0 28px; }
+    .compact-logo-img {
+      height: 28px;
+      width: auto;
+      display: block;
+    }
+
+    .compact-categories {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      scrollbar-width: none;
+      gap: 2px;
+    }
+
+    .compact-categories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .compact-cat-btn {
+      font-family: var(--ui);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: var(--ink-2);
+      padding: 4px 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 1.5px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .compact-cat-btn:hover {
+      color: var(--ink);
+    }
+
+    .compact-cat-btn.active {
+      color: var(--crimson);
+      font-weight: 600;
+      border-bottom-color: var(--crimson);
+    }
+
+    .compact-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ---------- MOBILE DRAWER MENU ---------- */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 199;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s;
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 80%;
+      max-width: 280px;
+      height: 100vh;
+      background: var(--paper);
+      z-index: 200;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .drawer-logo {
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    .close-drawer {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--ink-2);
+    }
+
+    .drawer-nav {
+      flex: 1;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .drawer-nav a {
+      font-family: var(--ui);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink-2);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+    }
+
+    .drawer-nav a:hover,
+    .drawer-nav a.active-drawer {
+      color: var(--crimson);
+      font-weight: 600;
+    }
+
+    .drawer-footer {
+      padding: 20px;
+      border-top: 1px solid var(--rule);
+    }
+
+    .drawer-footer a {
+      font-family: var(--ui);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-3);
+    }
+
+    body.drawer-open {
+      overflow: hidden;
+    }
+
+    /* ---------- PAGE CONTENT ---------- */
+    .page {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
 
     .section-head {
       display: flex;
@@ -194,6 +402,7 @@
       gap: 14px;
       margin: 34px 0 22px;
     }
+
     .section-head-label {
       font-family: var(--ui);
       font-size: 10px;
@@ -203,10 +412,147 @@
       color: var(--crimson);
       white-space: nowrap;
     }
-    .section-head-rule { flex: 1; height: 1px; background: var(--rule); }
-    .divider { border: none; border-top: 2px solid var(--ink); margin: 0; }
 
-    /* ── CHIPS ──────────────────────────────── */
+    .section-head-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .divider {
+      border: none;
+      border-top: 2px solid var(--ink);
+      margin: 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      min-height: 460px;
+    }
+
+    .hero-lead {
+      position: relative;
+      overflow: hidden;
+      border-right: 1px solid var(--rule);
+      cursor: pointer;
+      min-height: 460px;
+      background: var(--navy);
+    }
+
+    .hero-lead-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      transition: transform 0.4s ease;
+    }
+
+    .hero-lead:hover .hero-lead-img {
+      transform: scale(1.02);
+    }
+
+    .hero-lead-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8, 12, 20, 0.92) 0%, rgba(8, 12, 20, 0.4) 60%, transparent 100%);
+    }
+
+    .hero-lead-body {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 26px 22px 22px;
+    }
+
+    .hero-lead-body h2 {
+      font-family: var(--serif);
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: #f4efe8;
+      line-height: 1.25;
+      margin: 8px 0 8px;
+    }
+
+    .hero-excerpt {
+      font-family: var(--prose);
+      font-size: 0.85rem;
+      color: #c0b8a8;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .hero-byline {
+      font-family: var(--ui);
+      font-size: 11px;
+      color: #7a7060;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-stack {
+      display: flex;
+      flex-direction: column;
+      background: var(--paper);
+    }
+
+    .hero-card {
+      flex: 1;
+      padding: 16px;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      transition: background 0.2s;
+      background: var(--paper);
+    }
+
+    .hero-card:last-child {
+      border-bottom: none;
+    }
+
+    .hero-card:hover {
+      background: var(--paper-2);
+    }
+
+    .hero-card-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      background: #e8e2d8;
+    }
+
+    .hero-card h3 {
+      font-family: var(--serif);
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--ink);
+      margin: 6px 0;
+    }
+
+    .card-excerpt {
+      font-family: var(--prose);
+      font-size: 0.75rem;
+      color: var(--ink-2);
+      line-height: 1.45;
+      margin-bottom: 8px;
+    }
+
+    .card-meta {
+      font-family: var(--ui);
+      font-size: 10px;
+      color: var(--ink-3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .chip {
       font-family: var(--ui);
       font-size: 9.5px;
@@ -217,185 +563,99 @@
       border-radius: 2px;
       display: inline-block;
     }
-    .chip-world     { background:#0b1927; color:#9ab0c8; }
-    .chip-economy   { background:#0e3d27; color:#8ec8a8; }
-    .chip-innovation{ background:#0a3d78; color:#90b8e8; }
-    .chip-defense   { background:#3d0e1a; color:#c89098; }
-    .chip-society   { background:#3d3000; color:#c8b870; }
-    .chip-default   { background:#1a1a1a; color:#aaa; }
-    .chip-breaking  {
+
+    .chip-world { background: #0b1927; color: #9ab0c8; }
+    .chip-economy { background: #0e3d27; color: #8ec8a8; }
+    .chip-innovation { background: #0a3d78; color: #90b8e8; }
+    .chip-defense { background: #3d0e1a; color: #c89098; }
+    .chip-society { background: #3d3000; color: #c8b870; }
+    .chip-default { background: #1a1a1a; color: #aaa; }
+    .chip-breaking {
       background: var(--crimson);
       color: #fff;
       animation: pulse-chip 2s ease-in-out infinite;
       margin-right: 5px;
     }
-    @keyframes pulse-chip { 0%,100%{opacity:1} 50%{opacity:.65} }
 
-    /* ── HERO ──────────────────────────────── */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      border: 1px solid var(--rule);
-      margin-bottom: 0;
-    }
-    .hero-lead {
-      position: relative;
-      overflow: hidden;
-      border-right: 1px solid var(--rule);
-      cursor: pointer;
-      min-height: 500px;
-    }
-    .hero-lead-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      inset: 0;
-      transition: transform .6s ease;
-    }
-    .hero-lead:hover .hero-lead-img { transform: scale(1.04); }
-    .hero-lead-scrim {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(8,12,20,.95) 0%, rgba(8,12,20,.45) 55%, transparent 100%);
-    }
-    .hero-lead-body {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 32px 28px 26px;
-    }
-    .hero-lead-body h2 {
-      font-family: var(--serif);
-      font-size: 2rem;
-      font-weight: 900;
-      color: #f4efe8;
-      line-height: 1.2;
-      margin: 8px 0 10px;
-    }
-    .hero-lead-body .hero-excerpt {
-      font-family: var(--prose);
-      font-size: .9rem;
-      color: #c0b8a8;
-      line-height: 1.55;
-      margin-bottom: 14px;
-    }
-    .hero-byline {
-      font-family: var(--ui);
-      font-size: 11px;
-      color: #7a7060;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    @keyframes pulse-chip {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
     }
 
-    .hero-stack { display: flex; flex-direction: column; }
-    .hero-card {
-      flex: 1;
-      padding: 20px 20px;
-      border-bottom: 1px solid var(--rule);
-      cursor: pointer;
-      transition: background .2s;
-    }
-    .hero-card:last-child { border-bottom: none; }
-    .hero-card:hover { background: var(--paper-2); }
-    .hero-card-img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      border-radius: 2px;
-      margin-bottom: 12px;
-    }
-    .hero-card h3 {
-      font-family: var(--serif);
-      font-size: 1.05rem;
-      font-weight: 700;
-      line-height: 1.3;
-      color: var(--ink);
-      margin: 6px 0 6px;
-    }
-    .hero-card .card-excerpt {
-      font-family: var(--prose);
-      font-size: .8rem;
-      color: var(--ink-2);
-      line-height: 1.5;
-      margin-bottom: 8px;
-    }
-    .card-meta {
-      font-family: var(--ui);
-      font-size: 10.5px;
-      color: var(--ink-3);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* ── FEED ──────────────────────────────── */
-    .feed {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border-left: 1px solid var(--rule);
-      border-top: 1px solid var(--rule);
-    }
-    .feed-item {
-      padding: 22px 22px;
-      border-right: 1px solid var(--rule);
-      border-bottom: 1px solid var(--rule);
-      cursor: pointer;
-      transition: background .2s;
-    }
-    .feed-item:hover { background: var(--paper-2); }
-    .feed-item-img {
-      width: 100%;
-      height: 126px;
-      object-fit: cover;
-      border-radius: 2px;
-      margin-bottom: 10px;
-    }
-    .feed-item h3 {
-      font-family: var(--serif);
-      font-size: 1rem;
-      font-weight: 700;
-      line-height: 1.3;
-      color: var(--ink);
-      margin: 6px 0 6px;
-    }
-    .feed-item .item-excerpt {
-      font-family: var(--prose);
-      font-size: .8rem;
-      color: var(--ink-2);
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    /* ── SHARE BTN ──────────────────────────────── */
     .share-btn {
       background: none;
       border: none;
       cursor: pointer;
       font-family: var(--ui);
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 600;
       color: var(--ink-3);
-      letter-spacing: .8px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
       gap: 4px;
       padding: 3px 0;
-      transition: color .2s;
     }
-    .share-btn:hover { color: var(--crimson); }
 
-    /* ── LOAD MORE ──────────────────────────────── */
+    .share-btn:hover {
+      color: var(--crimson);
+    }
+
+    .feed {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-left: 1px solid var(--rule);
+      border-top: 1px solid var(--rule);
+      background: var(--paper);
+    }
+
+    .feed-item {
+      padding: 18px;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .feed-item:hover {
+      background: var(--paper-2);
+    }
+
+    .feed-item-img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      background: #e8e2d8;
+    }
+
+    .feed-item h3 {
+      font-family: var(--serif);
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin: 6px 0;
+    }
+
+    .item-excerpt {
+      font-size: 0.75rem;
+      color: var(--ink-2);
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
     .load-more-row {
       text-align: center;
       padding: 44px 0;
       border-top: 1px solid var(--rule);
     }
+
     .load-more-btn {
       font-family: var(--ui);
       font-size: 11px;
@@ -405,187 +665,274 @@
       background: transparent;
       color: var(--ink);
       border: 1.5px solid var(--ink);
-      padding: 14px 40px;
+      padding: 12px 36px;
       cursor: pointer;
-      transition: all .25s;
+      transition: all 0.25s;
     }
-    .load-more-btn:hover { background: var(--ink); color: var(--paper); }
-    .load-more-btn:disabled { opacity: .35; cursor: not-allowed; }
 
-    /* ── FOOTER ──────────────────────────────── */
+    .load-more-btn:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
     .site-footer {
       background: var(--navy);
       color: #8898a8;
       margin-top: 70px;
-      padding: 60px 28px 32px;
+      padding: 48px 28px 32px;
     }
-    .footer-inner { max-width: 1300px; margin: 0 auto; }
+
+    .footer-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
     .footer-grid {
       display: grid;
-      grid-template-columns: 260px 1fr 1fr 1fr;
-      gap: 48px;
-      padding-bottom: 44px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      grid-template-columns: 240px 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    .footer-brand-logo {
-      font-family: var(--serif);
-      font-size: 1.7rem;
-      font-weight: 900;
-      color: #e8e0d4;
-      display: block;
-      text-decoration: none;
-      margin-bottom: 14px;
-    }
+
     .footer-brand p {
       font-family: var(--prose);
-      font-size: .82rem;
+      font-size: 0.8rem;
       color: #5a6878;
-      line-height: 1.65;
     }
+
     .footer-col h5 {
       font-family: var(--ui);
-      font-size: 9.5px;
+      font-size: 9px;
       font-weight: 700;
-      letter-spacing: 2.5px;
+      letter-spacing: 2px;
       text-transform: uppercase;
       color: #c0ccd8;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
+
     .footer-col a {
       display: block;
       font-family: var(--ui);
-      font-size: 13px;
+      font-size: 12px;
       color: #5a6878;
-      text-decoration: none;
-      margin-bottom: 10px;
-      transition: color .2s;
+      margin-bottom: 8px;
+      cursor: pointer;
     }
-    .footer-col a:hover { color: #d8e4f0; }
+
     .footer-bottom {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding-top: 26px;
+      padding-top: 24px;
       font-family: var(--ui);
-      font-size: 11px;
+      font-size: 10px;
       color: #3a4858;
     }
 
-    /* ── TOAST ──────────────────────────────── */
     .toast {
       position: fixed;
-      bottom: 28px;
+      bottom: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(60px);
       background: var(--ink);
       color: #f4efe8;
       font-family: var(--ui);
-      font-size: 13px;
-      padding: 12px 22px;
+      font-size: 12px;
+      padding: 10px 20px;
       border-radius: 3px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.3);
       z-index: 999;
       opacity: 0;
-      transition: all .3s ease;
+      transition: all 0.3s ease;
       pointer-events: none;
       white-space: nowrap;
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ── EMPTY STATE ──────────────────────────────── */
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
     .empty-state {
       text-align: center;
       padding: 80px 20px;
       color: var(--ink-3);
-      font-family: var(--ui);
-      font-size: 14px;
     }
 
-    /* ── RESPONSIVE ──────────────────────────────── */
-    @media (max-width: 1024px) {
-      .feed { grid-template-columns: repeat(2,1fr); }
-    }
+    /* RESPONSIVE */
     @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-lead { min-height: 360px; border-right: none; border-bottom: 1px solid var(--rule); }
-      .hero-stack { flex-direction: row; }
-      .hero-card { border-bottom: none; border-right: 1px solid var(--rule); }
-      .hero-card:last-child { border-right: none; }
-      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .hero {
+        grid-template-columns: 1fr;
+      }
+      .hero-lead {
+        min-height: 360px;
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+      .hero-stack {
+        flex-direction: row;
+      }
+      .hero-card {
+        border-bottom: none;
+        border-right: 1px solid var(--rule);
+      }
+      .feed {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
     }
-    @media (max-width: 640px) {
-      /* Header */
-      .masthead-top { grid-template-columns: 1fr; justify-items: center; gap: 4px; }
-      .masthead-date, .masthead-actions { display: none; }
-      .logo-wordmark { font-size: 1.65rem; }
-      .logo-img-el { height: 32px; }
-      .compact-logo { font-size: 1rem; }
-      .nav-btn { padding: 10px 12px; font-size: 10.5px; letter-spacing: .6px; }
-      .compact-admin { display: none; }
-      /* Hero */
-      .hero-stack { flex-direction: column; }
-      .hero-card { border-right: none; border-bottom: 1px solid var(--rule); }
-      .hero-lead { min-height: 280px; }
-      .hero-lead-body h2 { font-size: 1.3rem; }
-      .hero-lead-body .hero-excerpt { display: none; }
-      /* Feed */
-      .feed { grid-template-columns: 1fr; }
-      /* Footer */
-      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
-      /* Page */
-      .page { padding: 0 14px; }
-      .section-head { margin: 24px 0 16px; }
+
+    @media (max-width: 768px) {
+      .header-inner {
+        padding: 0 16px;
+      }
+      .main-categories {
+        display: none;
+      }
+      .compact-categories {
+        display: none;
+      }
+      .main-logo {
+        font-size: 1.1rem;
+      }
+      .compact-logo {
+        font-size: 0.9rem;
+      }
+      .hero-stack {
+        flex-direction: column;
+      }
+      .hero-card {
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+      .feed {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      .page {
+        padding: 0 16px;
+      }
+      .hero-lead-body h2 {
+        font-size: 1.2rem;
+      }
+      .hero-lead-body .hero-excerpt {
+        display: none;
+      }
     }
-    @media (max-width: 400px) {
-      .logo-wordmark { font-size: 1.4rem; }
-      .nav-btn { padding: 10px 10px; font-size: 10px; }
+
+    @media (max-width: 480px) {
+      .main-logo {
+        font-size: 0.95rem;
+      }
+      .main-logo-img {
+        height: 24px;
+      }
+      .compact-logo-img {
+        height: 22px;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- MASTHEAD -->
-<header class="masthead" id="masthead">
-  <div class="masthead-inner">
-    <!-- Full header: date + logo + admin (collapses on scroll) -->
-    <div class="masthead-top">
-      <div class="masthead-date" id="hdr-date"></div>
-      <div class="logo-area">
-        <a href="index.html" style="text-decoration:none;">
-          <img src="images/lol.png" class="logo-img-el"
-               onerror="this.style.display='none';document.getElementById('logo-wm').style.display='block';" alt="The Alamin Gazette">
-          <span class="logo-wordmark" id="logo-wm" style="display:none;">The Alamin Gazette</span>
-        </a>
-        <div class="logo-tagline">Independent · Informed · Indispensable</div>
+<!-- HEADER CONTAINER (swaps between main and compact on scroll) -->
+<div class="header-container" id="headerContainer">
+  <!-- MAIN HEADER (visible at top) -->
+  <div class="main-header">
+    <div class="header-inner">
+      <div class="main-logo">
+        <img src="images/lol.png" class="main-logo-img" alt="The Alamin Gazette" 
+             onerror="this.style.display='none';document.getElementById('mainLogoText').style.display='block';">
+        <span class="main-logo" id="mainLogoText" style="display:none;">The Alamin Gazette</span>
       </div>
-      <div class="masthead-actions">
-        <a href="admin.html" class="pill-btn">Admin</a>
+      <div class="main-categories">
+        <button class="cat-btn active" data-cat="">All</button>
+        <button class="cat-btn" data-cat="World Affairs">World Affairs</button>
+        <button class="cat-btn" data-cat="Economy & Markets">Economy</button>
+        <button class="cat-btn" data-cat="Innovation">Innovation</button>
+        <button class="cat-btn" data-cat="Defense & Security">Defense</button>
+        <button class="cat-btn" data-cat="Society">Society</button>
       </div>
-    </div>
-    <!-- Nav row: compact logo appears here on scroll -->
-    <div class="masthead-nav-row">
-      <a href="index.html" class="compact-logo" id="compact-logo">The Alamin Gazette</a>
-      <nav class="nav-strip">
-        <button class="nav-btn active" onclick="setCategory(this,'')">All</button>
-        <button class="nav-btn" onclick="setCategory(this,'World Affairs')">World Affairs</button>
-        <button class="nav-btn" onclick="setCategory(this,'Economy & Markets')">Economy</button>
-        <button class="nav-btn" onclick="setCategory(this,'Innovation')">Innovation</button>
-        <button class="nav-btn" onclick="setCategory(this,'Defense & Security')">Defense</button>
-        <button class="nav-btn" onclick="setCategory(this,'Society')">Society</button>
-      </nav>
-      <a href="admin.html" class="compact-admin">Admin</a>
+      <div class="main-actions">
+        <button class="icon-btn" id="searchBtn">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="10.5" cy="10.5" r="7.5"/>
+            <line x1="16" y1="16" x2="22" y2="22"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="hamburgerBtn">
+          <div class="hamburger-icon">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
-</header>
 
-<!-- MAIN -->
+  <!-- COMPACT HEADER (visible on scroll) -->
+  <div class="compact-header">
+    <div class="header-inner">
+      <div class="compact-logo">
+        <img src="images/lol.png" class="compact-logo-img" alt="The Alamin Gazette" 
+             onerror="this.style.display='none';document.getElementById('compactLogoText').style.display='block';">
+        <span class="compact-logo" id="compactLogoText" style="display:none;">The Alamin Gazette</span>
+      </div>
+      <div class="compact-categories">
+        <button class="compact-cat-btn active" data-cat="">All</button>
+        <button class="compact-cat-btn" data-cat="World Affairs">World</button>
+        <button class="compact-cat-btn" data-cat="Economy & Markets">Econ</button>
+        <button class="compact-cat-btn" data-cat="Innovation">Innov</button>
+        <button class="compact-cat-btn" data-cat="Defense & Security">Defense</button>
+        <button class="compact-cat-btn" data-cat="Society">Society</button>
+      </div>
+      <div class="compact-actions">
+        <button class="icon-btn" id="compactSearchBtn">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="10.5" cy="10.5" r="7.5"/>
+            <line x1="16" y1="16" x2="22" y2="22"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="compactHamburgerBtn">
+          <div class="hamburger-icon">
+            <span></span><span></span><span></span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Drawer Menu -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-header">
+    <span class="drawer-logo">The Alamin Gazette</span>
+    <button class="close-drawer" id="closeDrawerBtn">×</button>
+  </div>
+  <div class="drawer-nav" id="drawerNav">
+    <a data-cat="">All Stories</a>
+    <a data-cat="World Affairs">World Affairs</a>
+    <a data-cat="Economy & Markets">Economy & Markets</a>
+    <a data-cat="Innovation">Innovation</a>
+    <a data-cat="Defense & Security">Defense & Security</a>
+    <a data-cat="Society">Society</a>
+  </div>
+  <div class="drawer-footer">
+    <a href="admin.html">Admin Portal</a>
+  </div>
+</div>
+
 <main class="page">
-
   <div class="section-head">
     <span class="section-head-label">Top Stories</span>
     <span class="section-head-rule"></span>
   </div>
-  <div id="hero-zone"></div>
+  <div id="heroZone"><div class="empty-state">Loading intelligence...</div></div>
 
   <hr class="divider" style="margin:36px 0 0;">
 
@@ -593,260 +940,219 @@
     <span class="section-head-label">Intelligence Feed</span>
     <span class="section-head-rule"></span>
   </div>
-  <div class="feed" id="feed-zone"></div>
+  <div class="feed" id="feedZone"></div>
 
-  <div class="load-more-row" id="load-more-row" style="display:none;">
-    <button class="load-more-btn" id="load-more-btn" onclick="loadMore()">Load More Stories</button>
+  <div class="load-more-row" id="loadMoreRow" style="display:none;">
+    <button class="load-more-btn" id="loadMoreBtn">Load More Stories</button>
   </div>
-
 </main>
 
-<!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-brand">
-        <img src="images/lol.png" style="height:40px;filter:brightness(10);opacity:.85;margin-bottom:12px;"
-             onerror="this.style.display='none';document.getElementById('fl').style.display='block';" alt="">
-        <span class="footer-brand-logo" id="fl" style="display:none;">The Alamin Gazette</span>
         <p>Independent world intelligence. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
       </div>
       <div class="footer-col">
-        <h5>Regions</h5>
-        <a href="#">Asia-Pacific</a>
-        <a href="#">EMEA</a>
-        <a href="#">Americas</a>
-        <a href="#">Middle East</a>
-        <a href="#">Africa</a>
-      </div>
-      <div class="footer-col">
         <h5>Sections</h5>
-        <a href="#" onclick="setCategory(null,'World Affairs')">World Affairs</a>
-        <a href="#" onclick="setCategory(null,'Economy & Markets')">Economy & Markets</a>
-        <a href="#" onclick="setCategory(null,'Innovation')">Innovation</a>
-        <a href="#" onclick="setCategory(null,'Defense & Security')">Defense & Security</a>
-        <a href="#" onclick="setCategory(null,'Society')">Society</a>
+        <a data-cat="World Affairs">World Affairs</a>
+        <a data-cat="Economy & Markets">Economy</a>
+        <a data-cat="Innovation">Innovation</a>
+        <a data-cat="Defense & Security">Defense</a>
+        <a data-cat="Society">Society</a>
       </div>
       <div class="footer-col">
         <h5>The Gazette</h5>
-        <a href="#">About Us</a>
-        <a href="#">Editorial Standards</a>
-        <a href="#">Contact</a>
-        <a href="admin.html">Admin Portal</a>
+        <a href="#">About</a>
+        <a href="#">Standards</a>
+        <a href="admin.html">Admin</a>
       </div>
     </div>
     <div class="footer-bottom">
       <span>© 2025 The Alamin Gazette. All rights reserved.</span>
-      <span>Powered by Supabase · Built by Alamin</span>
+      <span>Supabase · Intelligence</span>
     </div>
   </div>
 </footer>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toastMsg"></div>
 
 <script>
-// ── CONFIG ─────────────────────────────────────────
-const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
-const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
-const PAGE = 12;
+  const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let allPosts = [], filtered = [], feedOffset = 0, activeCat = '';
+  const PAGE = 12;
+  let allPosts = [], filtered = [], feedOffset = 0, activeCat = '', isLoading = false;
 
-// ── DATE ───────────────────────────────────────────
-document.getElementById('hdr-date').textContent =
-  new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  function chipClass(c) {
+    const map = {
+      'World Affairs': 'chip-world',
+      'Economy & Markets': 'chip-economy',
+      'Innovation': 'chip-innovation',
+      'Defense & Security': 'chip-defense',
+      'Society': 'chip-society'
+    };
+    return map[c] || 'chip-default';
+  }
 
-// ── HELPERS ────────────────────────────────────────
-function chipClass(c) {
-  return { 'World Affairs':'chip-world','Economy & Markets':'chip-economy',
-    'Innovation':'chip-innovation','Defense & Security':'chip-defense','Society':'chip-society' }[c] || 'chip-default';
-}
+  function teaser(p, n) {
+    const t = (p.excerpt || p.content || '').replace(/<[^>]+>/g, '');
+    return t.length > n ? t.slice(0, n).trim() + '…' : t;
+  }
 
-function teaser(p, n) {
-  const t = (p.excerpt || p.content || '').replace(/<[^>]+>/g,'');
-  return t.length > n ? t.slice(0, n).trim() + '…' : t;
-}
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'Just now';
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    const d = Math.floor(h / 24);
+    if (d < 7) return `${d}d ago`;
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
 
-function timeAgo(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1)  return 'Just now';
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  if (d < 7)  return `${d}d ago`;
-  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-}
+  function fullDate(iso) {
+    return new Date(iso).toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+    });
+  }
 
-function fullDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', {
-    weekday:'long', year:'numeric', month:'long', day:'numeric',
-    hour:'2-digit', minute:'2-digit', timeZoneName:'short'
+  function articleURL(slug) { return `article.html?id=${slug}`; }
+  function shareIco() { return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`; }
+  function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+  function showToast(msg) { const t = document.getElementById('toastMsg'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+
+  window.doShare = function(e, slug, title) {
+    e.stopPropagation();
+    const url = window.location.origin + '/' + articleURL(slug);
+    if (navigator.share) navigator.share({ title, url });
+    else navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
+  };
+
+  function renderHero(posts) {
+    const el = document.getElementById('heroZone');
+    if (!posts.length) { el.innerHTML = '<div class="empty-state">No stories found.</div>'; return; }
+    const lead = posts[0];
+    const cards = posts.slice(1, 3);
+    el.innerHTML = `<div class="hero"><div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'"><img class="hero-lead-img" src="${lead.image_url || 'https://placehold.co/900x560/0b1927/3a5878?text=Gazette'}" alt=""><div class="hero-lead-scrim"></div><div class="hero-lead-body"><div>${lead.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(lead.category)}">${lead.category || 'World'}</span></div><h2>${escapeHtml(lead.title)}</h2><p class="hero-excerpt">${escapeHtml(teaser(lead, 200))}</p><div class="hero-byline"><span>${lead.author || 'Alamin Gazette'} · ${timeAgo(lead.created_at)}</span><button class="share-btn" onclick="doShare(event,'${lead.slug}','${escapeHtml(lead.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div></div><div class="hero-stack">${cards.map(p => `<div class="hero-card" onclick="location.href='${articleURL(p.slug)}'"><img class="hero-card-img" src="${p.image_url || 'https://placehold.co/600x280/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="card-excerpt">${escapeHtml(teaser(p, 110))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('')}</div></div>`;
+  }
+
+  function renderFeed(posts, append = false) {
+    const el = document.getElementById('feedZone');
+    const html = posts.map(p => `<div class="feed-item" onclick="location.href='${articleURL(p.slug)}'"><img class="feed-item-img" src="${p.image_url || 'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}" loading="lazy" alt=""><div>${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}<span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span></div><h3>${escapeHtml(p.title)}</h3><p class="item-excerpt">${escapeHtml(teaser(p, 140))}</p><div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="doShare(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">${shareIco()} Share</button></div></div>`).join('');
+    if (append) el.insertAdjacentHTML('beforeend', html);
+    else el.innerHTML = html;
+  }
+
+  async function loadPosts() {
+    const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
+    if (error || !data) { document.getElementById('heroZone').innerHTML = '<div class="empty-state">Unable to load stories.</div>'; console.error(error); return; }
+    allPosts = data.sort((a, b) => { if (a.breaking && !b.breaking) return -1; if (!a.breaking && b.breaking) return 1; return new Date(b.created_at) - new Date(a.created_at); });
+    applyFilter();
+  }
+
+  function applyFilter() {
+    filtered = activeCat ? allPosts.filter(p => p.category === activeCat) : [...allPosts];
+    renderHero(filtered.slice(0, 3));
+    feedOffset = PAGE;
+    renderFeed(filtered.slice(3, 3 + PAGE));
+    document.getElementById('loadMoreRow').style.display = filtered.length > 3 + PAGE ? 'block' : 'none';
+  }
+
+  function setCategory(cat) {
+    activeCat = cat;
+    document.querySelectorAll('.cat-btn, .compact-cat-btn').forEach(btn => {
+      if (btn.dataset.cat === cat) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+    document.querySelectorAll('#drawerNav a').forEach(link => {
+      if (link.dataset.cat === cat) link.classList.add('active-drawer');
+      else link.classList.remove('active-drawer');
+    });
+    applyFilter();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function loadMore() {
+    if (isLoading) return;
+    isLoading = true;
+    const btn = document.getElementById('loadMoreBtn');
+    btn.textContent = 'Loading…'; btn.disabled = true;
+    await new Promise(r => setTimeout(r, 100));
+    const slice = filtered.slice(3 + feedOffset, 3 + feedOffset + PAGE);
+    renderFeed(slice, true);
+    feedOffset += PAGE;
+    if (3 + feedOffset >= filtered.length) document.getElementById('loadMoreRow').style.display = 'none';
+    else { btn.textContent = 'Load More Stories'; btn.disabled = false; }
+    isLoading = false;
+  }
+
+  // Scroll handler - no shake, just toggle class
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrolled = window.scrollY > 30;
+        document.getElementById('headerContainer').classList.toggle('compact', scrolled);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // Event listeners
+  document.querySelectorAll('.cat-btn, .compact-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => setCategory(btn.dataset.cat));
   });
-}
+  document.querySelectorAll('#drawerNav a').forEach(link => {
+    link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat); closeDrawer(); });
+  });
+  document.querySelectorAll('.footer-col a[data-cat]').forEach(link => {
+    link.addEventListener('click', (e) => { e.preventDefault(); setCategory(link.dataset.cat); });
+  });
+  document.getElementById('loadMoreBtn')?.addEventListener('click', loadMore);
 
-function articleURL(slug) { return `article.html?id=${slug}`; }
+  // Drawer functions
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  function openDrawer() { drawer.classList.add('open'); overlay.classList.add('open'); document.body.classList.add('drawer-open'); }
+  function closeDrawer() { drawer.classList.remove('open'); overlay.classList.remove('open'); document.body.classList.remove('drawer-open'); }
+  
+  document.querySelectorAll('#hamburgerBtn, #compactHamburgerBtn').forEach(btn => {
+    btn.addEventListener('click', openDrawer);
+  });
+  document.getElementById('closeDrawerBtn')?.addEventListener('click', closeDrawer);
+  overlay?.addEventListener('click', closeDrawer);
 
-function shareIco() {
-  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-    <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-  </svg>`;
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function doShare(e, slug, title) {
-  e.stopPropagation();
-  const url = location.origin + '/' + articleURL(slug);
-  if (navigator.share) navigator.share({ title, url });
-  else navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
-}
-// ── HERO ───────────────────────────────────────────
-function renderHero(posts) {
-  const el = document.getElementById('hero-zone');
-  if (!posts.length) { el.innerHTML = '<div class="empty-state">No stories found.</div>'; return; }
-
-  const lead  = posts[0];
-  const cards = posts.slice(1, 3);
-
-  el.innerHTML = `
-    <div class="hero">
-      <div class="hero-lead" onclick="location.href='${articleURL(lead.slug)}'">
-        <img class="hero-lead-img"
-          src="${lead.image_url || 'https://placehold.co/900x560/0b1927/3a5878?text=The+Alamin+Gazette'}"
-          onerror="this.src='https://placehold.co/900x560/0b1927/3a5878?text=The+Alamin+Gazette'" alt="">
-        <div class="hero-lead-scrim"></div>
-        <div class="hero-lead-body">
-          <div>
-            ${lead.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}
-            <span class="chip ${chipClass(lead.category)}">${lead.category || 'World'}</span>
-          </div>
-          <h2>${lead.title}</h2>
-          <p class="hero-excerpt">${teaser(lead, 200)}</p>
-          <div class="hero-byline">
-            <span>${lead.author || 'Alamin Gazette'} &nbsp;·&nbsp; <span title="${fullDate(lead.created_at)}">${timeAgo(lead.created_at)}</span></span>
-            <button class="share-btn" style="color:#7a7060" onclick="doShare(event,'${lead.slug}','${lead.title.replace(/'/g,"\\'")}')">
-              ${shareIco()} Share
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="hero-stack">
-        ${cards.map(p => `
-          <div class="hero-card" onclick="location.href='${articleURL(p.slug)}'">
-            <img class="hero-card-img"
-              src="${p.image_url || 'https://placehold.co/600x280/0b1927/3a5878?text=Gazette'}"
-              onerror="this.src='https://placehold.co/600x280/0b1927/3a5878?text=Gazette'" loading="lazy" alt="">
-            <div>
-              ${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}
-              <span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span>
-            </div>
-            <h3>${p.title}</h3>
-            <p class="card-excerpt">${teaser(p, 110)}</p>
-            <div class="card-meta">
-              <span title="${fullDate(p.created_at)}">${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span>
-              <button class="share-btn" onclick="doShare(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
-                ${shareIco()} Share
-              </button>
-            </div>
-          </div>`).join('')}
-      </div>
-    </div>`;
-}
-
-// ── FEED ───────────────────────────────────────────
-function renderFeed(posts, append = false) {
-  const el = document.getElementById('feed-zone');
-  const html = posts.map(p => `
-    <div class="feed-item" onclick="location.href='${articleURL(p.slug)}'">
-      <img class="feed-item-img"
-        src="${p.image_url || 'https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'}"
-        onerror="this.src='https://placehold.co/400x160/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
-      <div>
-        ${p.breaking ? '<span class="chip chip-breaking">Breaking</span>' : ''}
-        <span class="chip ${chipClass(p.category)}">${p.category || 'World'}</span>
-      </div>
-      <h3>${p.title}</h3>
-      <p class="item-excerpt">${teaser(p, 140)}</p>
-      <div class="card-meta">
-        <span title="${fullDate(p.created_at)}">${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span>
-        <button class="share-btn" onclick="doShare(event,'${p.slug}','${p.title.replace(/'/g,"\\'")}')">
-          ${shareIco()} Share
-        </button>
-      </div>
-    </div>`).join('');
-  if (append) el.innerHTML += html; else el.innerHTML = html;
-}
-
-// ── LOAD & FILTER ─────────────────────────────────
-async function loadPosts() {
-  const { data, error } = await sb
-    .from('posts')
-    .select('*')
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
-
-  if (error || !data) {
-    document.getElementById('hero-zone').innerHTML =
-      '<div class="empty-state">Unable to load stories. Please try again.</div>';
-    console.error(error);
-    return;
+  // Search function
+  function openSearch() {
+    const q = prompt('Search The Alamin Gazette:');
+    if (q && q.trim()) {
+      const term = q.trim().toLowerCase();
+      const results = allPosts.filter(p => 
+        p.title.toLowerCase().includes(term) || 
+        (p.excerpt || '').toLowerCase().includes(term) ||
+        (p.content || '').toLowerCase().includes(term)
+      );
+      if (results.length) {
+        renderHero(results.slice(0, 3));
+        renderFeed(results.slice(3, 3 + PAGE));
+        document.getElementById('loadMoreRow').style.display = results.length > 3 + PAGE ? 'block' : 'none';
+      } else {
+        showToast('No results found');
+        applyFilter();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
+  document.querySelectorAll('#searchBtn, #compactSearchBtn').forEach(btn => {
+    btn.addEventListener('click', openSearch);
+  });
 
-  // Breaking always floats up
-  allPosts = data.sort((a, b) =>
-    (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) ||
-    new Date(b.created_at) - new Date(a.created_at)
-  );
-
-  buildTicker(data);
-  applyFilter();
-}
-
-function applyFilter() {
-  filtered = activeCat ? allPosts.filter(p => p.category === activeCat) : allPosts;
-  renderHero(filtered.slice(0, 3));
-  feedOffset = PAGE;
-  renderFeed(filtered.slice(3, 3 + PAGE));
-  const hasMore = filtered.length > 3 + PAGE;
-  document.getElementById('load-more-row').style.display = hasMore ? 'block' : 'none';
-}
-
-function setCategory(btn, cat) {
-  activeCat = cat;
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  applyFilter();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function loadMore() {
-  const btn = document.getElementById('load-more-btn');
-  btn.textContent = 'Loading…'; btn.disabled = true;
-  const slice = filtered.slice(3 + feedOffset, 3 + feedOffset + PAGE);
-  renderFeed(slice, true);
-  feedOffset += PAGE;
-  if (3 + feedOffset >= filtered.length) {
-    document.getElementById('load-more-row').style.display = 'none';
-  } else {
-    btn.textContent = 'Load More Stories'; btn.disabled = false;
-  }
-}
-
-
-// ── SCROLL-SHRINK HEADER ──────────────────────────
-window.addEventListener('scroll', () => {
-  document.getElementById('masthead').classList.toggle('scrolled', window.scrollY > 60);
-}, { passive: true });
-
-loadPosts();
+  loadPosts();
 </script>
 </body>
 </html>
