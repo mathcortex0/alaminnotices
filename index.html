@@ -62,7 +62,6 @@
       box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
     }
 
-    /* Hidden state — moved completely off-screen, no layout shift */
     .site-header.header-hidden {
       transform: translateY(-100%);
     }
@@ -86,18 +85,28 @@
       flex: 1;
       display: flex;
       justify-content: flex-start;
+      z-index: 5;
     }
 
+    /* FIX: Logo container allows clicks to pass through to nav links, but logo itself remains clickable */
     .header-center {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
+      pointer-events: none;  /* allows clicking through the logo area to nav links */
+      z-index: 1;
+    }
+    .header-center a {
+      pointer-events: auto;  /* keeps the logo clickable */
+      display: inline-block;
+      line-height: 0;
     }
 
     .header-right {
       flex: 1;
       display: flex;
       justify-content: flex-end;
+      z-index: 5;
     }
 
     .icon-btn {
@@ -120,7 +129,7 @@
     }
 
     .logo-img {
-      height: 120px;
+      height: 120px;   /* increased size as you requested */
       width: auto;
     }
 
@@ -134,13 +143,16 @@
       white-space: nowrap;
     }
 
-    /* Navigation row — inside fixed header */
+    /* Navigation row — now sits above the logo pointer area */
     .nav-row {
+      position: relative;
+      z-index: 10;        /* ensures nav links are above the logo container */
       border-top: 1px solid var(--paper-2);
       padding: 6px 0;
       overflow-x: auto;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
+      background: var(--paper);  /* solid background to avoid any transparency overlap */
     }
 
     .nav-row::-webkit-scrollbar {
@@ -822,7 +834,7 @@
 </head>
 <body>
 
-<!-- FIXED HEADER — ZERO JITTER AUTO-HIDE -->
+<!-- FIXED HEADER — ZERO JITTER AUTO-HIDE WITH CLICK-THROUGH FIX FOR NAV -->
 <header class="site-header" id="siteHeader">
   <div class="header-container">
     <div class="header-top">
@@ -837,7 +849,7 @@
       </div>
       <div class="header-center">
         <a href="index.html">
-          <img src="images/lol.png" class="logo-img" onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='block';" alt="">
+          <img src="images/lol.png" class="logo-img" onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='block';" alt="The Alamin Gazette">
           <span class="logo-text" id="fallbackLogo" style="display:none;">The Alamin Gazette</span>
         </a>
       </div>
@@ -943,15 +955,14 @@
   // ========== ZERO JITTER AUTO-HIDE HEADER (NYT STYLE) ==========
   let lastScrollPosition = 0;
   let ticking = false;
-  const SCROLL_THRESHOLD_DOWN = 8;    // tiny buffer to avoid micro-jitter
+  const SCROLL_THRESHOLD_DOWN = 8;
   const SCROLL_THRESHOLD_UP = 5;
-  const TOP_SAFE_ZONE = 65;            // always show header near top
+  const TOP_SAFE_ZONE = 65;
 
   function handleScroll() {
     const currentScrollY = window.scrollY;
     const scrollDelta = currentScrollY - lastScrollPosition;
 
-    // Always show header when near the very top (no jitter)
     if (currentScrollY <= TOP_SAFE_ZONE) {
       siteHeader.classList.remove('header-hidden');
       lastScrollPosition = currentScrollY;
@@ -959,12 +970,9 @@
       return;
     }
 
-    // Scrolling down & past threshold -> hide header
     if (scrollDelta > SCROLL_THRESHOLD_DOWN && !siteHeader.classList.contains('header-hidden')) {
       siteHeader.classList.add('header-hidden');
-    }
-    // Scrolling up & past threshold -> show header
-    else if (scrollDelta < -SCROLL_THRESHOLD_UP && siteHeader.classList.contains('header-hidden')) {
+    } else if (scrollDelta < -SCROLL_THRESHOLD_UP && siteHeader.classList.contains('header-hidden')) {
       siteHeader.classList.remove('header-hidden');
     }
 
@@ -1039,6 +1047,16 @@
     return html;
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
   function renderHero(posts) {
     if (!posts.length) {
       heroZone.innerHTML = '<div class="empty-state">No stories found</div>';
@@ -1070,16 +1088,6 @@
           `).join('')}
         </div>
       </div>`;
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
   }
 
   function renderFeed(posts, append = false) {
