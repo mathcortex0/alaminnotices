@@ -4,50 +4,163 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>The Alamin Gazette — World Intelligence</title>
-  <meta name="description" content="Independent world intelligence. Breaking news across every continent.">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="description" content="Independent world intelligence. Breaking news and in-depth reporting across every continent — politics, economy, innovation, defense, and society.">
+  <meta name="keywords" content="world news, breaking news, intelligence, global affairs, economy, innovation, defense, society">
+  <meta name="author" content="The Alamin Gazette">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0b1927">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="The Alamin Gazette — World Intelligence">
+  <meta property="og:description" content="Independent world intelligence. Breaking news across every continent.">
+  <meta property="og:site_name" content="The Alamin Gazette">
+  <meta property="og:image" content="images/lol.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Alamin Gazette — World Intelligence">
+  <meta name="twitter:description" content="Independent world intelligence. Breaking news across every continent.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="index.html">
+
+  <!-- Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    /* ============================================================
+       DESIGN TOKENS
+    ============================================================ */
     :root {
-      --ink: #0f0f0f;
-      --ink-2: #3a3a3a;
-      --ink-3: #6e6e6e;
-      --paper: #f9f7f3;
-      --paper-2: #f1ece3;
-      --rule: #cfc8bb;
-      --navy: #0b1927;
-      --crimson: #b01428;
-      --serif: 'Playfair Display', Georgia, serif;
-      --prose: 'Source Serif 4', Georgia, serif;
-      --ui: 'DM Sans', system-ui, sans-serif;
-      --hdr: 52px;
+      --ink:       #0f0f0f;
+      --ink-2:     #3a3a3a;
+      --ink-3:     #6e6e6e;
+      --paper:     #f9f7f3;
+      --paper-2:   #f1ece3;
+      --rule:      #cfc8bb;
+      --navy:      #0b1927;
+      --crimson:   #b01428;
+      --gold:      #c8922a;
+      --serif:     'Playfair Display', Georgia, serif;
+      --prose:     'Source Serif 4', Georgia, serif;
+      --ui:        'DM Sans', system-ui, sans-serif;
+      --hdr:       52px;
+      --nav:       40px;
+      --hdr-total: 92px;
+      --transition-fast: 0.15s ease;
+      --transition-med:  0.25s ease;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.1);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.14);
+      --radius:    3px;
     }
 
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
     body {
       font-family: var(--prose);
       background: var(--paper);
       color: var(--ink);
-      line-height: 1.5;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
     }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: var(--ui); }
 
-    a {
-      color: inherit;
-      text-decoration: none;
+    /* ============================================================
+       SKIP LINK (accessibility)
+    ============================================================ */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 16px;
+      background: var(--crimson);
+      color: #fff;
+      font-family: var(--ui);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 0 0 var(--radius) var(--radius);
+      z-index: 9999;
+      transition: top 0.2s;
     }
+    .skip-link:focus { top: 0; outline: 3px solid #fff; outline-offset: 2px; }
 
-    img {
-      max-width: 100%;
-      display: block;
+    /* ============================================================
+       LIVE TICKER
+    ============================================================ */
+    .ticker-bar {
+      background: var(--navy);
+      color: #c0ccd8;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
     }
+    .ticker-label {
+      font-family: var(--ui);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: var(--navy);
+      padding: 0 14px 0 16px;
+      white-space: nowrap;
+      z-index: 2;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255,255,255,.08);
+    }
+    .ticker-label-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--crimson);
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: blink-dot 1.4s ease-in-out infinite;
+    }
+    @keyframes blink-dot { 0%,100%{opacity:1} 50%{opacity:.2} }
+    .ticker-track { flex: 1; overflow: hidden; }
+    .ticker-inner {
+      display: flex;
+      gap: 0;
+      animation: ticker-scroll 40s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-inner:hover { animation-play-state: paused; }
+    @keyframes ticker-scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    .ticker-item {
+      font-family: var(--ui);
+      font-size: 11px;
+      font-weight: 500;
+      color: #8898a8;
+      padding: 0 32px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color var(--transition-fast);
+    }
+    .ticker-item:hover { color: #e0e8f0; }
+    .ticker-item::before { content: '◆'; color: var(--crimson); margin-right: 10px; font-size: 7px; vertical-align: middle; }
 
-    /* ========= HEADER — ZERO JITTER AUTO-HIDE (NYT STYLE) ========= */
+    /* ============================================================
+       FIXED HEADER
+    ============================================================ */
     .site-header {
       position: fixed;
       top: 0;
@@ -57,22 +170,14 @@
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
       transform: translateY(0);
-      transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      transition: transform 0.28s cubic-bezier(0.2,0.9,0.4,1.1), box-shadow 0.2s;
       will-change: transform;
-      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
     }
+    .site-header.header-hidden { transform: translateY(-100%); }
+    .site-header.scrolled { box-shadow: var(--shadow-md); }
 
-    .site-header.header-hidden {
-      transform: translateY(-100%);
-    }
+    .header-container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-    .header-container {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    /* Top row: hamburger + logo + search */
     .header-top {
       height: var(--hdr);
       display: flex;
@@ -81,389 +186,305 @@
       position: relative;
     }
 
-    .header-left {
+    .header-left, .header-right {
       flex: 1;
       display: flex;
-      justify-content: flex-start;
+      align-items: center;
       z-index: 5;
     }
+    .header-left { justify-content: flex-start; gap: 8px; }
+    .header-right { justify-content: flex-end; gap: 8px; }
 
-    /* FIX: Logo container allows clicks to pass through to nav links, but logo itself remains clickable */
     .header-center {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      pointer-events: none;  /* allows clicking through the logo area to nav links */
+      pointer-events: none;
       z-index: 1;
     }
-    .header-center a {
-      pointer-events: auto;  /* keeps the logo clickable */
-      display: inline-block;
-      line-height: 0;
-    }
+    .header-center a { pointer-events: auto; display: inline-block; line-height: 0; }
 
-    .header-right {
-      flex: 1;
-      display: flex;
-      justify-content: flex-end;
-      z-index: 5;
+    .logo-img { height: 48px; width: auto; }
+    .logo-text {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--ink);
+      white-space: nowrap;
     }
 
     .icon-btn {
       background: none;
       border: none;
-      cursor: pointer;
       color: var(--ink-2);
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      transition: background 0.15s, color 0.15s;
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius);
+      transition: background var(--transition-fast), color var(--transition-fast);
     }
+    .icon-btn:hover { background: var(--paper-2); color: var(--ink); }
+    .icon-btn:focus-visible { outline: 2px solid var(--crimson); outline-offset: 2px; }
 
-    .icon-btn:hover {
-      background: var(--paper-2);
-      color: var(--ink);
+    /* Date display */
+    .header-date {
+      font-family: var(--ui);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--ink-3);
+      letter-spacing: 0.5px;
+      display: none;
     }
+    @media (min-width: 768px) { .header-date { display: block; } }
 
-    .logo-img {
-      height: 120px;   /* increased size as you requested */
-      width: auto;
-    }
-
-    .logo-text {
-      font-family: var(--serif);
-      font-size: 1.4rem;
-      font-weight: 900;
-      letter-spacing: -0.3px;
-      color: var(--ink);
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    /* Navigation row — now sits above the logo pointer area */
+    /* Nav row */
     .nav-row {
       position: relative;
-      z-index: 10;        /* ensures nav links are above the logo container */
+      z-index: 10;
       border-top: 1px solid var(--paper-2);
-      padding: 6px 0;
       overflow-x: auto;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
-      background: var(--paper);  /* solid background to avoid any transparency overlap */
+      background: var(--paper);
     }
-
-    .nav-row::-webkit-scrollbar {
-      display: none;
-    }
+    .nav-row::-webkit-scrollbar { display: none; }
 
     .nav-links {
       display: flex;
-      gap: 4px;
+      gap: 0;
       justify-content: center;
       min-width: min-content;
+      padding: 0 4px;
     }
 
     .nav-link {
       font-family: var(--ui);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.9px;
       text-transform: uppercase;
       color: var(--ink-3);
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
-      padding: 8px 14px;
-      cursor: pointer;
+      padding: 10px 14px;
       white-space: nowrap;
-      transition: color 0.15s, border-color 0.15s;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
     }
+    .nav-link:hover { color: var(--ink); border-bottom-color: rgba(176,20,40,.3); }
+    .nav-link.active { color: var(--ink); border-bottom-color: var(--crimson); }
+    .nav-link:focus-visible { outline: 2px solid var(--crimson); outline-offset: -2px; border-radius: var(--radius); }
 
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--ink);
-      border-bottom-color: var(--crimson);
-    }
-
-    /* ========= SEARCH PANEL (slides from top, below header) ========= */
+    /* ============================================================
+       SEARCH PANEL
+    ============================================================ */
     .search-panel {
       position: fixed;
-      top: var(--hdr);
-      left: 0;
-      right: 0;
+      top: var(--hdr-total);
+      left: 0; right: 0;
       background: var(--paper);
       border-bottom: 1px solid var(--rule);
-      padding: 12px 20px;
+      padding: 14px 20px;
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       z-index: 999;
       transform: translateY(-120%);
       opacity: 0;
-      transition: transform 0.2s ease, opacity 0.18s ease;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+      transition: transform 0.22s ease, opacity 0.18s ease;
+      pointer-events: none;
+      box-shadow: var(--shadow-md);
+    }
+    .search-panel.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+    .search-input-wrap { flex: 1; position: relative; }
+    .search-icon-inner {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-3);
       pointer-events: none;
     }
-
-    .search-panel.open {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
     .search-input {
-      flex: 1;
+      width: 100%;
       font-family: var(--ui);
       font-size: 15px;
       color: var(--ink);
       background: var(--paper-2);
-      border: 1px solid var(--rule);
-      border-radius: 4px;
-      padding: 10px 14px;
+      border: 1.5px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 10px 14px 10px 40px;
       outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
     }
+    .search-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(11,25,39,.07); }
 
-    .search-input:focus {
-      border-color: var(--navy);
+    .search-results-count {
+      font-family: var(--ui);
+      font-size: 11px;
+      color: var(--ink-3);
+      white-space: nowrap;
     }
-
     .search-cancel {
       font-family: var(--ui);
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--ink-3);
       background: none;
       border: none;
-      cursor: pointer;
       padding: 8px;
+      transition: color var(--transition-fast);
     }
+    .search-cancel:hover { color: var(--crimson); }
 
-    .search-cancel:hover {
-      color: var(--crimson);
-    }
-
-    /* ========= DRAWER (hamburger menu) ========= */
+    /* ============================================================
+       DRAWER
+    ============================================================ */
     .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.4);
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
       z-index: 2000;
       display: none;
+      opacity: 0;
+      transition: opacity 0.25s;
     }
-
-    .drawer-overlay.open {
-      display: block;
-    }
+    .drawer-overlay.open { display: block; opacity: 1; }
 
     .drawer {
       position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: min(280px, 80vw);
+      top: 0; left: 0; bottom: 0;
+      width: min(300px, 85vw);
       background: var(--paper);
       z-index: 2001;
       transform: translateX(-100%);
-      transition: transform 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      display: flex; flex-direction: column;
+      box-shadow: var(--shadow-lg);
     }
-
-    .drawer.open {
-      transform: translateX(0);
-    }
+    .drawer.open { transform: translateX(0); }
 
     .drawer-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 22px;
       border-bottom: 2px solid var(--ink);
     }
-
-    .drawer-brand {
-      font-family: var(--serif);
-      font-size: 1.1rem;
-      font-weight: 900;
-      color: var(--ink);
-    }
+    .drawer-brand { font-family: var(--serif); font-size: 1.1rem; font-weight: 900; }
 
     .drawer-close-x {
-      background: none;
-      border: none;
-      cursor: pointer;
+      background: none; border: none;
       color: var(--ink-2);
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      transition: background 0.15s, color 0.15s;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius);
+      transition: background var(--transition-fast), color var(--transition-fast);
     }
+    .drawer-close-x:hover { background: var(--paper-2); color: var(--crimson); }
+    .drawer-close-x:focus-visible { outline: 2px solid var(--crimson); }
 
-    .drawer-close-x:hover {
-      background: var(--paper-2);
-      color: var(--crimson);
-    }
-
-    .drawer-body {
-      flex: 1;
-      padding: 12px 0;
-    }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 8px 0; }
 
     .drawer-item {
-      display: block;
-      width: 100%;
-      text-align: left;
-      font-family: var(--ui);
-      font-size: 15px;
-      font-weight: 600;
+      display: block; width: 100%; text-align: left;
+      font-family: var(--ui); font-size: 15px; font-weight: 600;
       color: var(--ink-2);
-      background: none;
-      border: none;
+      background: none; border: none;
       border-bottom: 1px solid var(--rule);
-      padding: 15px 24px;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      padding: 16px 24px;
+      transition: background var(--transition-fast), color var(--transition-fast), border-left-color var(--transition-fast);
+      border-left: 3px solid transparent;
     }
-
-    .drawer-item:hover {
-      background: var(--paper-2);
-      color: var(--ink);
-    }
-
-    .drawer-item.active {
-      color: var(--crimson);
-      border-left: 3px solid var(--crimson);
-      background: rgba(176, 20, 40, 0.04);
-    }
+    .drawer-item:hover { background: var(--paper-2); color: var(--ink); }
+    .drawer-item.active { color: var(--crimson); border-left-color: var(--crimson); background: rgba(176,20,40,.03); }
+    .drawer-item:focus-visible { outline: 2px solid var(--crimson); outline-offset: -2px; }
 
     .drawer-footer {
       padding: 20px 24px;
       border-top: 1px solid var(--rule);
+      display: flex; flex-direction: column; gap: 10px;
     }
-
     .drawer-admin {
-      font-family: var(--ui);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--ink-3);
-      transition: color 0.15s;
+      font-family: var(--ui); font-size: 12px; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      color: var(--ink-3); transition: color var(--transition-fast);
     }
+    .drawer-admin:hover { color: var(--crimson); }
 
-    .drawer-admin:hover {
-      color: var(--crimson);
+    /* ============================================================
+       READING LIST BUTTON (new feature)
+    ============================================================ */
+    .rl-count {
+      position: relative;
+      display: flex; align-items: center;
     }
+    .rl-badge {
+      position: absolute;
+      top: 2px; right: 2px;
+      background: var(--crimson); color: #fff;
+      font-family: var(--ui); font-size: 8px; font-weight: 800;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      display: none;
+    }
+    .rl-badge.visible { display: flex; }
 
-    /* ========= MAIN CONTENT (add top padding because header is fixed) ========= */
+    /* ============================================================
+       PAGE LAYOUT
+    ============================================================ */
     .page {
       max-width: 1300px;
       margin: 0 auto;
       padding: 0 20px;
-      padding-top: 88px; /* header height approx 52+36 = 88px */
     }
+
+    /* Ticker offset: ticker is 32px, header is ~92px */
+    .page-content { padding-top: calc(var(--hdr-total) + 32px + 16px); }
 
     .section-head {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 32px 0 20px;
+      display: flex; align-items: center; gap: 14px;
+      margin: 36px 0 22px;
     }
-
     .section-label {
-      font-family: var(--ui);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--crimson);
+      font-family: var(--ui); font-size: 9px; font-weight: 800;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--crimson); white-space: nowrap;
     }
+    .section-line { flex: 1; height: 1px; background: var(--rule); }
 
-    .section-line {
-      flex: 1;
-      height: 1px;
-      background: var(--rule);
-    }
+    .divider { border: none; border-top: 2px solid var(--ink); margin: 36px 0 0; }
 
-    .divider {
-      border: none;
-      border-top: 2px solid var(--ink);
-      margin: 32px 0 0;
-    }
-
-    /* chips */
+    /* ============================================================
+       CHIPS
+    ============================================================ */
     .chip {
-      font-family: var(--ui);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 2px;
-      display: inline-block;
+      font-family: var(--ui); font-size: 9px; font-weight: 800;
+      letter-spacing: 1.3px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 2px; display: inline-block;
     }
-
-    .chip-world {
-      background: #0b1927;
-      color: #9ab0c8;
+    .chip-world     { background: #0b1927; color: #9ab0c8; }
+    .chip-economy   { background: #0e3d27; color: #8ec8a8; }
+    .chip-innovation{ background: #0a3d78; color: #90b8e8; }
+    .chip-defense   { background: #3d0e1a; color: #c89098; }
+    .chip-society   { background: #3d3000; color: #c8b870; }
+    .chip-default   { background: #2a2a2a; color: #bbb; }
+    .chip-breaking  {
+      background: var(--crimson); color: #fff;
+      animation: blink-chip 2s infinite;
+      margin-right: 5px;
     }
+    @keyframes blink-chip { 0%,100%{opacity:1} 50%{opacity:.65} }
 
-    .chip-economy {
-      background: #0e3d27;
-      color: #8ec8a8;
-    }
-
-    .chip-innovation {
-      background: #0a3d78;
-      color: #90b8e8;
-    }
-
-    .chip-defense {
-      background: #3d0e1a;
-      color: #c89098;
-    }
-
-    .chip-society {
-      background: #3d3000;
-      color: #c8b870;
-    }
-
-    .chip-default {
-      background: #2a2a2a;
-      color: #bbb;
-    }
-
-    .chip-breaking {
-      background: var(--crimson);
-      color: white;
-      animation: blink 2s infinite;
-      margin-right: 4px;
-    }
-
-    @keyframes blink {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.6;
-      }
-    }
-
-    /* hero */
+    /* ============================================================
+       HERO LAYOUT
+    ============================================================ */
     .hero {
       display: grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 1fr 310px;
       border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
     }
 
     .hero-main {
@@ -471,116 +492,97 @@
       overflow: hidden;
       cursor: pointer;
       border-right: 1px solid var(--rule);
-      min-height: 460px;
+      min-height: 480px;
     }
-
     .hero-main-img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       object-fit: cover;
-      transition: transform 0.4s;
+      transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
     }
-
-    .hero-main:hover .hero-main-img {
-      transform: scale(1.02);
-    }
+    .hero-main:hover .hero-main-img { transform: scale(1.03); }
+    .hero-main:focus-within { outline: 3px solid var(--crimson); outline-offset: -3px; }
 
     .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(6, 10, 18, 0.94) 0%, rgba(6, 10, 18, 0.4) 60%, transparent 100%);
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(6,10,18,.95) 0%, rgba(6,10,18,.45) 55%, rgba(6,10,18,.1) 100%);
     }
 
     .hero-content {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 28px 24px 22px;
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 30px 26px 24px;
     }
-
     .hero-content h2 {
       font-family: var(--serif);
-      font-size: 1.8rem;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
       font-weight: 900;
       color: #f3ede4;
-      line-height: 1.2;
-      margin: 8px 0 10px;
+      line-height: 1.18;
+      margin: 9px 0 11px;
     }
-
-    .hero-excerpt {
-      font-size: 0.88rem;
-      color: #c8c0b0;
-      margin-bottom: 12px;
-    }
-
+    .hero-excerpt { font-size: 0.87rem; color: #c8c0b0; margin-bottom: 14px; line-height: 1.5; }
     .hero-meta {
-      font-family: var(--ui);
-      font-size: 10px;
-      color: #9a9280;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      font-family: var(--ui); font-size: 10.5px; color: #9a9280;
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    .hero-stack {
-      display: flex;
-      flex-direction: column;
-    }
-
+    .hero-stack { display: flex; flex-direction: column; }
     .hero-side {
-      flex: 1;
-      padding: 18px;
+      flex: 1; padding: 18px;
       border-bottom: 1px solid var(--rule);
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background var(--transition-fast);
+      position: relative;
     }
-
-    .hero-side:last-child {
-      border-bottom: none;
-    }
-
-    .hero-side:hover {
-      background: var(--paper-2);
-    }
+    .hero-side:last-child { border-bottom: none; }
+    .hero-side:hover { background: var(--paper-2); }
+    .hero-side:focus-within { outline: 2px solid var(--crimson); outline-offset: -2px; }
 
     .hero-side-img {
-      width: 100%;
-      height: 130px;
+      width: 100%; height: 130px;
       object-fit: cover;
-      margin-bottom: 10px;
+      border-radius: 2px;
+      margin-bottom: 11px;
+      transition: opacity 0.2s;
     }
+    .hero-side:hover .hero-side-img { opacity: .92; }
 
     .hero-side h3 {
-      font-family: var(--serif);
-      font-size: 1rem;
-      font-weight: 700;
-      margin: 5px 0;
+      font-family: var(--serif); font-size: 1rem; font-weight: 700;
+      margin: 6px 0; line-height: 1.3;
     }
-
-    .side-excerpt {
-      font-size: 0.78rem;
-      color: var(--ink-2);
-      margin-bottom: 8px;
-    }
-
+    .side-excerpt { font-size: 0.78rem; color: var(--ink-2); margin-bottom: 9px; line-height: 1.45; }
     .card-meta {
-      font-family: var(--ui);
-      font-size: 10px;
-      color: var(--ink-3);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      font-family: var(--ui); font-size: 10px; color: var(--ink-3);
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* feed */
+    /* ============================================================
+       SHARE / SAVE BUTTONS
+    ============================================================ */
+    .share-btn {
+      background: none; border: none;
+      font-family: var(--ui); font-size: 9.5px; font-weight: 700;
+      color: var(--ink-3);
+      display: inline-flex; align-items: center; gap: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 4px 6px;
+      border-radius: 2px;
+      transition: color var(--transition-fast), background var(--transition-fast);
+    }
+    .share-btn:hover { color: var(--crimson); background: rgba(176,20,40,.06); }
+    .share-btn:focus-visible { outline: 2px solid var(--crimson); }
+
+    /* ============================================================
+       FEED GRID
+    ============================================================ */
     .feed {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       border-left: 1px solid var(--rule);
       border-top: 1px solid var(--rule);
+      border-radius: var(--radius);
+      overflow: hidden;
     }
 
     .feed-item {
@@ -588,632 +590,1002 @@
       border-right: 1px solid var(--rule);
       border-bottom: 1px solid var(--rule);
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background var(--transition-fast);
+      position: relative;
     }
-
-    .feed-item:hover {
-      background: var(--paper-2);
-    }
+    .feed-item:hover { background: var(--paper-2); }
+    .feed-item:focus-within { outline: 2px solid var(--crimson); outline-offset: -2px; }
 
     .feed-img {
-      width: 100%;
-      height: 120px;
+      width: 100%; height: 120px;
       object-fit: cover;
-      margin-bottom: 10px;
+      border-radius: 2px;
+      margin-bottom: 11px;
+      transition: opacity 0.2s;
     }
+    .feed-item:hover .feed-img { opacity: .9; }
 
     .feed-item h3 {
-      font-family: var(--serif);
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin: 5px 0;
+      font-family: var(--serif); font-size: 0.96rem; font-weight: 700;
+      margin: 6px 0; line-height: 1.3;
     }
-
     .feed-excerpt {
-      font-size: 0.78rem;
-      color: var(--ink-2);
+      font-size: 0.79rem; color: var(--ink-2);
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .share-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: var(--ui);
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--ink-3);
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      text-transform: uppercase;
-    }
-
-    .share-btn:hover {
-      color: var(--crimson);
-    }
-
-    .load-more-row {
-      text-align: center;
-      padding: 40px 0;
-      border-top: 1px solid var(--rule);
-    }
-
-    .load-btn {
-      font-family: var(--ui);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      background: transparent;
-      color: var(--ink);
-      border: 1.5px solid var(--ink);
-      padding: 12px 36px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .load-btn:hover {
-      background: var(--ink);
-      color: var(--paper);
-    }
-
-    .load-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    /* footer */
-    .footer {
-      background: var(--navy);
-      color: #8898a8;
-      margin-top: 60px;
-      padding: 48px 20px 28px;
-    }
-
-    .footer-inner {
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 240px 1fr 1fr 1fr;
-      gap: 40px;
-      padding-bottom: 36px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .footer-brand {
-      font-family: var(--serif);
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: #e4ddd4;
-      display: block;
-      margin-bottom: 12px;
-    }
-
-    .footer-brand p {
-      font-size: 0.82rem;
-      color: #5a6a7a;
+      margin-bottom: 11px;
       line-height: 1.5;
     }
 
+    /* ============================================================
+       LOAD MORE
+    ============================================================ */
+    .load-more-row {
+      text-align: center;
+      padding: 44px 0;
+      border-top: 1px solid var(--rule);
+    }
+    .load-btn {
+      font-family: var(--ui); font-size: 11px; font-weight: 700;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      background: transparent; color: var(--ink);
+      border: 1.5px solid var(--ink);
+      padding: 13px 42px;
+      transition: all 0.22s;
+      border-radius: var(--radius);
+    }
+    .load-btn:hover { background: var(--ink); color: var(--paper); }
+    .load-btn:focus-visible { outline: 2px solid var(--crimson); outline-offset: 3px; }
+    .load-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ============================================================
+       SKELETON LOADERS
+    ============================================================ */
+    @keyframes shimmer {
+      0% { background-position: -800px 0; }
+      100% { background-position: 800px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--rule) 25%, var(--paper-2) 37%, var(--rule) 63%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 2px;
+    }
+    .skeleton-hero {
+      height: 480px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+    }
+
+    /* ============================================================
+       EMPTY / ERROR STATES
+    ============================================================ */
+    .empty-state {
+      text-align: center; padding: 64px 20px;
+      color: var(--ink-3); font-family: var(--ui);
+    }
+    .empty-state h3 { font-family: var(--serif); font-size: 1.4rem; color: var(--ink-2); margin-bottom: 10px; }
+    .empty-state p { font-size: 13px; line-height: 1.6; }
+
+    /* ============================================================
+       READING LIST PANEL (new feature)
+    ============================================================ */
+    .rl-panel {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: min(360px, 92vw);
+      background: var(--paper);
+      z-index: 2001;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      display: flex; flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      border-left: 1px solid var(--rule);
+    }
+    .rl-panel.open { transform: translateX(0); }
+
+    .rl-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 22px;
+      border-bottom: 2px solid var(--ink);
+    }
+    .rl-title { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; }
+    .rl-body { flex: 1; overflow-y: auto; padding: 0; }
+    .rl-empty { text-align: center; padding: 48px 20px; color: var(--ink-3); font-family: var(--ui); font-size: 13px; }
+    .rl-item {
+      display: grid; grid-template-columns: 64px 1fr auto;
+      gap: 12px; align-items: start;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--rule);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .rl-item:hover { background: var(--paper-2); }
+    .rl-item img { width: 64px; height: 48px; object-fit: cover; border-radius: 2px; }
+    .rl-item-title { font-family: var(--serif); font-size: 0.88rem; font-weight: 700; line-height: 1.3; }
+    .rl-item-meta { font-family: var(--ui); font-size: 10px; color: var(--ink-3); margin-top: 4px; }
+    .rl-remove {
+      background: none; border: none;
+      color: var(--ink-3); padding: 4px;
+      border-radius: 2px;
+      transition: color var(--transition-fast);
+    }
+    .rl-remove:hover { color: var(--crimson); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      background: var(--navy);
+      color: #8898a8;
+      margin-top: 64px;
+      padding: 52px 20px 30px;
+    }
+    .footer-inner { max-width: 1300px; margin: 0 auto; }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr 1fr 1fr;
+      gap: 44px;
+      padding-bottom: 38px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+
+    .footer-brand-name {
+      font-family: var(--serif); font-size: 1.35rem; font-weight: 900;
+      color: #e4ddd4; display: block; margin-bottom: 14px;
+    }
+    .footer-tagline { font-size: 0.82rem; color: #4a5a6a; line-height: 1.6; }
+
     .footer-col h5 {
-      font-family: var(--ui);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #b8c8d8;
-      margin-bottom: 16px;
+      font-family: var(--ui); font-size: 9px; font-weight: 800;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: #b8c8d8; margin-bottom: 18px;
     }
-
     .footer-col a {
-      display: block;
-      font-size: 13px;
-      color: #5a6a7a;
-      margin-bottom: 10px;
+      display: block; font-family: var(--ui); font-size: 13px;
+      color: #4a5a6a; margin-bottom: 11px;
+      transition: color var(--transition-fast);
     }
-
-    .footer-col a:hover {
-      color: #c8d8e8;
-    }
+    .footer-col a:hover { color: #c8d8e8; }
+    .footer-col a:focus-visible { outline: 1px solid var(--gold); border-radius: 2px; }
 
     .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      padding-top: 22px;
-      font-size: 11px;
-      color: #4a5a6a;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px;
+      padding-top: 24px;
+      font-family: var(--ui); font-size: 11px; color: #3a4a5a;
     }
 
+    /* ============================================================
+       TOAST
+    ============================================================ */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: var(--ink);
-      color: #f4ede4;
-      font-family: var(--ui);
-      font-size: 13px;
-      padding: 10px 20px;
-      border-radius: 4px;
-      z-index: 3000;
-      opacity: 0;
-      transition: all 0.25s;
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(64px);
+      background: var(--ink); color: #f4ede4;
+      font-family: var(--ui); font-size: 13px;
+      padding: 11px 22px;
+      border-radius: var(--radius);
+      z-index: 3000; opacity: 0;
+      transition: all 0.26s;
       pointer-events: none;
       white-space: nowrap;
+      box-shadow: var(--shadow-md);
+      border-left: 3px solid var(--gold);
     }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+    /* ============================================================
+       BACK TO TOP
+    ============================================================ */
+    .back-to-top {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--navy); color: var(--paper);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: none;
+      opacity: 0; transform: scale(0.8);
+      transition: all 0.25s ease;
+      z-index: 900; pointer-events: none;
+      box-shadow: var(--shadow-md);
     }
+    .back-to-top.visible { opacity: 1; transform: scale(1); pointer-events: auto; }
+    .back-to-top:hover { background: var(--crimson); transform: scale(1.07); }
+    .back-to-top:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--ink-3);
-      font-family: var(--ui);
+    /* ============================================================
+       ANIMATIONS
+    ============================================================ */
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1024px) {
+      .footer-grid { grid-template-columns: 240px 1fr 1fr; }
+      .footer-grid > div:last-child { display: none; }
     }
 
     @media (max-width: 860px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-main {
-        min-height: 360px;
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-      }
-
-      .hero-stack {
-        flex-direction: row;
-      }
-
-      .hero-side {
-        border-bottom: none;
-        border-right: 1px solid var(--rule);
-      }
-
-      .hero-side:last-child {
-        border-right: none;
-      }
-
-      .footer-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 28px;
-      }
-
-      .page {
-        padding-top: 82px;
-      }
+      .hero { grid-template-columns: 1fr; }
+      .hero-main { min-height: 360px; border-right: none; border-bottom: 1px solid var(--rule); }
+      .hero-stack { flex-direction: row; }
+      .hero-side { border-bottom: none; border-right: 1px solid var(--rule); }
+      .hero-side:last-child { border-right: none; }
+      .feed { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+      .footer-grid > div:nth-child(n+3) { }
     }
 
     @media (max-width: 640px) {
-      .feed {
-        grid-template-columns: 1fr;
-      }
+      :root { --hdr: 48px; }
+      .feed { grid-template-columns: 1fr; }
+      .hero-stack { flex-direction: column; }
+      .hero-side { border-right: none; border-bottom: 1px solid var(--rule); }
+      .hero-side:last-child { border-bottom: none; }
+      .hero-main { min-height: 280px; }
+      .hero-content h2 { font-size: 1.3rem; }
+      .logo-text { font-size: 1rem; }
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .nav-links { justify-content: flex-start; }
+      .ticker-bar { display: none; }
+      .back-to-top { bottom: 20px; right: 16px; }
+      .page-content { padding-top: calc(var(--hdr-total) + 16px); }
+    }
 
-      .hero-stack {
-        flex-direction: column;
+    /* ============================================================
+       DARK MODE
+    ============================================================ */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink:     #f0ece4;
+        --ink-2:   #c8c0b4;
+        --ink-3:   #8a8278;
+        --paper:   #141210;
+        --paper-2: #1e1b17;
+        --rule:    #2e2a24;
       }
+      .site-header, .nav-row { background: var(--paper); }
+      .search-input { background: var(--paper-2); color: var(--ink); }
+      .drawer { background: var(--paper); }
+      .rl-panel { background: var(--paper); }
+      .hero-overlay { background: linear-gradient(to top, rgba(3,4,7,.97) 0%, rgba(3,4,7,.5) 55%, transparent 100%); }
+    }
 
-      .hero-side {
-        border-right: none;
-        border-bottom: 1px solid var(--rule);
-      }
+    /* ============================================================
+       PRINT
+    ============================================================ */
+    @media print {
+      .site-header, .ticker-bar, .drawer, .toast, .back-to-top, .search-panel { display: none !important; }
+      .page { padding-top: 0; }
+    }
 
-      .hero-main {
-        min-height: 280px;
+    /* ============================================================
+       HIGH CONTRAST / REDUCED MOTION
+    ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
       }
-
-      .hero-content h2 {
-        font-size: 1.3rem;
-      }
-
-      .logo-text {
-        font-size: 1.1rem;
-      }
-
-      .footer-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .nav-links {
-        justify-content: flex-start;
-      }
+      .ticker-inner { animation: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- FIXED HEADER — ZERO JITTER AUTO-HIDE WITH CLICK-THROUGH FIX FOR NAV -->
-<header class="site-header" id="siteHeader">
+<!-- SKIP NAVIGATION -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- LIVE TICKER -->
+<div class="ticker-bar" role="marquee" aria-label="Breaking news ticker" aria-live="polite">
+  <div class="ticker-label">
+    <span class="ticker-label-dot" aria-hidden="true"></span>LIVE
+  </div>
+  <div class="ticker-track" aria-hidden="true">
+    <div class="ticker-inner" id="tickerInner">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- FIXED HEADER -->
+<header class="site-header" id="siteHeader" role="banner">
   <div class="header-container">
     <div class="header-top">
+
+      <!-- LEFT: hamburger + date -->
       <div class="header-left">
-        <button class="icon-btn" id="hamburgerBtn" aria-label="Menu">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
+        <button class="icon-btn" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="drawer">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
+        <span class="header-date" id="headerDate" aria-label="Today's date"></span>
       </div>
+
+      <!-- CENTER: logo -->
       <div class="header-center">
-        <a href="index.html">
-          <img src="images/lol.png" class="logo-img" onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='block';" alt="The Alamin Gazette">
+        <a href="index.html" aria-label="The Alamin Gazette — Homepage">
+          <img src="images/lol.png" class="logo-img" alt="The Alamin Gazette"
+               onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='inline';">
           <span class="logo-text" id="fallbackLogo" style="display:none;">The Alamin Gazette</span>
         </a>
       </div>
+
+      <!-- RIGHT: reading list + search -->
       <div class="header-right">
-        <button class="icon-btn" id="searchIconBtn" aria-label="Search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <div class="rl-count">
+          <button class="icon-btn" id="readingListBtn" aria-label="Reading list" aria-expanded="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+          <span class="rl-badge" id="rlBadge" aria-live="polite" aria-label="reading list items"></span>
+        </div>
+        <button class="icon-btn" id="searchIconBtn" aria-label="Search articles" aria-expanded="false" aria-controls="searchPanel">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
         </button>
       </div>
+
     </div>
-    <div class="nav-row">
-      <div class="nav-links" id="navLinks">
-        <button class="nav-link active" data-cat="">All</button>
-        <button class="nav-link" data-cat="World Affairs">World Affairs</button>
-        <button class="nav-link" data-cat="Economy & Markets">Economy</button>
-        <button class="nav-link" data-cat="Innovation">Innovation</button>
-        <button class="nav-link" data-cat="Defense & Security">Defense</button>
-        <button class="nav-link" data-cat="Society">Society</button>
+
+    <!-- NAV ROW -->
+    <nav class="nav-row" aria-label="Article categories">
+      <div class="nav-links" id="navLinks" role="list">
+        <button class="nav-link active" data-cat="" role="listitem" aria-current="true">All</button>
+        <button class="nav-link" data-cat="World Affairs" role="listitem">World Affairs</button>
+        <button class="nav-link" data-cat="Economy & Markets" role="listitem">Economy</button>
+        <button class="nav-link" data-cat="Innovation" role="listitem">Innovation</button>
+        <button class="nav-link" data-cat="Defense & Security" role="listitem">Defense</button>
+        <button class="nav-link" data-cat="Society" role="listitem">Society</button>
       </div>
-    </div>
+    </nav>
+
   </div>
 </header>
 
 <!-- SEARCH PANEL -->
-<div class="search-panel" id="searchPanel">
-  <input type="text" class="search-input" id="searchInput" placeholder="Search articles..." autocomplete="off">
+<div class="search-panel" id="searchPanel" role="search" aria-label="Search articles">
+  <div class="search-input-wrap">
+    <span class="search-icon-inner" aria-hidden="true">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </span>
+    <input type="search" class="search-input" id="searchInput"
+           placeholder="Search headlines, topics, authors…"
+           autocomplete="off" autocorrect="off" spellcheck="false"
+           aria-label="Search articles">
+  </div>
+  <span class="search-results-count" id="searchCount" aria-live="polite" aria-atomic="true"></span>
   <button class="search-cancel" id="searchCancelBtn">Cancel</button>
 </div>
 
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+
 <!-- DRAWER -->
-<div class="drawer-overlay" id="drawerOverlay"></div>
-<div class="drawer" id="drawer">
+<nav class="drawer" id="drawer" aria-label="Site navigation" aria-hidden="true">
   <div class="drawer-header">
     <span class="drawer-brand">The Alamin Gazette</span>
-    <button class="drawer-close-x" id="drawerCloseBtn" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18" />
-        <line x1="6" y1="6" x2="18" y2="18" />
+    <button class="drawer-close-x" id="drawerCloseBtn" aria-label="Close menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
       </svg>
     </button>
   </div>
-  <div class="drawer-body" id="drawerBody">
+  <div class="drawer-body">
     <button class="drawer-item active" data-cat="">All Stories</button>
     <button class="drawer-item" data-cat="World Affairs">World Affairs</button>
-    <button class="drawer-item" data-cat="Economy & Markets">Economy & Markets</button>
+    <button class="drawer-item" data-cat="Economy & Markets">Economy &amp; Markets</button>
     <button class="drawer-item" data-cat="Innovation">Innovation</button>
-    <button class="drawer-item" data-cat="Defense & Security">Defense & Security</button>
+    <button class="drawer-item" data-cat="Defense & Security">Defense &amp; Security</button>
     <button class="drawer-item" data-cat="Society">Society</button>
   </div>
   <div class="drawer-footer">
     <a href="admin.html" class="drawer-admin">Admin Portal →</a>
   </div>
+</nav>
+
+<!-- READING LIST PANEL -->
+<div class="rl-panel" id="rlPanel" aria-label="Reading list" role="region">
+  <div class="rl-header">
+    <span class="rl-title">Reading List</span>
+    <button class="drawer-close-x" id="rlCloseBtn" aria-label="Close reading list">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="rl-body" id="rlBody">
+    <div class="rl-empty">No saved articles yet.<br>Tap the bookmark icon on any story.</div>
+  </div>
 </div>
 
-<main class="page">
-  <div class="section-head"><span class="section-label">TOP STORIES</span><span class="section-line"></span></div>
-  <div id="heroZone"><div class="empty-state">Loading intelligence ...</div></div>
-  <hr class="divider">
-  <div class="section-head"><span class="section-label">LATEST</span><span class="section-line"></span></div>
-  <div class="feed" id="feedZone"></div>
-  <div class="load-more-row" id="loadMoreRow" style="display: none;">
-    <button class="load-btn" id="loadMoreBtn">Load More Stories</button>
+<!-- MAIN CONTENT -->
+<main class="page page-content" id="main-content" tabindex="-1">
+
+  <!-- TOP STORIES -->
+  <div class="section-head">
+    <span class="section-label">Top Stories</span>
+    <span class="section-line" aria-hidden="true"></span>
   </div>
+  <div id="heroZone" aria-live="polite" aria-label="Top stories">
+    <div class="skeleton skeleton-hero" aria-label="Loading top stories..."></div>
+  </div>
+
+  <hr class="divider" aria-hidden="true">
+
+  <!-- LATEST -->
+  <div class="section-head">
+    <span class="section-label">Latest</span>
+    <span class="section-line" aria-hidden="true"></span>
+  </div>
+  <div class="feed" id="feedZone" aria-live="polite" aria-label="Latest articles"></div>
+
+  <div class="load-more-row" id="loadMoreRow" style="display:none;">
+    <button class="load-btn" id="loadMoreBtn" aria-label="Load more stories">Load More Stories</button>
+  </div>
+
 </main>
 
-<footer class="footer">
+<!-- FOOTER -->
+<footer class="footer" role="contentinfo">
   <div class="footer-inner">
     <div class="footer-grid">
-      <div class="footer-col">
-        <span class="footer-brand">The Alamin Gazette</span>
-        <p>Independent world intelligence. Reporting the stories that define tomorrow.</p>
+      <div>
+        <span class="footer-brand-name">The Alamin Gazette</span>
+        <p class="footer-tagline">Independent world intelligence. Reporting the stories that define tomorrow — across every continent, every category, every consequence.</p>
       </div>
-      <div class="footer-col"><h5>Regions</h5><a href="#">Asia-Pacific</a><a href="#">EMEA</a><a href="#">Americas</a></div>
-      <div class="footer-col"><h5>Sections</h5><a href="#" class="footer-nav-link" data-cat="World Affairs">World Affairs</a><a href="#" class="footer-nav-link" data-cat="Economy & Markets">Economy</a><a href="#" class="footer-nav-link" data-cat="Innovation">Innovation</a></div>
-      <div class="footer-col"><h5>The Gazette</h5><a href="#">About</a><a href="#">Contact</a><a href="admin.html">Admin Portal</a></div>
+      <div class="footer-col">
+        <h5>Regions</h5>
+        <a href="#">Asia-Pacific</a>
+        <a href="#">EMEA</a>
+        <a href="#">Americas</a>
+        <a href="#">Middle East</a>
+      </div>
+      <div class="footer-col">
+        <h5>Sections</h5>
+        <a href="#" class="footer-nav-link" data-cat="World Affairs">World Affairs</a>
+        <a href="#" class="footer-nav-link" data-cat="Economy & Markets">Economy</a>
+        <a href="#" class="footer-nav-link" data-cat="Innovation">Innovation</a>
+        <a href="#" class="footer-nav-link" data-cat="Defense & Security">Defense</a>
+      </div>
+      <div class="footer-col">
+        <h5>The Gazette</h5>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="admin.html">Admin Portal</a>
+      </div>
     </div>
-    <div class="footer-bottom"><span>© 2025 The Alamin Gazette</span><span>Supabase · Intelligence</span></div>
+    <div class="footer-bottom">
+      <span>© <span id="copyrightYear"></span> The Alamin Gazette. All rights reserved.</span>
+      <span>Powered by Supabase</span>
+    </div>
   </div>
 </footer>
-<div class="toast" id="toastMsg"></div>
+
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</button>
+
+<!-- TOAST -->
+<div class="toast" id="toastMsg" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
-  // SUPABASE CONFIG
-  const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  const PAGE_SIZE = 12;
+// ============================================================
+// SUPABASE
+// ============================================================
+const SUPABASE_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
 
-  let allPosts = [];
-  let filteredPosts = [];
-  let feedOffset = 0;
-  let activeCategory = '';
+let sb;
+const PAGE_SIZE = 12;
+let allPosts = [];
+let filteredPosts = [];
+let feedOffset = 0;
+let activeCategory = '';
 
-  // DOM
-  const heroZone = document.getElementById('heroZone');
-  const feedZone = document.getElementById('feedZone');
-  const loadRow = document.getElementById('loadMoreRow');
-  const loadBtn = document.getElementById('loadMoreBtn');
-  const siteHeader = document.getElementById('siteHeader');
+// DOM refs
+const heroZone    = document.getElementById('heroZone');
+const feedZone    = document.getElementById('feedZone');
+const loadRow     = document.getElementById('loadMoreRow');
+const loadBtn     = document.getElementById('loadMoreBtn');
+const siteHeader  = document.getElementById('siteHeader');
+const backToTop   = document.getElementById('backToTop');
 
-  // ========== ZERO JITTER AUTO-HIDE HEADER (NYT STYLE) ==========
-  let lastScrollPosition = 0;
-  let ticking = false;
-  const SCROLL_THRESHOLD_DOWN = 8;
-  const SCROLL_THRESHOLD_UP = 5;
-  const TOP_SAFE_ZONE = 65;
+// ============================================================
+// HEADER DATE
+// ============================================================
+(function setDate() {
+  const d = new Date();
+  const s = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  document.getElementById('headerDate').textContent = s;
+  document.getElementById('copyrightYear').textContent = d.getFullYear();
+})();
 
-  function handleScroll() {
-    const currentScrollY = window.scrollY;
-    const scrollDelta = currentScrollY - lastScrollPosition;
+// ============================================================
+// AUTO-HIDE HEADER (zero jitter, RAF throttled)
+// ============================================================
+let lastScroll = 0, ticking = false;
+const THRESHOLD_DOWN = 8, THRESHOLD_UP = 5, SAFE_ZONE = 80;
 
-    if (currentScrollY <= TOP_SAFE_ZONE) {
-      siteHeader.classList.remove('header-hidden');
-      lastScrollPosition = currentScrollY;
-      ticking = false;
-      return;
-    }
+function handleScroll() {
+  const y = window.scrollY;
+  const delta = y - lastScroll;
 
-    if (scrollDelta > SCROLL_THRESHOLD_DOWN && !siteHeader.classList.contains('header-hidden')) {
-      siteHeader.classList.add('header-hidden');
-    } else if (scrollDelta < -SCROLL_THRESHOLD_UP && siteHeader.classList.contains('header-hidden')) {
-      siteHeader.classList.remove('header-hidden');
-    }
-
-    lastScrollPosition = currentScrollY;
-    ticking = false;
+  if (y <= SAFE_ZONE) {
+    siteHeader.classList.remove('header-hidden');
+  } else if (delta > THRESHOLD_DOWN) {
+    siteHeader.classList.add('header-hidden');
+  } else if (delta < -THRESHOLD_UP) {
+    siteHeader.classList.remove('header-hidden');
   }
 
-  function onScrollHandler() {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        handleScroll();
-        ticking = false;
-      });
-      ticking = true;
-    }
+  siteHeader.classList.toggle('scrolled', y > 10);
+  backToTop.classList.toggle('visible', y > 600);
+  lastScroll = y;
+  ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+  if (!ticking) { requestAnimationFrame(handleScroll); ticking = true; }
+}, { passive: true });
+
+backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getChipClass(cat) {
+  return {
+    'World Affairs':    'chip-world',
+    'Economy & Markets':'chip-economy',
+    'Innovation':       'chip-innovation',
+    'Defense & Security':'chip-defense',
+    'Society':          'chip-society'
+  }[cat] || 'chip-default';
+}
+
+function truncate(text, len) {
+  if (!text) return '';
+  const plain = text.replace(/<[^>]+>/g, '');
+  return plain.length > len ? plain.slice(0, len).trimEnd() + '…' : plain;
+}
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'Just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7)  return `${d}d ago`;
+  return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric' });
+}
+
+function articleUrl(slug) { return `article.html?id=${encodeURIComponent(slug)}`; }
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderChips(post) {
+  let html = '';
+  if (post.breaking) html += '<span class="chip chip-breaking" aria-label="Breaking news">Breaking</span>';
+  html += `<span class="chip ${getChipClass(post.category)}">${escapeHtml(post.category || 'World')}</span>`;
+  return html;
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toastMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// SHARE
+// ============================================================
+function shareArticle(event, slug, title) {
+  event.stopPropagation();
+  const url = `${location.origin}/article.html?id=${encodeURIComponent(slug)}`;
+  if (navigator.share) {
+    navigator.share({ title, url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(url).then(() => showToast('Link copied to clipboard'));
   }
+}
 
-  window.addEventListener('scroll', onScrollHandler, { passive: true });
+// ============================================================
+// READING LIST
+// ============================================================
+function getReadingList() {
+  try { return JSON.parse(localStorage.getItem('gazette_rl') || '[]'); } catch { return []; }
+}
+function saveReadingList(list) {
+  try { localStorage.setItem('gazette_rl', JSON.stringify(list)); } catch {}
+}
 
-  // Helper functions
-  function getChipClass(cat) {
-    const map = {
-      'World Affairs': 'chip-world',
-      'Economy & Markets': 'chip-economy',
-      'Innovation': 'chip-innovation',
-      'Defense & Security': 'chip-defense',
-      'Society': 'chip-society'
-    };
-    return map[cat] || 'chip-default';
+function isInReadingList(slug) { return getReadingList().some(p => p.slug === slug); }
+
+function toggleReadingList(event, post) {
+  event.stopPropagation();
+  const list = getReadingList();
+  const idx = list.findIndex(p => p.slug === post.slug);
+  if (idx === -1) {
+    list.unshift({ slug: post.slug, title: post.title, image_url: post.image_url, author: post.author, created_at: post.created_at });
+    saveReadingList(list);
+    showToast('Saved to Reading List');
+  } else {
+    list.splice(idx, 1);
+    saveReadingList(list);
+    showToast('Removed from Reading List');
   }
+  updateRlBadge();
+  renderRlPanel();
+}
 
-  function truncate(text, len) {
-    if (!text) return '';
-    const plain = text.replace(/<[^>]+>/g, '');
-    return plain.length > len ? plain.slice(0, len).trim() + '…' : plain;
+function updateRlBadge() {
+  const count = getReadingList().length;
+  const badge = document.getElementById('rlBadge');
+  badge.textContent = count || '';
+  badge.classList.toggle('visible', count > 0);
+  badge.setAttribute('aria-label', count ? `${count} saved articles` : '');
+}
+
+function renderRlPanel() {
+  const list = getReadingList();
+  const body = document.getElementById('rlBody');
+  if (!list.length) {
+    body.innerHTML = '<div class="rl-empty">No saved articles yet.<br>Tap the bookmark icon on any story.</div>';
+    return;
   }
+  body.innerHTML = list.map(p => `
+    <div class="rl-item" onclick="location.href='${articleUrl(p.slug)}'" role="link" tabindex="0"
+         onkeydown="if(event.key==='Enter')location.href='${articleUrl(p.slug)}'">
+      <img src="${escapeHtml(p.image_url||'https://placehold.co/64x48/cfc8bb/8a7a6a?text=+')}"
+           onerror="this.src='https://placehold.co/64x48/cfc8bb/8a7a6a?text=+'" alt="" loading="lazy">
+      <div>
+        <div class="rl-item-title">${escapeHtml(p.title)}</div>
+        <div class="rl-item-meta">${escapeHtml(p.author||'Gazette')} · ${timeAgo(p.created_at)}</div>
+      </div>
+      <button class="rl-remove" onclick="event.stopPropagation();toggleReadingList(event,${JSON.stringify(p).replace(/"/g,'&quot;')})"
+              aria-label="Remove from reading list">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>`).join('');
+}
 
-  function timeAgo(iso) {
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'Just now';
-    if (mins < 60) return `${mins}m ago`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d ago`;
-    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
+// ============================================================
+// TICKER
+// ============================================================
+function buildTicker(posts) {
+  const items = posts.slice(0, 10);
+  const html = items.map(p =>
+    `<span class="ticker-item" onclick="location.href='${articleUrl(p.slug)}'" tabindex="0"
+           onkeydown="if(event.key==='Enter')location.href='${articleUrl(p.slug)}'"
+           role="link">${escapeHtml(p.title)}</span>`
+  ).join('');
+  // Duplicate for seamless loop
+  document.getElementById('tickerInner').innerHTML = html + html;
+}
 
-  function articleUrl(slug) {
-    return `article.html?id=${slug}`;
-  }
-
-  function shareArticle(event, slug, title) {
-    event.stopPropagation();
-    const url = `${window.location.origin}/article.html?id=${slug}`;
-    if (navigator.share) navigator.share({ title, url });
-    else navigator.clipboard.writeText(url).then(() => showToast('Link copied'));
-  }
-
-  function showToast(msg) {
-    const toast = document.getElementById('toastMsg');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-
-  function renderChips(post) {
-    let html = '';
-    if (post.breaking) html += '<span class="chip chip-breaking">Breaking</span>';
-    html += `<span class="chip ${getChipClass(post.category)}">${post.category || 'World'}</span>`;
-    return html;
-  }
-
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
-  }
-
-  function renderHero(posts) {
-    if (!posts.length) {
-      heroZone.innerHTML = '<div class="empty-state">No stories found</div>';
-      return;
-    }
-    const main = posts[0];
-    const sides = posts.slice(1, 3);
+// ============================================================
+// RENDER HERO
+// ============================================================
+function renderHero(posts) {
+  if (!posts.length) {
     heroZone.innerHTML = `
-      <div class="hero">
-        <div class="hero-main" onclick="location.href='${articleUrl(main.slug)}'">
-          <img class="hero-main-img" src="${main.image_url || 'https://placehold.co/900x460/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/900x460/0b1927/3a5878?text=Gazette'" alt="">
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <div>${renderChips(main)}</div>
-            <h2>${escapeHtml(main.title)}</h2>
-            <div class="hero-excerpt">${truncate(main.excerpt || main.content, 160)}</div>
-            <div class="hero-meta"><span>${main.author || 'Alamin Gazette'} · ${timeAgo(main.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${main.slug}','${escapeHtml(main.title).replace(/'/g, "\\'")}')"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button></div>
+      <div class="empty-state">
+        <h3>No stories found</h3>
+        <p>Try a different category or search term.</p>
+      </div>`;
+    return;
+  }
+
+  const main  = posts[0];
+  const sides = posts.slice(1, 3);
+  const safeTitle = t => escapeHtml(t).replace(/'/g, '&#39;');
+
+  heroZone.innerHTML = `
+    <div class="hero fade-in" role="region" aria-label="Top stories">
+      <div class="hero-main" onclick="location.href='${articleUrl(main.slug)}'"
+           role="link" tabindex="0" aria-label="${escapeHtml(main.title)}"
+           onkeydown="if(event.key==='Enter')location.href='${articleUrl(main.slug)}'">
+        <img class="hero-main-img"
+             src="${escapeHtml(main.image_url||'https://placehold.co/900x480/0b1927/3a5878?text=Gazette')}"
+             onerror="this.src='https://placehold.co/900x480/0b1927/3a5878?text=Gazette'"
+             alt="${escapeHtml(main.title)}" width="900" height="480">
+        <div class="hero-overlay" aria-hidden="true"></div>
+        <div class="hero-content">
+          <div aria-label="Category">${renderChips(main)}</div>
+          <h2>${escapeHtml(main.title)}</h2>
+          <p class="hero-excerpt">${truncate(main.excerpt || main.content, 170)}</p>
+          <div class="hero-meta">
+            <span>${escapeHtml(main.author||'Alamin Gazette')} · <time datetime="${main.created_at}">${timeAgo(main.created_at)}</time></span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="share-btn" onclick="toggleReadingList(event, ${JSON.stringify(main).replace(/"/g,'&quot;')})"
+                      aria-label="${isInReadingList(main.slug)?'Remove from':'Save to'} reading list">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="${isInReadingList(main.slug)?'currentColor':'none'}" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>Save
+              </button>
+              <button class="share-btn" onclick="shareArticle(event,'${main.slug}','${safeTitle(main.title)}')"
+                      aria-label="Share article: ${escapeHtml(main.title)}">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>Share
+              </button>
+            </div>
           </div>
         </div>
-        <div class="hero-stack">
-          ${sides.map(p => `
-            <div class="hero-side" onclick="location.href='${articleUrl(p.slug)}'">
-              <img class="hero-side-img" src="${p.image_url || 'https://placehold.co/600x260/0b1927/3a5878?text=Gazette'}" onerror="this.src='https://placehold.co/600x260/0b1927/3a5878?text=Gazette'" alt="">
-              <div>${renderChips(p)}</div>
-              <h3>${escapeHtml(p.title)}</h3>
-              <div class="side-excerpt">${truncate(p.excerpt || p.content, 95)}</div>
-              <div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">Share</button></div>
-            </div>
-          `).join('')}
-        </div>
-      </div>`;
-  }
-
-  function renderFeed(posts, append = false) {
-    if (!posts.length && !append) {
-      feedZone.innerHTML = '<div class="empty-state">No more stories</div>';
-      return;
-    }
-    const html = posts.map(p => `
-      <div class="feed-item" onclick="location.href='${articleUrl(p.slug)}'">
-        <img class="feed-img" src="${p.image_url || 'https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'}" onerror="this.src='https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'" loading="lazy" alt="">
-        <div>${renderChips(p)}</div>
-        <h3>${escapeHtml(p.title)}</h3>
-        <div class="feed-excerpt">${truncate(p.excerpt || p.content, 120)}</div>
-        <div class="card-meta"><span>${p.author || 'Alamin Gazette'} · ${timeAgo(p.created_at)}</span><button class="share-btn" onclick="shareArticle(event,'${p.slug}','${escapeHtml(p.title).replace(/'/g, "\\'")}')">Share</button></div>
       </div>
-    `).join('');
-    if (append) feedZone.innerHTML += html;
-    else feedZone.innerHTML = html;
+
+      <div class="hero-stack">
+        ${sides.map(p => `
+          <div class="hero-side" onclick="location.href='${articleUrl(p.slug)}'"
+               role="link" tabindex="0" aria-label="${escapeHtml(p.title)}"
+               onkeydown="if(event.key==='Enter')location.href='${articleUrl(p.slug)}'">
+            <img class="hero-side-img"
+                 src="${escapeHtml(p.image_url||'https://placehold.co/600x260/0b1927/3a5878?text=Gazette')}"
+                 onerror="this.src='https://placehold.co/600x260/0b1927/3a5878?text=Gazette'"
+                 alt="${escapeHtml(p.title)}" width="300" height="130" loading="lazy">
+            <div>${renderChips(p)}</div>
+            <h3>${escapeHtml(p.title)}</h3>
+            <p class="side-excerpt">${truncate(p.excerpt||p.content, 100)}</p>
+            <div class="card-meta">
+              <span>${escapeHtml(p.author||'Gazette')} · <time datetime="${p.created_at}">${timeAgo(p.created_at)}</time></span>
+              <button class="share-btn" onclick="shareArticle(event,'${p.slug}','${safeTitle(p.title)}')"
+                      aria-label="Share: ${escapeHtml(p.title)}">Share</button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ============================================================
+// RENDER FEED
+// ============================================================
+function renderFeed(posts, append = false) {
+  if (!posts.length && !append) {
+    feedZone.innerHTML = '<div class="empty-state"><p>No more stories.</p></div>';
+    return;
   }
 
-  function applyFilter(category) {
-    if (category !== undefined) activeCategory = category;
-    filteredPosts = activeCategory ? allPosts.filter(p => p.category === activeCategory) : [...allPosts];
-    renderHero(filteredPosts.slice(0, 3));
-    feedOffset = 8;
-    renderFeed(filteredPosts.slice(3, 3 + 8));
-    const hasMore = filteredPosts.length > 3 + 8;
-    loadRow.style.display = hasMore ? 'block' : 'none';
-    if (hasMore) {
-      loadBtn.disabled = false;
-      loadBtn.textContent = 'Load More Stories';
-    }
-  }
+  const safeTitle = t => escapeHtml(t).replace(/'/g, '&#39;');
 
-  function loadMore() {
-    const start = 3 + feedOffset;
-    const nextBatch = filteredPosts.slice(start, start + PAGE_SIZE);
-    if (nextBatch.length) {
-      renderFeed(nextBatch, true);
-      feedOffset += PAGE_SIZE;
-    }
-    if (3 + feedOffset >= filteredPosts.length) loadRow.style.display = 'none';
-    else {
-      loadBtn.disabled = false;
-      loadBtn.textContent = 'Load More Stories';
-    }
-  }
+  const html = posts.map(p => `
+    <article class="feed-item fade-in" onclick="location.href='${articleUrl(p.slug)}'"
+             role="link" tabindex="0" aria-label="${escapeHtml(p.title)}"
+             onkeydown="if(event.key==='Enter')location.href='${articleUrl(p.slug)}'">
+      <img class="feed-img"
+           src="${escapeHtml(p.image_url||'https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette')}"
+           onerror="this.src='https://placehold.co/400x120/e8e2d8/9a8a7a?text=Gazette'"
+           loading="lazy" alt="${escapeHtml(p.title)}" width="400" height="120">
+      <div>${renderChips(p)}</div>
+      <h3>${escapeHtml(p.title)}</h3>
+      <p class="feed-excerpt">${truncate(p.excerpt||p.content, 120)}</p>
+      <div class="card-meta">
+        <span>${escapeHtml(p.author||'Gazette')} · <time datetime="${p.created_at}">${timeAgo(p.created_at)}</time></span>
+        <div style="display:flex;gap:4px;">
+          <button class="share-btn" onclick="toggleReadingList(event,${JSON.stringify(p).replace(/"/g,'&quot;')})"
+                  aria-label="${isInReadingList(p.slug)?'Remove from':'Save to'} reading list">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="${isInReadingList(p.slug)?'currentColor':'none'}" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+          <button class="share-btn" onclick="shareArticle(event,'${p.slug}','${safeTitle(p.title)}')"
+                  aria-label="Share: ${escapeHtml(p.title)}">Share</button>
+        </div>
+      </div>
+    </article>`).join('');
 
-  async function loadPosts() {
-    heroZone.innerHTML = '<div class="empty-state">Loading stories...</div>';
-    const { data, error } = await sb.from('posts').select('*').eq('is_published', true).order('created_at', { ascending: false });
-    if (error) {
-      heroZone.innerHTML = `<div class="empty-state">Error: ${error.message}</div>`;
-      return;
-    }
-    if (!data || !data.length) {
-      heroZone.innerHTML = '<div class="empty-state">No published stories yet.</div>';
-      return;
-    }
-    allPosts = data.sort((a, b) => (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) || new Date(b.created_at) - new Date(a.created_at));
-    applyFilter('');
-  }
+  if (append) feedZone.innerHTML += html;
+  else feedZone.innerHTML = html;
+}
 
-  function setActiveNav(cat) {
-    document.querySelectorAll('.nav-link').forEach(btn => {
-      if (btn.dataset.cat === cat || (!cat && btn.dataset.cat === '')) btn.classList.add('active');
-      else btn.classList.remove('active');
-    });
-    document.querySelectorAll('.drawer-item').forEach(btn => {
-      if (btn.dataset.cat === cat || (!cat && btn.dataset.cat === '')) btn.classList.add('active');
-      else btn.classList.remove('active');
-    });
-  }
+// ============================================================
+// FILTER / SEARCH
+// ============================================================
+function applyFilter(category) {
+  if (category !== undefined) activeCategory = category;
+  filteredPosts = activeCategory
+    ? allPosts.filter(p => p.category === activeCategory)
+    : [...allPosts];
+  renderHero(filteredPosts.slice(0, 3));
+  feedOffset = 8;
+  renderFeed(filteredPosts.slice(3, 3 + feedOffset));
+  const hasMore = filteredPosts.length > 3 + feedOffset;
+  loadRow.style.display = hasMore ? 'block' : 'none';
+}
 
-  function handleCategorySelect(cat) {
-    setActiveNav(cat);
-    applyFilter(cat);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    closeDrawer();
-    closeSearch();
-  }
+function loadMore() {
+  const start = 3 + feedOffset;
+  const batch = filteredPosts.slice(start, start + PAGE_SIZE);
+  if (batch.length) { renderFeed(batch, true); feedOffset += PAGE_SIZE; }
+  if (3 + feedOffset >= filteredPosts.length) loadRow.style.display = 'none';
+}
 
-  function openDrawer() {
-    document.getElementById('drawer').classList.add('open');
-    document.getElementById('drawerOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeDrawer() {
-    document.getElementById('drawer').classList.remove('open');
-    document.getElementById('drawerOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function openSearch() {
-    document.getElementById('searchPanel').classList.add('open');
-    document.getElementById('searchInput').focus();
-  }
-  function closeSearch() {
-    document.getElementById('searchPanel').classList.remove('open');
-    document.getElementById('searchInput').value = '';
-    applyFilter(activeCategory);
-  }
-  function doSearch() {
+let searchTimeout;
+function doSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
     const term = document.getElementById('searchInput').value.trim().toLowerCase();
-    if (!term) {
-      applyFilter(activeCategory);
-      return;
-    }
-    const results = allPosts.filter(p => p.title.toLowerCase().includes(term) || (p.excerpt || '').toLowerCase().includes(term) || (p.content || '').toLowerCase().includes(term));
+    const countEl = document.getElementById('searchCount');
+    if (!term) { applyFilter(activeCategory); countEl.textContent = ''; return; }
+    const results = allPosts.filter(p =>
+      p.title.toLowerCase().includes(term) ||
+      (p.excerpt||'').toLowerCase().includes(term) ||
+      (p.content||'').toLowerCase().includes(term) ||
+      (p.author||'').toLowerCase().includes(term) ||
+      (p.category||'').toLowerCase().includes(term)
+    );
+    countEl.textContent = `${results.length} result${results.length !== 1 ? 's' : ''}`;
     renderHero(results.slice(0, 3));
-    renderFeed(results.slice(3, 3 + 12));
+    renderFeed(results.slice(3, 15));
     loadRow.style.display = 'none';
+  }, 200);
+}
+
+// ============================================================
+// NAV STATE
+// ============================================================
+function setActiveNav(cat) {
+  document.querySelectorAll('.nav-link').forEach(btn => {
+    const active = btn.dataset.cat === cat;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-current', active ? 'true' : 'false');
+  });
+  document.querySelectorAll('.drawer-item').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.cat === cat));
+}
+
+function handleCategorySelect(cat) {
+  setActiveNav(cat);
+  applyFilter(cat);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  closeDrawer();
+  closeSearch();
+}
+
+// ============================================================
+// DRAWER / SEARCH / RL PANEL
+// ============================================================
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer').removeAttribute('aria-hidden');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawerOverlay').removeAttribute('aria-hidden');
+  document.getElementById('hamburgerBtn').setAttribute('aria-expanded','true');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer').setAttribute('aria-hidden','true');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('drawerOverlay').setAttribute('aria-hidden','true');
+  document.getElementById('hamburgerBtn').setAttribute('aria-expanded','false');
+  document.body.style.overflow = '';
+}
+
+function openSearch() {
+  document.getElementById('searchPanel').classList.add('open');
+  document.getElementById('searchIconBtn').setAttribute('aria-expanded','true');
+  setTimeout(() => document.getElementById('searchInput').focus(), 50);
+}
+function closeSearch() {
+  document.getElementById('searchPanel').classList.remove('open');
+  document.getElementById('searchIconBtn').setAttribute('aria-expanded','false');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchCount').textContent = '';
+  applyFilter(activeCategory);
+}
+
+function openRlPanel() {
+  renderRlPanel();
+  document.getElementById('rlPanel').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('drawerOverlay').removeAttribute('aria-hidden');
+  document.getElementById('readingListBtn').setAttribute('aria-expanded','true');
+  document.body.style.overflow = 'hidden';
+}
+function closeRlPanel() {
+  document.getElementById('rlPanel').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('drawerOverlay').setAttribute('aria-hidden','true');
+  document.getElementById('readingListBtn').setAttribute('aria-expanded','false');
+  document.body.style.overflow = '';
+}
+
+// Keyboard: close overlays on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeDrawer(); closeSearch(); closeRlPanel(); }
+});
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+document.getElementById('hamburgerBtn').addEventListener('click', openDrawer);
+document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
+document.getElementById('drawerOverlay').addEventListener('click', () => { closeDrawer(); closeRlPanel(); });
+document.getElementById('searchIconBtn').addEventListener('click', openSearch);
+document.getElementById('searchCancelBtn').addEventListener('click', closeSearch);
+document.getElementById('searchInput').addEventListener('input', doSearch);
+document.getElementById('readingListBtn').addEventListener('click', openRlPanel);
+document.getElementById('rlCloseBtn').addEventListener('click', closeRlPanel);
+loadBtn.addEventListener('click', loadMore);
+
+document.querySelectorAll('.nav-link').forEach(btn =>
+  btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat)));
+document.querySelectorAll('.drawer-item[data-cat]').forEach(btn =>
+  btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat)));
+document.querySelectorAll('.footer-nav-link').forEach(a =>
+  a.addEventListener('click', e => { e.preventDefault(); handleCategorySelect(a.dataset.cat); }));
+
+// ============================================================
+// LOAD POSTS
+// ============================================================
+async function loadPosts() {
+  heroZone.innerHTML = '<div class="skeleton skeleton-hero" aria-label="Loading top stories..."></div>';
+  feedZone.innerHTML = '';
+
+  if (!window.supabase) {
+    heroZone.innerHTML = '<div class="empty-state"><h3>Loading…</h3><p>Please wait.</p></div>';
+    return;
   }
 
-  // event listeners
-  document.getElementById('hamburgerBtn').addEventListener('click', openDrawer);
-  document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
-  document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
-  document.getElementById('searchIconBtn').addEventListener('click', openSearch);
-  document.getElementById('searchCancelBtn').addEventListener('click', closeSearch);
-  document.getElementById('searchInput').addEventListener('input', doSearch);
-  loadBtn.addEventListener('click', loadMore);
-  document.querySelectorAll('.nav-link').forEach(btn => btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat)));
-  document.querySelectorAll('.drawer-item').forEach(btn => btn.addEventListener('click', () => handleCategorySelect(btn.dataset.cat)));
-  document.querySelectorAll('.footer-nav-link').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); handleCategorySelect(link.dataset.cat); }));
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  loadPosts();
+  const { data, error } = await sb
+    .from('posts').select('*').eq('is_published', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    heroZone.innerHTML = `<div class="empty-state"><h3>Could not load stories</h3><p>${escapeHtml(error.message)}</p></div>`;
+    return;
+  }
+
+  if (!data || !data.length) {
+    heroZone.innerHTML = '<div class="empty-state"><h3>No stories yet</h3><p>Check back soon.</p></div>';
+    return;
+  }
+
+  // Breaking stories float to top, then by date
+  allPosts = data.sort((a, b) =>
+    (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) ||
+    new Date(b.created_at) - new Date(a.created_at)
+  );
+
+  buildTicker(allPosts);
+  applyFilter('');
+  updateRlBadge();
+}
+
+// Init after Supabase loads
+window.addEventListener('load', loadPosts);
 </script>
+
 </body>
 </html>
