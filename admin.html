@@ -38,6 +38,63 @@
       --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
       --shadow-md: 0 4px 16px rgba(0,0,0,.1);
       --shadow-lg: 0 8px 32px rgba(0,0,0,.14);
+      color-scheme: light;
+    }
+
+    /* ── Dark theme ── */
+    html.theme-dark {
+      --ink:     #e8e2d8;
+      --ink-2:   #bdb5a8;
+      --ink-3:   #7a7268;
+      --paper:   #141210;
+      --paper-2: #1e1b17;
+      --rule:    #2e2a24;
+      --surface: #1a1714;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.35);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.45);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.6);
+      color-scheme: dark;
+    }
+
+    /* Dark overrides — elements that need explicit fixes */
+    html.theme-dark body                 { background: #0e0c0a; }
+    html.theme-dark .editor-panel        { background: var(--surface); }
+    html.theme-dark .list-panel          { background: var(--paper); }
+    html.theme-dark .auth-card           { background: var(--surface); }
+    html.theme-dark .stat-card           { background: var(--surface); }
+    html.theme-dark .sidebar-card        { background: var(--surface); }
+    html.theme-dark .modal-box           { background: var(--surface); }
+    html.theme-dark .field input,
+    html.theme-dark .field textarea,
+    html.theme-dark .field select        { background: var(--paper-2); color: var(--ink); border-color: var(--rule); }
+    html.theme-dark .field input:focus,
+    html.theme-dark .field textarea:focus{ background: #222; border-color: #5a7090; box-shadow: 0 0 0 3px rgba(90,112,144,.12); }
+    html.theme-dark .breaking-row        { background: var(--paper-2); border-color: var(--rule); }
+    html.theme-dark .breaking-row.on     { background: #200a0e; border-color: var(--crimson); }
+    html.theme-dark .pub-row             { background: var(--paper-2); }
+    html.theme-dark .pub-row.pub-live    { background: #0a1a10; }
+    html.theme-dark .up-preview          { border-color: var(--rule); }
+    html.theme-dark .post-row:hover      { background: var(--paper-2); }
+    html.theme-dark .btn-ghost           { border-color: var(--rule); color: var(--ink-3); }
+    html.theme-dark .btn-ghost:hover     { border-color: var(--ink); color: var(--ink); background: var(--paper-2); }
+    html.theme-dark .filter-btn          { border-color: var(--rule); color: var(--ink-3); background: transparent; }
+    html.theme-dark .filter-btn:hover,
+    html.theme-dark .filter-btn.active   { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    html.theme-dark .count-badge         { background: var(--paper-2); border-color: var(--rule); }
+    html.theme-dark #search              { background: var(--paper-2); color: var(--ink); }
+    html.theme-dark .hdr-badge           { background: rgba(200,146,42,.1); }
+
+    /* Theme toggle button */
+    html.theme-dark .theme-toggle-btn    { background: rgba(255,255,255,.07); color: #b8c8d8; border-color: rgba(255,255,255,.12); }
+    html.theme-dark .theme-toggle-btn:hover { background: rgba(255,255,255,.12); color: #dde8f0; }
+
+    /* Smooth transition */
+    html.theme-transitioning *:not(img) {
+      transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease !important;
     }
 
     /* ============================================================
@@ -113,6 +170,21 @@
     }
     #logout-btn:hover { color: #ede8e0; border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.05); }
     #logout-btn:focus-visible { outline: 2px solid var(--gold); }
+
+    /* Theme toggle button in header */
+    .theme-toggle-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #7a8a9a;
+      font-family: var(--ui); font-size: 11px; font-weight: 700;
+      letter-spacing: .5px;
+      padding: 6px 13px; border-radius: var(--radius);
+      cursor: pointer; transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .theme-toggle-btn:hover { background: rgba(255,255,255,.11); color: #c8d8e8; }
+    .theme-toggle-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
     /* ============================================================
        AUTH SCREEN
@@ -463,6 +535,19 @@
   </div>
   <div class="hdr-right">
     <a href="index.html" class="hdr-link" aria-label="View live site">← View Site</a>
+    <button id="adminThemeBtn" class="theme-toggle-btn"
+            onclick="cycleTheme()"
+            aria-label="Toggle colour theme"
+            title="Toggle theme">
+      <svg id="adminThemeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <span id="adminThemeLabel">Light</span>
+    </button>
     <button id="logout-btn" onclick="doLogout()" aria-label="Sign out">Sign Out</button>
   </div>
 </header>
@@ -680,6 +765,88 @@
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
+// ============================================================
+// THEME ENGINE — synced via gazette_theme (shared with all pages)
+// Admin has a cycle button in the header: Light → Dark → System → Light
+// ============================================================
+(function() {
+  const THEME_KEY = 'gazette_theme';
+  function getOsPref() { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+  function applyTheme(pref, skip) {
+    const html = document.documentElement;
+    const resolved = pref === 'system' ? getOsPref() : pref;
+    if (!skip) {
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 350);
+    }
+    html.classList.toggle('theme-dark', resolved === 'dark');
+  }
+  let pref = 'system';
+  try { pref = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+  applyTheme(pref, true);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    let s = 'system'; try { s = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+    if (s === 'system') applyTheme('system', false);
+  });
+})();
+
+// Icons & labels for the three states
+const THEME_STATES = {
+  light: {
+    label: 'Light',
+    icon: `<circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`
+  },
+  dark: {
+    label: 'Dark',
+    icon: `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`
+  },
+  system: {
+    label: 'System',
+    icon: `<rect x="2" y="3" width="20" height="14" rx="2"/>
+      <line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>`
+  }
+};
+
+function updateThemeBtn(pref) {
+  const btn   = document.getElementById('adminThemeBtn');
+  const icon  = document.getElementById('adminThemeIcon');
+  const label = document.getElementById('adminThemeLabel');
+  if (!btn) return;
+  const state = THEME_STATES[pref] || THEME_STATES.system;
+  if (icon)  icon.innerHTML = state.icon;
+  if (label) label.textContent = state.label;
+  btn.setAttribute('aria-label', `Theme: ${state.label} — click to cycle`);
+}
+
+function cycleTheme() {
+  const THEME_KEY = 'gazette_theme';
+  const ORDER = ['light', 'dark', 'system'];
+  let current = 'system';
+  try { current = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+  const next = ORDER[(ORDER.indexOf(current) + 1) % ORDER.length];
+  try { localStorage.setItem(THEME_KEY, next); } catch {}
+
+  const html = document.documentElement;
+  html.classList.add('theme-transitioning');
+  setTimeout(() => html.classList.remove('theme-transitioning'), 350);
+  const resolved = next === 'system'
+    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : next;
+  html.classList.toggle('theme-dark', resolved === 'dark');
+  updateThemeBtn(next);
+}
+
+// Sync button label after DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  let pref = 'system';
+  try { pref = localStorage.getItem('gazette_theme') || 'system'; } catch {}
+  updateThemeBtn(pref);
+});
+
 const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
 const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
 const IBB_KEY  = '5eedf24deee3528bc34e811052972c74';
