@@ -408,21 +408,24 @@
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
     /* ============================================================
-       TOAST
+       TOAST — hardcoded dark so text is always visible on any bg
     ============================================================ */
     .toast {
       position: fixed; bottom: 28px; right: 28px;
-      background: var(--navy); color: #c0d0e0;
-      font-size: 13px; padding: 14px 20px;
-      border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      background: #060e18;        /* always deep dark — never flips */
+      color: #d8e8f0;             /* always light blue-white */
+      font-family: var(--ui); font-size: 13px; font-weight: 500;
+      padding: 14px 20px;
+      border-radius: var(--radius);
+      box-shadow: 0 6px 28px rgba(0,0,0,.5);
       z-index: 999; opacity: 0; transform: translateY(16px);
       transition: all .28s; pointer-events: none;
       border-left: 3px solid var(--gold);
-      max-width: 300px; line-height: 1.45;
+      max-width: 320px; line-height: 1.5;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast.ok  { border-left-color: #4caf80; }
-    .toast.err { border-left-color: var(--crimson); }
+    .toast.err { border-left-color: #e05060; }
 
     /* ============================================================
        RESPONSIVE
