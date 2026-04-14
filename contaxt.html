@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Contact Us — The Alamin Gazette</title>
+  <meta name="description" content="Get in touch with The Alamin Gazette editorial team. Send us tips, press inquiries, corrections, or general feedback.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0b1927">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contact — The Alamin Gazette">
+  <meta property="og:description" content="Reach our editorial team with tips, inquiries, or feedback.">
+  <meta property="og:site_name" content="The Alamin Gazette">
+  <link rel="canonical" href="contact.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#0f0f0f; --ink-2:#3a3a3a; --ink-3:#6e6e6e;
+      --paper:#f9f7f3; --paper-2:#f1ece3; --rule:#cfc8bb;
+      --navy:#0b1927; --crimson:#b01428; --gold:#c8922a; --green:#0e7c45;
+      --serif:'Playfair Display',Georgia,serif;
+      --prose:'Source Serif 4',Georgia,serif;
+      --ui:'DM Sans',system-ui,sans-serif;
+      --radius:3px; --ease:cubic-bezier(.4,0,.2,1);
+      color-scheme:light;
+    }
+    html.theme-dark {
+      --ink:#e8e2d8; --ink-2:#bdb5a8; --ink-3:#7a7268;
+      --paper:#141210; --paper-2:#1e1b17; --rule:#2e2a24;
+      color-scheme:dark;
+    }
+    html.theme-dark body            { background:#0e0c0a; }
+    html.theme-dark .masthead       { background:var(--paper); border-color:var(--rule); }
+    html.theme-dark .form-card      { background:#1a1714; border-color:var(--rule); }
+    html.theme-dark .sidebar-card   { background:#1a1714; border-color:var(--rule); }
+    html.theme-dark .sc-item:hover  { background:var(--paper-2); }
+    html.theme-dark .rt-item        { background:var(--paper-2); }
+    html.theme-dark .inquiry-tab    { background:var(--paper-2); color:var(--ink-3); border-color:var(--rule); }
+    html.theme-dark .field input,
+    html.theme-dark .field textarea { background:var(--paper-2); color:var(--ink); border-color:var(--rule); }
+    html.theme-dark .field input:focus,
+    html.theme-dark .field textarea:focus { background:#222; border-color:#5a7090; }
+    html.theme-dark .rate-limit-banner { background:#1e180a; }
+    html.theme-transitioning *:not(img) {
+      transition:background-color .3s ease,color .3s ease,border-color .3s ease !important;
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+    body{font-family:var(--prose);background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    button{cursor:pointer;font-family:var(--ui)}
+
+    .skip-link{position:absolute;top:-100%;left:16px;background:var(--crimson);color:#fff;font-family:var(--ui);font-size:13px;font-weight:700;padding:10px 20px;border-radius:0 0 var(--radius) var(--radius);z-index:9999;transition:top .2s}
+    .skip-link:focus{top:0;outline:3px solid #fff}
+
+    /* MASTHEAD */
+    .masthead{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--rule);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:100;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+    .mast-back{font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3);display:inline-flex;align-items:center;gap:5px;min-width:90px;padding:6px 8px;border-radius:var(--radius);transition:color .18s}
+    .mast-back:hover{color:var(--crimson)}
+    .mast-back:focus-visible{outline:2px solid var(--crimson)}
+    .mast-center{position:absolute;left:50%;transform:translateX(-50%);pointer-events:none}
+    .mast-center a{pointer-events:auto;line-height:0;display:inline-block}
+    .mast-logo-img{height:44px;width:auto}
+    .mast-logo-txt{font-family:var(--serif);font-size:1.15rem;font-weight:900;color:var(--ink)}
+    .mast-right{min-width:90px;display:flex;justify-content:flex-end}
+    .mast-admin{font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3);padding:6px 8px;border-radius:var(--radius);transition:color .18s}
+    .mast-admin:hover{color:var(--crimson)}
+
+    /* PAGE */
+    .page-wrap{max-width:1160px;margin:0 auto;padding:0 24px 80px}
+
+    /* HERO */
+    .page-hero{padding:60px 0 52px;border-bottom:2px solid var(--ink);margin-bottom:56px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end}
+    .page-hero-eyebrow{font-family:var(--ui);font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--crimson);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .page-hero-eyebrow::after{content:'';flex:1;height:1px;background:var(--rule);max-width:60px}
+    .page-hero h1{font-family:var(--serif);font-size:clamp(2.4rem,4.5vw,3.8rem);font-weight:900;line-height:1.08;letter-spacing:-.4px;color:var(--ink);margin-bottom:20px}
+    .page-hero h1 em{font-style:italic;color:var(--crimson)}
+    .page-hero-lead{font-family:var(--prose);font-size:1.05rem;font-weight:300;color:var(--ink-2);line-height:1.72;max-width:400px}
+    .fact-item{display:flex;align-items:flex-start;gap:18px;padding:22px 0;border-bottom:1px solid var(--rule)}
+    .fact-item:first-child{border-top:1px solid var(--rule)}
+    .fact-icon{width:40px;height:40px;flex-shrink:0;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#8aaccc;margin-top:2px}
+    .fact-label{font-family:var(--ui);font-size:9px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+    .fact-value{font-family:var(--ui);font-size:14px;font-weight:600;color:var(--ink-2)}
+    .fact-sub{font-family:var(--ui);font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.5}
+
+    /* FORM SECTION */
+    .form-section{display:grid;grid-template-columns:1fr 380px;gap:56px;align-items:start}
+
+    .form-card{background:#fff;border:1px solid var(--rule);border-top:3px solid var(--crimson);border-radius:var(--radius);padding:40px 36px;box-shadow:0 2px 20px rgba(0,0,0,.05)}
+    .form-card-header{margin-bottom:32px}
+    .form-card-header h2{font-family:var(--serif);font-size:1.5rem;font-weight:700;margin-bottom:7px;color:var(--ink)}
+    .form-card-header p{font-family:var(--ui);font-size:13px;color:var(--ink-3);line-height:1.6}
+
+    .inquiry-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--rule)}
+    .inquiry-tab{font-family:var(--ui);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:6px 14px;border:1.5px solid var(--rule);background:transparent;border-radius:20px;color:var(--ink-3);transition:all .18s;white-space:nowrap}
+    .inquiry-tab:hover{border-color:var(--ink-2);color:var(--ink-2)}
+    .inquiry-tab.active{background:var(--navy);color:#b8d0e8;border-color:var(--navy)}
+    .inquiry-tab:focus-visible{outline:2px solid var(--crimson);outline-offset:2px}
+
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .field{margin-bottom:20px;position:relative}
+    .field label{display:block;font-family:var(--ui);font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
+    .field label .req{color:var(--crimson);margin-left:2px}
+    .field input,.field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--rule);background:var(--paper);font-family:var(--ui);font-size:14px;color:var(--ink);border-radius:var(--radius);outline:none;transition:border-color .18s,box-shadow .18s,background .18s;-webkit-appearance:none;appearance:none}
+    .field input:focus,.field textarea:focus{border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(11,25,39,.08)}
+    .field input.error,.field textarea.error{border-color:var(--crimson)}
+    .field input.valid,.field textarea.valid{border-color:var(--green)}
+    .field textarea{resize:vertical;min-height:140px;line-height:1.65}
+    .field-err{font-family:var(--ui);font-size:11px;color:var(--crimson);margin-top:5px;display:none}
+    .field-err.show{display:block}
+    .field-counter{position:absolute;right:12px;bottom:10px;font-family:var(--ui);font-size:10px;color:var(--ink-3);pointer-events:none}
+    .field-counter.warn{color:var(--gold)}
+    .field-counter.over{color:var(--crimson)}
+
+    .submit-btn{width:100%;padding:15px 24px;background:var(--navy);color:#c8dced;font-family:var(--ui);font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;border:none;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 2px 8px rgba(11,25,39,.18);margin-top:8px}
+    .submit-btn:hover:not(:disabled){background:#0f2540;transform:translateY(-1px);box-shadow:0 6px 20px rgba(11,25,39,.25)}
+    .submit-btn:active{transform:translateY(0)}
+    .submit-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+    .submit-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+    .btn-spinner{width:16px;height:16px;border:2px solid rgba(200,220,237,.3);border-top-color:#c8dced;border-radius:50%;animation:spin .7s linear infinite;display:none}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .rate-limit-banner{display:none;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:var(--radius);padding:18px 20px;margin-bottom:24px}
+    .rate-limit-banner.show{display:flex;gap:14px;align-items:flex-start}
+    .rl-icon{color:var(--gold);flex-shrink:0;margin-top:1px}
+    .rl-title{font-family:var(--ui);font-size:13px;font-weight:700;color:#7a5a10;margin-bottom:4px}
+    .rl-msg{font-family:var(--ui);font-size:12px;color:#9a7a30;line-height:1.55}
+    .rl-countdown{font-family:var(--ui);font-size:11px;font-weight:700;color:var(--gold);margin-top:6px}
+
+    .success-state{display:none;text-align:center;padding:48px 20px}
+    .success-state.show{display:block}
+    .success-icon{width:72px;height:72px;border-radius:50%;background:#e8f8ef;border:2px solid #a8dfc0;display:flex;align-items:center;justify-content:center;margin:0 auto 22px;animation:popIn .4s var(--ease) both}
+    @keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+    .success-state h3{font-family:var(--serif);font-size:1.6rem;font-weight:700;color:var(--ink);margin-bottom:10px}
+    .success-state p{font-family:var(--ui);font-size:13.5px;color:var(--ink-3);line-height:1.65;max-width:320px;margin:0 auto 28px}
+    .success-back{font-family:var(--ui);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:12px 28px;background:var(--navy);color:#c8dced;border:none;border-radius:var(--radius);transition:background .18s}
+    .success-back:hover{background:#0f2540}
+
+    /* SIDEBAR */
+    .contact-sidebar{display:flex;flex-direction:column;gap:24px}
+    .sidebar-card{background:#fff;border:1px solid var(--rule);border-radius:var(--radius);padding:26px 24px;box-shadow:0 1px 8px rgba(0,0,0,.04)}
+    .sidebar-card h4{font-family:var(--serif);font-size:1rem;font-weight:700;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--rule);color:var(--ink)}
+    .sc-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--paper-2);cursor:pointer;transition:background .15s;border-radius:2px}
+    .sc-item:last-child{border-bottom:none}
+    .sc-item:hover{background:var(--paper-2);margin:0 -8px;padding:10px 8px}
+    .sc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+    .sc-title{font-family:var(--ui);font-size:12.5px;font-weight:700;color:var(--ink-2);margin-bottom:2px}
+    .sc-desc{font-family:var(--ui);font-size:11px;color:var(--ink-3);line-height:1.5}
+    .response-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+    .rt-item{background:var(--paper-2);border-radius:2px;padding:12px 10px;text-align:center}
+    .rt-time{font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--ink)}
+    .rt-label{font-family:var(--ui);font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
+    .social-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+    .social-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--ui);font-size:11px;font-weight:600;color:var(--ink-3);background:var(--paper-2);border:1px solid var(--rule);padding:6px 12px;border-radius:20px;text-decoration:none;transition:all .18s}
+    .social-chip:hover{background:var(--navy);color:#b8d0e8;border-color:var(--navy)}
+    .social-chip:focus-visible{outline:2px solid var(--crimson)}
+
+    /* FOOTER */
+    .footer{background:#060e18;margin-top:80px}
+    .footer-accent{height:3px;background:linear-gradient(90deg,#b01428,#c8922a,#b01428)}
+    .footer-inner{max-width:1160px;margin:0 auto;padding:0 24px}
+    .footer-nl{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:32px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .footer-nl-title{font-family:var(--serif);font-size:1.05rem;font-weight:700;color:#e0d8cc;margin-bottom:4px}
+    .footer-nl-sub{font-size:12.5px;color:#4a5866;line-height:1.5}
+    .footer-nl-form{display:flex;gap:8px;flex-wrap:wrap}
+    .footer-nl-input{font-family:var(--ui);font-size:13px;color:#e0d8cc;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius);padding:10px 16px;outline:none;width:220px;max-width:100%;transition:border-color .2s}
+    .footer-nl-input::placeholder{color:#4a5a6a}
+    .footer-nl-input:focus{border-color:var(--gold)}
+    .footer-nl-btn{font-family:var(--ui);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--crimson);color:#fff;border:none;border-radius:var(--radius);padding:10px 20px;cursor:pointer;transition:background .2s}
+    .footer-nl-btn:hover{background:#8f0f1e}
+    .footer-grid{display:grid;grid-template-columns:260px 1fr 1fr 1fr;gap:40px;padding:44px 0 36px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .footer-brand-name{font-family:var(--serif);font-size:1.35rem;font-weight:900;color:#e8e0d4;display:block;margin-bottom:12px}
+    .footer-tagline{font-family:var(--prose);font-size:.82rem;color:#4a5a6a;line-height:1.65;margin-bottom:18px}
+    .footer-social{display:flex;gap:8px;flex-wrap:wrap}
+    .footer-social-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#6a7a8a;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .2s}
+    .footer-social-btn:hover{background:var(--crimson);border-color:var(--crimson);color:#fff}
+    .footer-col h5{font-family:var(--ui);font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#c0ccd8;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .footer-col a{display:block;font-family:var(--ui);font-size:13px;color:#4a5a6a;text-decoration:none;margin-bottom:10px;transition:color .18s}
+    .footer-col a:hover{color:#d8e4f0}
+    .footer-trust{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;padding:24px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .trust-item{display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:#3a4858}
+    .trust-item strong{color:#5a6878}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:22px 0;font-family:var(--ui);font-size:11px;color:#2e3e50}
+    .footer-legal{display:flex;gap:16px;flex-wrap:wrap}
+    .footer-legal a{color:#2e3e50;text-decoration:none;transition:color .15s}
+    .footer-legal a:hover{color:#5a7090}
+
+    /* RESPONSIVE */
+    @media(max-width:1000px){.form-section{grid-template-columns:1fr}.contact-sidebar{display:grid;grid-template-columns:1fr 1fr;gap:18px}.footer-grid{grid-template-columns:1fr 1fr 1fr;gap:28px}.footer-grid>div:last-child{display:none}}
+    @media(max-width:760px){.page-hero{grid-template-columns:1fr;gap:36px}.page-hero-right{order:-1}.contact-sidebar{grid-template-columns:1fr}.field-row{grid-template-columns:1fr}.form-card{padding:28px 22px}.footer-grid{grid-template-columns:1fr 1fr;gap:24px}}
+    @media(max-width:540px){.masthead{padding:0 16px}.page-wrap{padding:0 16px 60px}.mast-center{display:none}.page-hero{padding:36px 0 32px}.page-hero h1{font-size:2rem}.footer-grid{grid-template-columns:1fr;gap:20px}.footer-nl{flex-direction:column;align-items:flex-start}.footer-nl-input{width:100%}.footer-bottom{flex-direction:column;align-items:flex-start;gap:10px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}}
+    @media print{.masthead,.footer{display:none !important}}
+  </style>
+</head>
+<body>
+
+<a href="#contact-form" class="skip-link">Skip to contact form</a>
+
+<header class="masthead" role="banner">
+  <a href="index.html" class="mast-back" aria-label="Back to homepage">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    Back
+  </a>
+  <div class="mast-center">
+    <a href="index.html" aria-label="The Alamin Gazette — Homepage">
+      <img src="images/lol.png" class="mast-logo-img" alt="The Alamin Gazette"
+           onerror="this.style.display='none';document.getElementById('mw').style.display='block';">
+      <span class="mast-logo-txt" id="mw" style="display:none;">The Alamin Gazette</span>
+    </a>
+  </div>
+  <div class="mast-right">
+    <a href="admin.html" class="mast-admin" aria-label="Admin portal">Admin →</a>
+  </div>
+</header>
+
+<main class="page-wrap" id="contact-form" tabindex="-1">
+
+  <!-- HERO -->
+  <div class="page-hero" role="region" aria-label="Contact page header">
+    <div>
+      <div class="page-hero-eyebrow" aria-hidden="true">Get in Touch</div>
+      <h1>Send us a<br><em>message.</em></h1>
+      <p class="page-hero-lead">Whether you have a news tip, press inquiry, correction request, or general feedback — our editorial team reads every message.</p>
+    </div>
+    <div>
+      <div role="list" aria-label="Contact information">
+        <div class="fact-item" role="listitem">
+          <div class="fact-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>
+            <div class="fact-label">Email</div>
+            <div class="fact-value">editorial@alamingazette.com</div>
+            <div class="fact-sub">For story submissions &amp; press releases</div>
+          </div>
+        </div>
+        <div class="fact-item" role="listitem">
+          <div class="fact-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div>
+            <div class="fact-label">Tip Line</div>
+            <div class="fact-value">tips@alamingazette.com</div>
+            <div class="fact-sub">Confidential source protection guaranteed</div>
+          </div>
+        </div>
+        <div class="fact-item" role="listitem">
+          <div class="fact-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="fact-label">Response Time</div>
+            <div class="fact-value">Within 24–48 hours</div>
+            <div class="fact-sub">Mon – Fri, excluding public holidays</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM + SIDEBAR -->
+  <div class="form-section">
+
+    <div class="form-card" role="region" aria-label="Contact form">
+
+      <!-- Rate limit notice -->
+      <div class="rate-limit-banner" id="rateLimitBanner" role="alert" aria-live="assertive">
+        <div class="rl-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div>
+          <div class="rl-title">You've already sent a message today</div>
+          <div class="rl-msg">We allow one submission per day to prevent spam. Please check back tomorrow.</div>
+          <div class="rl-countdown" id="rlCountdown" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="form-card-header" id="formHeader">
+        <h2>Write to us</h2>
+        <p>Fields marked <span style="color:var(--crimson);">*</span> are required. We never share your information.</p>
+      </div>
+
+      <!-- Inquiry tabs -->
+      <div class="inquiry-tabs" role="group" aria-label="Select inquiry type" id="inquiryTabs">
+        <button class="inquiry-tab active" data-type="General Inquiry"    aria-pressed="true">General</button>
+        <button class="inquiry-tab"        data-type="News Tip"           aria-pressed="false">News Tip</button>
+        <button class="inquiry-tab"        data-type="Press / PR"         aria-pressed="false">Press / PR</button>
+        <button class="inquiry-tab"        data-type="Correction Request" aria-pressed="false">Correction</button>
+        <button class="inquiry-tab"        data-type="Partnership"        aria-pressed="false">Partnership</button>
+      </div>
+
+      <!-- Success -->
+      <div class="success-state" id="successState" aria-live="polite" aria-atomic="true">
+        <div class="success-icon" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2e9e60" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Message sent!</h3>
+        <p>Thank you for reaching out. Our editorial team will get back to you within 24–48 hours.</p>
+        <button class="success-back" onclick="window.location.href='index.html'">Return to Homepage</button>
+      </div>
+
+      <!-- Form -->
+      <form id="contactForm" novalidate aria-label="Contact form"
+            action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="d175b8a6-796d-430f-8314-d49195a63000">
+        <input type="checkbox" name="botcheck" style="display:none;" tabindex="-1" aria-hidden="true">
+        <input type="hidden" name="subject" id="hiddenSubject" value="General Inquiry — The Alamin Gazette">
+        <input type="hidden" name="redirect" value="false">
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-name">Full Name <span class="req" aria-label="required">*</span></label>
+            <input type="text" id="f-name" name="name" placeholder="Your full name"
+                   autocomplete="name" required aria-required="true" oninput="vf(this)">
+            <div class="field-err" id="err-name" role="alert">Please enter your full name.</div>
+          </div>
+          <div class="field">
+            <label for="f-email">Email Address <span class="req" aria-label="required">*</span></label>
+            <input type="email" id="f-email" name="email" placeholder="you@example.com"
+                   autocomplete="email" required aria-required="true" oninput="vf(this)">
+            <div class="field-err" id="err-email" role="alert">Please enter a valid email address.</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-org">Organisation / Publication</label>
+          <input type="text" id="f-org" name="organisation"
+                 placeholder="Optional — company, outlet, or institution" autocomplete="organization">
+        </div>
+
+        <div class="field">
+          <label for="f-subject">Subject <span class="req" aria-label="required">*</span></label>
+          <input type="text" id="f-subject" name="subject_detail"
+                 placeholder="Brief description of your message"
+                 required aria-required="true" maxlength="120"
+                 oninput="vf(this);uc('f-subject','sc',120)">
+          <span class="field-counter" id="sc" aria-live="polite">0 / 120</span>
+          <div class="field-err" id="err-subject" role="alert">Please enter a subject.</div>
+        </div>
+
+        <div class="field" style="position:relative;">
+          <label for="f-message">Message <span class="req" aria-label="required">*</span></label>
+          <textarea id="f-message" name="message"
+                    placeholder="Share your message, tip, or inquiry in detail…"
+                    required aria-required="true" maxlength="2000"
+                    oninput="vf(this);uc('f-message','mc',2000)"></textarea>
+          <span class="field-counter" id="mc" style="bottom:14px;" aria-live="polite">0 / 2000</span>
+          <div class="field-err" id="err-message" role="alert">Please write a message (minimum 20 characters).</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn" aria-label="Send message">
+          <svg id="btnIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          <div class="btn-spinner" id="btnSpinner" aria-hidden="true"></div>
+          <span id="btnLabel">Send Message</span>
+        </button>
+
+        <p id="rateLimitNote" aria-live="polite"
+           style="font-family:var(--ui);font-size:11px;color:var(--ink-3);text-align:center;margin-top:14px;line-height:1.6;">
+          One submission per 24 hours per browser.
+        </p>
+      </form>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="contact-sidebar" aria-label="Contact options">
+      <div class="sidebar-card">
+        <h4>Common Inquiries</h4>
+        <div class="sc-item" role="button" tabindex="0" onclick="setInquiry('News Tip')" onkeydown="if(event.key==='Enter')setInquiry('News Tip')" aria-label="News tip">
+          <span class="sc-dot" style="background:#b01428;" aria-hidden="true"></span>
+          <div><div class="sc-title">Submit a News Tip</div><div class="sc-desc">Have info on a story? Our journalists protect all sources.</div></div>
+        </div>
+        <div class="sc-item" role="button" tabindex="0" onclick="setInquiry('Correction Request')" onkeydown="if(event.key==='Enter')setInquiry('Correction Request')" aria-label="Correction request">
+          <span class="sc-dot" style="background:#c8922a;" aria-hidden="true"></span>
+          <div><div class="sc-title">Request a Correction</div><div class="sc-desc">Spotted an error? We publish corrections promptly.</div></div>
+        </div>
+        <div class="sc-item" role="button" tabindex="0" onclick="setInquiry('Press / PR')" onkeydown="if(event.key==='Enter')setInquiry('Press / PR')" aria-label="Press inquiry">
+          <span class="sc-dot" style="background:#0a3d78;" aria-hidden="true"></span>
+          <div><div class="sc-title">Press &amp; Media Relations</div><div class="sc-desc">Interview requests, press releases, and media kit.</div></div>
+        </div>
+        <div class="sc-item" role="button" tabindex="0" onclick="setInquiry('Partnership')" onkeydown="if(event.key==='Enter')setInquiry('Partnership')" aria-label="Partnership">
+          <span class="sc-dot" style="background:#0e3d27;" aria-hidden="true"></span>
+          <div><div class="sc-title">Partnerships &amp; Syndication</div><div class="sc-desc">Licensing, editorial partnerships, co-publishing.</div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h4>Expected Response Times</h4>
+        <div class="response-grid">
+          <div class="rt-item"><div class="rt-time">4 hrs</div><div class="rt-label">Breaking Tips</div></div>
+          <div class="rt-item"><div class="rt-time">24 hrs</div><div class="rt-label">Press</div></div>
+          <div class="rt-item"><div class="rt-time">48 hrs</div><div class="rt-label">General</div></div>
+          <div class="rt-item"><div class="rt-time">7 days</div><div class="rt-label">Corrections</div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h4>Find Us Online</h4>
+        <div class="social-row">
+          <a href="#" class="social-chip" aria-label="X (Twitter)" rel="noopener noreferrer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            @AlaminGazette
+          </a>
+          <a href="#" class="social-chip" aria-label="Facebook" rel="noopener noreferrer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+          </a>
+          <a href="#" class="social-chip" aria-label="Instagram" rel="noopener noreferrer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            Instagram
+          </a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-accent" aria-hidden="true"></div>
+  <div class="footer-inner">
+
+    <div class="footer-nl">
+      <div>
+        <div class="footer-nl-title">Stay informed. Every morning.</div>
+        <div class="footer-nl-sub">The world's most important stories — delivered before 7 AM.</div>
+      </div>
+      <div class="footer-nl-form" role="form" aria-label="Newsletter signup">
+        <input class="footer-nl-input" type="email" id="nlEmail"
+               placeholder="Your email address" aria-label="Email for newsletter" autocomplete="email">
+        <button class="footer-nl-btn" onclick="handleNewsletter(this)" aria-label="Subscribe to newsletter">Subscribe</button>
+      </div>
+    </div>
+
+    <div class="footer-grid">
+      <div>
+        <span class="footer-brand-name">The Alamin Gazette</span>
+        <p class="footer-tagline">Independent world intelligence since 2024. We report the stories that define tomorrow across every continent and every consequence.</p>
+        <div class="footer-social" role="list" aria-label="Social media">
+          <a href="#" class="footer-social-btn" role="listitem" aria-label="X (Twitter)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="#" class="footer-social-btn" role="listitem" aria-label="Facebook">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" class="footer-social-btn" role="listitem" aria-label="Instagram">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="#" class="footer-social-btn" role="listitem" aria-label="RSS">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Coverage</h5>
+        <a href="index.html">World Affairs</a>
+        <a href="index.html">Economy &amp; Markets</a>
+        <a href="index.html">Innovation &amp; Tech</a>
+        <a href="index.html">Defense &amp; Security</a>
+        <a href="index.html">Society &amp; Culture</a>
+      </div>
+      <div class="footer-col">
+        <h5>Regions</h5>
+        <a href="index.html">Asia-Pacific</a>
+        <a href="index.html">Europe &amp; EMEA</a>
+        <a href="index.html">The Americas</a>
+        <a href="index.html">Middle East</a>
+        <a href="index.html">Africa</a>
+      </div>
+      <div class="footer-col">
+        <h5>The Gazette</h5>
+        <a href="#">About Us</a>
+        <a href="#">Our Journalists</a>
+        <a href="#">Editorial Standards</a>
+        <a href="contact.html" aria-current="page">Contact Us</a>
+        <a href="admin.html">Admin Portal</a>
+      </div>
+    </div>
+
+    <div class="footer-trust" role="list">
+      <div class="trust-item" role="listitem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a5a6a" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <strong>Editorial Independence</strong>&nbsp;— No advertiser influence
+      </div>
+      <div class="trust-item" role="listitem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a5a6a" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <strong>24/7 Coverage</strong>&nbsp;— Updated around the clock
+      </div>
+      <div class="trust-item" role="listitem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a5a6a" stroke-width="2" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <strong>Fact-Checked</strong>&nbsp;— Every story verified
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© <span id="footerYear"></span> The Alamin Gazette. All rights reserved.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Cookie Settings</a>
+        <a href="#">Sitemap</a>
+      </div>
+      <span style="font-family:var(--ui);font-size:11px;color:#2a3848;">Powered by Supabase &amp; Web3Forms</span>
+    </div>
+
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   THEME ENGINE
+============================================================ */
+(function(){
+  const KEY='gazette_theme';
+  function osPref(){return window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+  function apply(pref,skip){
+    const html=document.documentElement;
+    const resolved=pref==='system'?osPref():pref;
+    if(!skip){html.classList.add('theme-transitioning');setTimeout(()=>html.classList.remove('theme-transitioning'),350);}
+    html.classList.toggle('theme-dark',resolved==='dark');
+  }
+  let p='system';try{p=localStorage.getItem(KEY)||'system';}catch{}
+  apply(p,true);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{
+    let s='system';try{s=localStorage.getItem(KEY)||'system';}catch{}
+    if(s==='system')apply('system',false);
+  });
+})();
+
+/* ============================================================
+   RATE LIMIT — 1 submission per calendar day
+============================================================ */
+const RL_KEY='gazette_contact_last_submit';
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function hasSubmittedToday(){try{return localStorage.getItem(RL_KEY)===todayStr();}catch{return false;}}
+function markSubmitted(){try{localStorage.setItem(RL_KEY,todayStr());}catch{}}
+function timeUntilMidnight(){
+  const now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);
+  const d=mid-now,h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);
+  return h+'h '+m+'m '+s+'s';
+}
+function showRateLimit(){
+  document.getElementById('rateLimitBanner').classList.add('show');
+  document.getElementById('formHeader').style.cssText='opacity:.4;pointer-events:none';
+  document.getElementById('inquiryTabs').style.cssText='opacity:.4;pointer-events:none';
+  document.getElementById('contactForm').querySelectorAll('input,textarea,button,select').forEach(el=>el.disabled=true);
+  document.getElementById('rateLimitNote').textContent='';
+  function tick(){document.getElementById('rlCountdown').textContent='Resets in: '+timeUntilMidnight();}
+  tick();setInterval(tick,1000);
+}
+
+/* ============================================================
+   INQUIRY TABS
+============================================================ */
+document.querySelectorAll('.inquiry-tab').forEach(btn=>btn.addEventListener('click',()=>setInquiry(btn.dataset.type)));
+function setInquiry(type){
+  document.querySelectorAll('.inquiry-tab').forEach(btn=>{
+    const on=btn.dataset.type===type;
+    btn.classList.toggle('active',on);btn.setAttribute('aria-pressed',on.toString());
+  });
+  document.getElementById('hiddenSubject').value=type+' — The Alamin Gazette';
+  const sf=document.getElementById('f-subject');
+  if(!sf.value.trim())sf.placeholder='Re: '+type;
+  if(window.innerWidth<760)document.getElementById('contactForm').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ============================================================
+   VALIDATION
+============================================================ */
+function vf(el){
+  const id=el.id,errEl=document.getElementById('err-'+id.replace('f-',''));
+  let ok=true;
+  if(id==='f-name')   ok=el.value.trim().length>=2;
+  if(id==='f-email')  ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+  if(id==='f-subject')ok=el.value.trim().length>=3;
+  if(id==='f-message')ok=el.value.trim().length>=20;
+  el.classList.toggle('error',!ok);
+  el.classList.toggle('valid',ok&&el.value.trim()!=='');
+  if(errEl)errEl.classList.toggle('show',!ok&&el.value.trim()!=='');
+  return ok;
+}
+function validateAll(){return['f-name','f-email','f-subject','f-message'].map(id=>vf(document.getElementById(id))).every(Boolean);}
+function uc(fid,cid,max){
+  const len=document.getElementById(fid).value.length,el=document.getElementById(cid);
+  el.textContent=len+' / '+max;
+  el.className='field-counter'+(len>max*.85?' warn':'')+(len>=max?' over':'');
+}
+
+/* ============================================================
+   SUBMIT STATE
+============================================================ */
+function setSubmitting(on){
+  const btn=document.getElementById('submitBtn');
+  document.getElementById('btnLabel').textContent=on?'Sending…':'Send Message';
+  document.getElementById('btnIcon').style.display=on?'none':'';
+  document.getElementById('btnSpinner').style.display=on?'block':'none';
+  btn.disabled=on;
+}
+function showSuccess(){
+  ['contactForm','inquiryTabs','formHeader','rateLimitBanner'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  document.getElementById('successState').classList.add('show');
+}
+
+/* ============================================================
+   SUBMIT
+============================================================ */
+document.getElementById('contactForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  if(hasSubmittedToday()){showRateLimit();return;}
+  if(!validateAll()){const f=this.querySelector('.error');if(f)f.focus();return;}
+  setSubmitting(true);
+  const fd=new FormData(this);
+  const sub=document.getElementById('hiddenSubject').value;
+  const det=document.getElementById('f-subject').value.trim();
+  fd.set('subject',sub+(det?' — '+det:''));
+  try{
+    const res=await fetch('https://api.web3forms.com/submit',{method:'POST',body:fd});
+    const json=await res.json();
+    if(json.success){markSubmitted();showSuccess();}
+    else throw new Error(json.message||'Submission failed');
+  }catch(err){
+    setSubmitting(false);
+    const note=document.getElementById('rateLimitNote');
+    note.style.color='#b01428';
+    note.textContent='Error: '+err.message+'. Please try again or email us directly.';
+  }
+});
+
+/* ============================================================
+   NEWSLETTER
+============================================================ */
+function handleNewsletter(btn){
+  const input=document.getElementById('nlEmail');
+  if(!input.value.trim()||!input.value.includes('@')){
+    input.focus();input.style.borderColor='rgba(176,20,40,.7)';
+    setTimeout(()=>input.style.borderColor='',1400);return;
+  }
+  btn.textContent='✓ Subscribed!';btn.style.background='#0e3d27';btn.disabled=true;input.value='';
+}
+
+/* INIT */
+document.getElementById('footerYear').textContent=new Date().getFullYear();
+if(hasSubmittedToday())showRateLimit();
+</script>
+
+</body>
+</html>
