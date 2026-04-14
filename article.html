@@ -46,6 +46,27 @@
       --transition: 0.2s ease;
       --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
       --shadow-md: 0 4px 16px rgba(0,0,0,.1);
+      color-scheme: light;
+    }
+
+    html.theme-dark {
+      --ink:     #e8e2d8;
+      --ink-2:   #bdb5a8;
+      --ink-3:   #7a7268;
+      --paper:   #141210;
+      --paper-2: #1e1b17;
+      --rule:    #2e2a24;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.3);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.4);
+      color-scheme: dark;
+    }
+
+    html.theme-transitioning *:not(img):not(.article-hero-img):not(.related-card img) {
+      transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease !important;
     }
 
     /* ============================================================
@@ -389,19 +410,15 @@
       .mast-center { display: none; }
     }
 
-    /* DARK MODE */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --ink:     #f0ece4;
-        --ink-2:   #c8c0b4;
-        --ink-3:   #8a8278;
-        --paper:   #141210;
-        --paper-2: #1e1b17;
-        --rule:    #2e2a24;
-      }
-      .masthead { background: var(--paper); }
-      .article-body { color: #e4ddd4; }
-    }
+    /* ============================================================
+       DARK THEME — element-level overrides for article page
+    ============================================================ */
+    html.theme-dark .masthead        { background: var(--paper); border-color: var(--rule); }
+    html.theme-dark .article-body   { color: var(--ink); }
+    html.theme-dark .related-card:hover { background: var(--paper-2); }
+    html.theme-dark .sp             { color: var(--ink-2); border-color: var(--rule); }
+    html.theme-dark .sp:hover       { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    html.theme-dark .go-home        { color: #c8d4e8; }
 
     /* REDUCED MOTION */
     @media (prefers-reduced-motion: reduce) {
@@ -566,6 +583,32 @@
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
+// ============================================================
+// THEME ENGINE — shared key with index.html (gazette_theme)
+// ============================================================
+(function() {
+  const THEME_KEY = 'gazette_theme';
+  function getOsPref() { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+  function applyTheme(pref, skipTransition) {
+    const html = document.documentElement;
+    const resolved = pref === 'system' ? getOsPref() : pref;
+    if (!skipTransition) {
+      html.classList.add('theme-transitioning');
+      setTimeout(() => html.classList.remove('theme-transitioning'), 350);
+    }
+    html.classList.toggle('theme-dark', resolved === 'dark');
+  }
+  let pref = 'system';
+  try { pref = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+  applyTheme(pref, true);
+  // OS change listener
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    let stored = 'system';
+    try { stored = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+    if (stored === 'system') applyTheme('system', false);
+  });
+})();
+
 const SUPA_URL = 'https://szzqaqwpvxwrefkojplh.supabase.co';
 const SUPA_KEY = 'sb_publishable_xthiJ5eahaJU5w7kGDaY_A_vIwODkTa';
 
