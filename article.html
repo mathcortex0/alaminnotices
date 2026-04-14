@@ -307,44 +307,47 @@
     /* ============================================================
        FOOTER
     ============================================================ */
-    .site-footer { background:var(--navy); color:#8898a8; padding:56px 24px 30px; }
+    .site-footer { background:#060e18; color:#8898a8; padding:0 24px 30px; }
     .footer-inner { max-width:1300px; margin:0 auto; }
-    .footer-grid { display:grid; grid-template-columns:260px 1fr 1fr 1fr; gap:48px; padding-bottom:44px; border-bottom:1px solid rgba(255,255,255,.07); }
-    .footer-brand-name { font-family:var(--serif); font-size:1.4rem; font-weight:900; color:#e8e0d4; display:block; text-decoration:none; margin-bottom:14px; }
+    .footer-grid { display:grid; grid-template-columns:260px 1fr 1fr 1fr; gap:40px; padding:44px 0 36px; border-bottom:1px solid rgba(255,255,255,.06); }
+    .footer-brand-name { font-family:var(--serif); font-size:1.4rem; font-weight:900; color:#e8e0d4; display:block; margin-bottom:12px; }
     .footer-tagline { font-family:var(--prose); font-size:.82rem; color:#4a5a6a; line-height:1.65; }
-    .footer-col h5 { font-family:var(--ui); font-size:9.5px; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:#c0ccd8; margin-bottom:18px; }
+    .footer-col h5 { font-family:var(--ui); font-size:9px; font-weight:800; letter-spacing:2.5px; text-transform:uppercase; color:#c0ccd8; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.07); }
     .footer-col a { display:block; font-family:var(--ui); font-size:13px; color:#4a5a6a; text-decoration:none; margin-bottom:10px; transition:color var(--transition); }
     .footer-col a:hover { color:#d8e4f0; }
     .footer-col a:focus-visible { outline: 1px solid var(--gold); border-radius:2px; }
-    .footer-bottom { display:flex; justify-content:space-between; align-items:center; padding-top:26px; font-family:var(--ui); font-size:11px; color:#3a4858; flex-wrap:wrap; gap:8px; }
+    .footer-bottom { display:flex; justify-content:space-between; align-items:center; padding-top:22px; font-family:var(--ui); font-size:11px; color:#3a4858; flex-wrap:wrap; gap:10px; }
 
     /* ============================================================
-       BACK TO TOP
+       BACK TO TOP — explicit colours
     ============================================================ */
     .back-to-top {
       position: fixed; bottom: 28px; right: 28px;
-      background: var(--navy); color: var(--paper);
-      width: 44px; height: 44px; border-radius: 50%;
+      background: #0b1927;
+      color: #f0e8dc;
+      width: 46px; height: 46px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      border: none; box-shadow: var(--shadow-md);
+      border: 2px solid rgba(255,255,255,.15);
+      box-shadow: 0 4px 16px rgba(0,0,0,.35);
       opacity: 0; transform: scale(0.8);
       transition: all 0.25s ease;
       z-index: 900; pointer-events: none;
     }
     .back-to-top.visible { opacity: 1; transform: scale(1); pointer-events: auto; }
-    .back-to-top:hover { background: var(--crimson); transform: scale(1.07); }
+    .back-to-top:hover { background: var(--crimson); border-color: transparent; transform: scale(1.08); color: #fff; }
     .back-to-top:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
     /* ============================================================
-       TOAST
+       TOAST — always dark bg / light text
     ============================================================ */
     .toast {
       position: fixed; bottom: 28px; left: 50%;
       transform: translateX(-50%) translateY(64px);
-      background: var(--ink); color: #f4efe8;
-      font-family: var(--ui); font-size: 13px;
+      background: #111108;
+      color: #f0e8dc;
+      font-family: var(--ui); font-size: 13px; font-weight: 500;
       padding: 12px 22px; border-radius: var(--radius);
-      box-shadow: 0 8px 24px rgba(0,0,0,.28);
+      box-shadow: 0 6px 24px rgba(0,0,0,.45);
       z-index: 999; opacity: 0;
       transition: all .28s; pointer-events: none;
       white-space: nowrap;
@@ -468,41 +471,97 @@
 
 <!-- FOOTER -->
 <footer class="site-footer" role="contentinfo">
+  <div style="height:3px;background:linear-gradient(90deg,#b01428,#c8922a,#b01428);" aria-hidden="true"></div>
   <div class="footer-inner">
-    <div class="footer-grid">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;padding:32px 0;border-bottom:1px solid rgba(255,255,255,.06);">
       <div>
+        <div style="font-family:var(--serif);font-size:1.05rem;font-weight:700;color:#e0d8cc;margin-bottom:4px;">Stay informed. Every morning.</div>
+        <div style="font-size:12.5px;color:#4a5866;line-height:1.5;">The world&#39;s most important stories — delivered before 7 AM.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="email" placeholder="Your email address"
+               style="font-family:var(--ui);font-size:13px;color:#e0d8cc;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:3px;padding:10px 16px;outline:none;width:220px;max-width:100%;"
+               aria-label="Email for newsletter" autocomplete="email">
+        <button style="font-family:var(--ui);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:#b01428;color:#fff;border:none;border-radius:3px;padding:10px 20px;cursor:pointer;"
+                aria-label="Subscribe to newsletter">Subscribe</button>
+      </div>
+    </div>
+
+    <div class="footer-grid">
+      <div class="footer-brand">
         <span class="footer-brand-name">The Alamin Gazette</span>
-        <p class="footer-tagline">Independent world intelligence. Reporting the stories that define tomorrow — across every continent, every category, every consequence.</p>
+        <p class="footer-tagline">Independent world intelligence since 2024. We report the stories that define tomorrow — across every continent, every category, every consequence.</p>
+        <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
+          <a href="#" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#6a7a8a;display:flex;align-items:center;justify-content:center;text-decoration:none;" aria-label="X (Twitter)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="#" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#6a7a8a;display:flex;align-items:center;justify-content:center;text-decoration:none;" aria-label="Facebook">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#6a7a8a;display:flex;align-items:center;justify-content:center;text-decoration:none;" aria-label="Instagram">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="#" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#6a7a8a;display:flex;align-items:center;justify-content:center;text-decoration:none;" aria-label="RSS">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Coverage</h5>
+        <a href="index.html">World Affairs</a>
+        <a href="index.html">Economy &amp; Markets</a>
+        <a href="index.html">Innovation &amp; Tech</a>
+        <a href="index.html">Defense &amp; Security</a>
+        <a href="index.html">Society &amp; Culture</a>
       </div>
       <div class="footer-col">
         <h5>Regions</h5>
         <a href="index.html">Asia-Pacific</a>
-        <a href="index.html">EMEA</a>
-        <a href="index.html">Americas</a>
+        <a href="index.html">Europe &amp; EMEA</a>
+        <a href="index.html">The Americas</a>
         <a href="index.html">Middle East</a>
-      </div>
-      <div class="footer-col">
-        <h5>Sections</h5>
-        <a href="index.html">World Affairs</a>
-        <a href="index.html">Economy &amp; Markets</a>
-        <a href="index.html">Innovation</a>
-        <a href="index.html">Defense &amp; Security</a>
-        <a href="index.html">Society</a>
+        <a href="index.html">Africa</a>
       </div>
       <div class="footer-col">
         <h5>The Gazette</h5>
         <a href="#">About Us</a>
+        <a href="#">Our Journalists</a>
         <a href="#">Editorial Standards</a>
-        <a href="#">Contact</a>
+        <a href="#">Corrections Policy</a>
         <a href="admin.html">Admin Portal</a>
       </div>
     </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:28px;justify-content:center;padding:24px 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:#3a4858;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a5a6a" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <strong style="color:#5a6878;">Editorial Independence</strong>&nbsp;— No advertiser influence
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:#3a4858;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a5a6a" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <strong style="color:#5a6878;">24/7 Coverage</strong>&nbsp;— Updated around the clock
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-family:var(--ui);font-size:11px;color:#3a4858;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a5a6a" stroke-width="2" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <strong style="color:#5a6878;">Fact-Checked</strong>&nbsp;— Every story verified
+      </div>
+    </div>
+
     <div class="footer-bottom">
       <span>© <span id="footerYear"></span> The Alamin Gazette. All rights reserved.</span>
-      <span>Powered by Supabase · Built by Alamin</span>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <a href="#" style="color:#2e3e50;font-family:var(--ui);font-size:11px;text-decoration:none;">Privacy Policy</a>
+        <a href="#" style="color:#2e3e50;font-family:var(--ui);font-size:11px;text-decoration:none;">Terms of Use</a>
+        <a href="#" style="color:#2e3e50;font-family:var(--ui);font-size:11px;text-decoration:none;">Cookie Settings</a>
+        <a href="#" style="color:#2e3e50;font-family:var(--ui);font-size:11px;text-decoration:none;">Sitemap</a>
+      </div>
+      <span style="font-family:var(--ui);font-size:11px;color:#2a3848;">Powered by Supabase · Built by Alamin</span>
     </div>
+
   </div>
 </footer>
+
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
