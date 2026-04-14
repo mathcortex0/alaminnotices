@@ -40,7 +40,13 @@
     /* ============================================================
        DESIGN TOKENS
     ============================================================ */
+    /* ============================================================
+       DESIGN TOKENS — light (default) & dark themes
+       Theme class .theme-dark on <html> activates dark mode.
+       Transitions make the switch buttery smooth.
+    ============================================================ */
     :root {
+      /* Light palette */
       --ink:       #0f0f0f;
       --ink-2:     #3a3a3a;
       --ink-3:     #6e6e6e;
@@ -62,6 +68,30 @@
       --shadow-md: 0 4px 16px rgba(0,0,0,.1);
       --shadow-lg: 0 8px 32px rgba(0,0,0,.14);
       --radius:    3px;
+      color-scheme: light;
+    }
+
+    /* Dark theme overrides — activated via .theme-dark on <html> */
+    html.theme-dark {
+      --ink:     #e8e2d8;
+      --ink-2:   #bdb5a8;
+      --ink-3:   #7a7268;
+      --paper:   #141210;
+      --paper-2: #1e1b17;
+      --rule:    #2e2a24;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,.3);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.4);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.5);
+      color-scheme: dark;
+    }
+
+    /* Smooth theme transition on everything except images */
+    html.theme-transitioning *:not(img):not(.hero-main-img):not(.hero-side-img):not(.feed-img) {
+      transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease !important;
     }
 
     /* ============================================================
@@ -409,6 +439,40 @@
       color: var(--ink-3); transition: color var(--transition-fast);
     }
     .drawer-admin:hover { color: var(--crimson); }
+
+    /* ── THEME SWITCHER in drawer ── */
+    .theme-switcher {
+      padding: 0 0 14px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 4px;
+    }
+    .theme-switcher-label {
+      font-family: var(--ui); font-size: 9px; font-weight: 800;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-3); display: block; margin-bottom: 10px;
+    }
+    .theme-opts {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .theme-opt {
+      font-family: var(--ui); font-size: 11px; font-weight: 600;
+      color: var(--ink-3); background: var(--paper-2);
+      border: 1.5px solid var(--rule);
+      border-radius: var(--radius); padding: 8px 4px;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      transition: all 0.18s; cursor: pointer;
+    }
+    .theme-opt:hover { border-color: var(--ink-2); color: var(--ink-2); }
+    .theme-opt.active {
+      background: var(--navy); color: #b8d0e8;
+      border-color: var(--navy);
+    }
+    html.theme-dark .theme-opt.active {
+      background: var(--ink); color: var(--paper);
+      border-color: var(--ink);
+    }
+    .theme-opt:focus-visible { outline: 2px solid var(--crimson); outline-offset: 2px; }
 
     /* ============================================================
        READING LIST BUTTON (new feature)
@@ -956,23 +1020,31 @@
     }
 
     /* ============================================================
-       DARK MODE
+       DARK THEME — element-level overrides beyond CSS variables
     ============================================================ */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --ink:     #f0ece4;
-        --ink-2:   #c8c0b4;
-        --ink-3:   #8a8278;
-        --paper:   #141210;
-        --paper-2: #1e1b17;
-        --rule:    #2e2a24;
-      }
-      .site-header, .nav-row { background: var(--paper); }
-      .search-input { background: var(--paper-2); color: var(--ink); }
-      .drawer { background: var(--paper); }
-      .rl-panel { background: var(--paper); }
-      .hero-overlay { background: linear-gradient(to top, rgba(3,4,7,.97) 0%, rgba(3,4,7,.5) 55%, transparent 100%); }
+    html.theme-dark .site-header       { background: var(--paper); border-color: var(--rule); }
+    html.theme-dark .nav-row           { background: var(--paper); border-color: var(--rule); }
+    html.theme-dark .drawer            { background: var(--paper); }
+    html.theme-dark .rl-panel          { background: var(--paper); }
+    html.theme-dark .search-input      { background: var(--paper-2); color: var(--ink); }
+    html.theme-dark .search-panel      { background: var(--paper); }
+    html.theme-dark .feed-item         { background: var(--paper); }
+    html.theme-dark .feed-item:hover   { background: var(--paper-2); }
+    html.theme-dark .hero-side:hover   { background: var(--paper-2); }
+    html.theme-dark .load-btn          { color: var(--ink); border-color: var(--ink); }
+    html.theme-dark .load-btn:hover    { background: var(--ink); color: var(--paper); }
+    html.theme-dark .rl-item:hover     { background: var(--paper-2); }
+    html.theme-dark .hero-overlay {
+      background: linear-gradient(to top, rgba(3,4,7,.97) 0%, rgba(3,4,7,.55) 55%, transparent 100%);
     }
+    /* Skeleton in dark */
+    html.theme-dark .skeleton {
+      background: linear-gradient(90deg, var(--rule) 25%, var(--paper-2) 37%, var(--rule) 63%);
+      background-size: 800px 100%;
+    }
+    /* Footer newsletter input */
+    html.theme-dark .fnl-input { color: #e0d8cc; }
+    html.theme-dark .fnl-input::placeholder { color: #4a5a6a; }
 
     /* ============================================================
        PRINT
@@ -1106,6 +1178,34 @@
     <button class="drawer-item" data-cat="Society">Society</button>
   </div>
   <div class="drawer-footer">
+    <!-- THEME SWITCHER -->
+    <div class="theme-switcher" role="group" aria-label="Choose colour theme">
+      <span class="theme-switcher-label">Appearance</span>
+      <div class="theme-opts">
+        <button class="theme-opt" id="themeLight" data-theme="light" aria-pressed="false" aria-label="Light theme">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          Light
+        </button>
+        <button class="theme-opt" id="themeDark" data-theme="dark" aria-pressed="false" aria-label="Dark theme">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          Dark
+        </button>
+        <button class="theme-opt" id="themeSystem" data-theme="system" aria-pressed="false" aria-label="Use system default theme">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          System
+        </button>
+      </div>
+    </div>
     <a href="admin.html" class="drawer-admin">Admin Portal →</a>
   </div>
 </nav>
@@ -1309,6 +1409,73 @@
 <div class="toast" id="toastMsg" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
+// ============================================================
+// THEME ENGINE
+// Preference stored in localStorage: gazette_theme
+// Values: "light" | "dark" | "system" (default)
+// On load: read pref → if system, match OS → apply class to <html>
+// Drawer buttons update pref + class in real time.
+// ============================================================
+const THEME_KEY = 'gazette_theme';
+
+function getOsPrefers() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(pref, skipTransition) {
+  const html = document.documentElement;
+  const resolved = pref === 'system' ? getOsPrefers() : pref;
+
+  if (!skipTransition) {
+    html.classList.add('theme-transitioning');
+    setTimeout(() => html.classList.remove('theme-transitioning'), 350);
+  }
+
+  html.classList.toggle('theme-dark', resolved === 'dark');
+
+  // Update aria-pressed on buttons
+  ['light','dark','system'].forEach(t => {
+    const btn = document.getElementById('theme' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn) {
+      btn.classList.toggle('active', t === pref);
+      btn.setAttribute('aria-pressed', (t === pref).toString());
+    }
+  });
+}
+
+function setTheme(pref) {
+  try { localStorage.setItem(THEME_KEY, pref); } catch {}
+  applyTheme(pref, false);
+}
+
+function initTheme() {
+  let pref = 'system';
+  try { pref = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+  applyTheme(pref, true);
+
+  // Listen for OS changes when in "system" mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    let stored = 'system';
+    try { stored = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+    if (stored === 'system') applyTheme('system', false);
+  });
+}
+
+// Run immediately (before paint to avoid flash)
+initTheme();
+
+// Wire up drawer buttons once DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('themeLight') ?.addEventListener('click', () => setTheme('light'));
+  document.getElementById('themeDark')  ?.addEventListener('click', () => setTheme('dark'));
+  document.getElementById('themeSystem')?.addEventListener('click', () => setTheme('system'));
+
+  // Re-sync button active states after DOM is ready
+  let pref = 'system';
+  try { pref = localStorage.getItem(THEME_KEY) || 'system'; } catch {}
+  applyTheme(pref, true);
+});
+
 // ============================================================
 // SUPABASE
 // ============================================================
